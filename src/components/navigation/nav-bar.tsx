@@ -10,46 +10,52 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
-import {
-  Ambulance,
-  LayoutDashboard,
-  Home,
-  LogIn,
-  UserPlus,
-  Menu,
-} from "lucide-react";
+import { Ambulance, Menu } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function NavigationBar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
+  const navLinks = [
+    { href: "/driver", label: "Driver" },
+    { href: "/ambulance", label: "Ambulance" },
+    { href: "/admin", label: "Admin" },
+    { href: "/dashboard", label: "Dashboard" },
+    { href: "/profile", label: "Profile" },
+  ];
+
+  const isActiveLink = (href: string) => {
+    if (href === "/") {
+      return pathname === href;
+    }
+    return pathname?.startsWith(href);
+  };
+
   const NavLink = ({
     href,
-    icon: Icon,
     children,
   }: {
     href: string;
-    icon: React.ElementType;
     children: React.ReactNode;
   }) => (
     <Link
       href={href}
-      className={`flex items-center gap-2 p-2 rounded-md hover:bg-accent ${
-        pathname === href ? "text-primary" : ""
+      className={`flex items-center gap-2 p-2 rounded-md hover:text-gray-800 ${
+        pathname === href ? "text-red-500" : ""
       }`}
       onClick={() => setIsOpen(false)}
     >
-      <Icon className="h-4 w-4" aria-hidden="true" />
       {children}
     </Link>
   );
 
   return (
     <nav
-      className="border-b bg-white/80 backdrop-blur-md sticky top-0 z-50"
+      className="bg-transparent backdrop-blur-md p-3 sticky top-0 z-50 font-sans"
       aria-label="Main navigation"
     >
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto">
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
@@ -62,27 +68,42 @@ export function NavigationBar() {
 
           {/* Desktop Navigation */}
           <div
-            className="hidden md:flex items-center gap-4"
+            className="hidden md:flex items-center gap-4 font-work-sans text-sm"
             role="navigation"
             aria-label="Desktop menu"
           >
-            <NavLink href="/" icon={Home}>
-              Home
-            </NavLink>
-            <NavLink href="/driver" icon={Ambulance}>
-              Driver
-            </NavLink>
-            <NavLink href="/admin" icon={LayoutDashboard}>
-              Admin
-            </NavLink>
-            <NavLink href="/signin" icon={LogIn}>
-              Sign In
-            </NavLink>
-            <Button asChild variant="outline">
-              <NavLink href="/signup" icon={UserPlus}>
-                Sign Up
-              </NavLink>
-            </Button>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "hover:text-red-600 relative py-1",
+                  "after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:scale-x-0 after:bg-red-600 after:transition-transform after:duration-300",
+                  isActiveLink(link.href) && "text-gray-900 after:scale-x-100"
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/signin"
+              className={cn(
+                "text-gray-700 hover:text-red-600 relative py-1",
+                "after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:scale-x-0 after:bg-red-600 after:transition-transform after:duration-300",
+                isActiveLink("/signin") && "text-gray-900 after:scale-x-100"
+              )}
+            >
+              Signin
+            </Link>
+            <Link
+              href="/signup"
+              className={cn(
+                "bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full transition-colors",
+                isActiveLink("/signup") && "bg-black"
+              )}
+            >
+              Signup →
+            </Link>
           </div>
 
           {/* Mobile Navigation */}
@@ -107,26 +128,19 @@ export function NavigationBar() {
                   </Link>
                 </div>
                 <nav className="flex flex-col gap-2" aria-label="Mobile menu">
-                  <NavLink href="/" icon={Home}>
-                    Home
-                  </NavLink>
-                  <NavLink href="/driver" icon={Ambulance}>
-                    Driver
-                  </NavLink>
-                  <NavLink href="/admin" icon={LayoutDashboard}>
-                    Admin
-                  </NavLink>
-                  <NavLink href="/signin" icon={LogIn}>
-                    Sign In
-                  </NavLink>
+                  {navLinks.map((link) => (
+                    <NavLink key={link.href} href={link.href}>
+                      {link.label}
+                    </NavLink>
+                  ))}
+
+                  <NavLink href="/signin">Sign In</NavLink>
                   <Button
                     asChild
                     variant="outline"
                     className="w-full justify-start"
                   >
-                    <NavLink href="/signup" icon={UserPlus}>
-                      Sign Up
-                    </NavLink>
+                    <NavLink href="/signup">Sign Up</NavLink>
                   </Button>
                 </nav>
               </div>

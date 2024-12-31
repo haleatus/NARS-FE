@@ -4,7 +4,7 @@ import { Ambulance, Phone, Clock } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-accent">
+    <div className="min-h-screen">
       <div className="container mx-auto p-4 space-y-8">
         <section className="text-center space-y-6 py-12">
           <div className="inline-block animate-bounce mb-4">

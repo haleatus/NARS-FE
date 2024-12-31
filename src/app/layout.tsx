@@ -36,10 +36,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-gradient-to-br from-white to-[#FEE9E9] max-w-8xl mx-auto px-4 md:px-8 ${inter.variable} ${lora.variable} ${work_sans.variable}`}
+        className={`bg-gradient-to-br from-white to-[#FEE9E9] ${inter.variable} ${lora.variable} ${work_sans.variable}`}
       >
         <NavigationBar />
-        {children}
+        <div className="max-w-8xl mx-auto px-4">{children}</div>
         <Toaster />
       </body>
     </html>

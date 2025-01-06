@@ -10,7 +10,7 @@ import {
   SheetTrigger,
   SheetTitle,
 } from "@/components/ui/sheet";
-import { Ambulance, Menu } from "lucide-react";
+import { LucideGitCompareArrows, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function NavigationBar() {
@@ -52,7 +52,7 @@ export function NavigationBar() {
 
   return (
     <nav
-      className="bg-transparent backdrop-blur-md max-w-8xl mx-auto px-4 md:px-8 sticky top-0 z-50 font-sans"
+      className="bg-transparent backdrop-blur-md max-w-8xl mx-auto px-4 md:px-8 sticky top-0 z-50 font-sans font-medium"
       aria-label="Main navigation"
     >
       <div className="container mx-auto">
@@ -62,7 +62,7 @@ export function NavigationBar() {
             className="flex items-center gap-2 font-bold text-xl text-primary"
             aria-label="NARS Home"
           >
-            <Ambulance className="h-6 w-6" aria-hidden="true" />
+            <LucideGitCompareArrows className="h-6 w-6" aria-hidden="true" />
             NARS
           </Link>
 
@@ -123,7 +123,10 @@ export function NavigationBar() {
                     onClick={() => setIsOpen(false)}
                     aria-label="NARS Home"
                   >
-                    <Ambulance className="h-6 w-6" aria-hidden="true" />
+                    <LucideGitCompareArrows
+                      className="h-6 w-6"
+                      aria-hidden="true"
+                    />
                     NARS
                   </Link>
                 </div>

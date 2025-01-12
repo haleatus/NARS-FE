@@ -1,12 +1,14 @@
 "use client";
 
 import { EmergencyButton } from "@/components/emergency/emergency-button";
-import { LocateFixedIcon, PhoneIcon, MapPinIcon } from "lucide-react";
+import { motion } from "framer-motion";
+import { MapPin, MapPinIcon, Phone, Timer } from "lucide-react";
 import Image from "next/image";
+import { useState } from "react";
 
 const ambulanceData = [
   {
-    id: 1,
+    id: "1",
     image:
       "https://images.pexels.com/photos/17809395/pexels-photo-17809395/free-photo-of-an-ambulance-of-the-chicago-fire-department-on-the-street.jpeg?auto=compress&cs=tinysrgb&w=800",
     phone: "+1 234 567 890",
@@ -14,25 +16,25 @@ const ambulanceData = [
     distance: "2.5 km",
   },
   {
-    id: 2,
+    id: "2",
     image:
-      "https://images.pexels.com/photos/6765299/pexels-photo-6765299.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/3584101/pexels-photo-3584101.jpeg?auto=compress&cs=tinysrgb&w=600",
     phone: "+1 987 654 321",
     plate: "CD-5678",
     distance: "4.0 km",
   },
   {
-    id: 3,
+    id: "3",
     image:
-      "https://images.pexels.com/photos/12312312/pexels-photo-12312312.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/6519838/pexels-photo-6519838.jpeg?auto=compress&cs=tinysrgb&w=600",
     phone: "+1 345 678 901",
     plate: "EF-9012",
     distance: "6.2 km",
   },
   {
-    id: 4,
+    id: "4",
     image:
-      "https://images.pexels.com/photos/6785439/pexels-photo-6785439.jpeg?auto=compress&cs=tinysrgb&w=800",
+      "https://images.pexels.com/photos/6519847/pexels-photo-6519847.jpeg?auto=compress&cs=tinysrgb&w=600",
     phone: "+1 456 789 012",
     plate: "GH-3456",
     distance: "8.7 km",
@@ -40,76 +42,100 @@ const ambulanceData = [
 ];
 
 export default function Home() {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
   return (
-    <div className="container mx-auto p-4 space-y-8">
-      {/* Location Header */}
-      <div className="flex justify-end items-center">
-        <div className="bg-red-600 text-white flex gap-2 cursor-pointer items-center font-lora w-fit pl-2 pr-3 py-1.5 rounded-full text-sm">
-          <LocateFixedIcon className="h-4 w-4" />
-          Your Location
+    <div className="container mx-auto p-4 space-y-8 font-sans">
+      <div className="flex items-center justify-end">
+        <div className="bg-red-600 backdrop-blur-sm flex items-center gap-2 px-2 py-1 rounded-full shadow-sm text-white">
+          <MapPinIcon className="h-4 w-4 text-white" />
+          <span>Your Location</span>
         </div>
       </div>
+      {/* Main Content */}
+      <main className="container mx-auto px-4 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-semibold mb-2">Welcome Satkar</h1>
+            <p className="text-gray-600">
+              Find the closest ambulance available.
+            </p>
+          </div>
 
-      {/* Main Section */}
-      <div className="flex justify-between items-center w-full gap-4">
-        <div className="space-y-4 w-1/2">
-          {/* Informative Content */}
-          <p className="text-lg font-medium text-gray-700">
-            Our app provides real-time access to nearby ambulances for
-            emergencies. Quickly find and connect with the closest emergency
-            services to ensure timely help when you need it the most.
-          </p>
-          <EmergencyButton />
+          <div className="flex justify-center items-center flex-col">
+            <EmergencyButton />
+          </div>
+
+          <div className="bg-transparent text-black p-2">
+            <h2 className="text-3xl font-bold mb-2 flex items-center">
+              Closest Ambulances
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-white">
+              {ambulanceData.map((ambulance) => (
+                <motion.div
+                  key={ambulance.id}
+                  className="relative h-[140px] rounded-sm overflow-hidden cursor-pointer shadow hover:shadow-lg shadow-black"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  whileHover={{ scale: 1.02 }}
+                  onHoverStart={() => setHoveredId(ambulance.id)}
+                  onHoverEnd={() => setHoveredId(null)}
+                >
+                  <Image
+                    src={ambulance.image}
+                    alt={`Ambulance ${ambulance.plate}`}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-70" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl font-bold">
+                        {ambulance.plate}
+                      </span>
+                      <span className="text-lg flex items-center">
+                        <MapPin className="mr-1 text-red-500" size={18} />
+                        {ambulance.distance}
+                      </span>
+                    </div>
+                    {hoveredId === ambulance.id && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-2 flex flex-col gap-2"
+                      >
+                        <div className="flex items-center text-sm">
+                          <Timer className="mr-1 text-green-400" size={16} />
+                          Estimated arrival: 5 mins
+                        </div>
+                        <div className="flex items-center text-sm">
+                          <Phone className="mr-1 text-blue-400" size={16} />
+                          <a
+                            href={`tel:${ambulance.phone}`}
+                            className="hover:text-blue-400 transition-colors"
+                          >
+                            {ambulance.phone}
+                          </a>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
-        <div className="w-1/2 h-[500px] relative overflow-hidden bg-gray-200 rounded-md drop-shadow-lg shadow-black/35">
+
+        <div className="relative lg:flex hidden">
           <Image
-            src="https://images.pexels.com/photos/17809395/pexels-photo-17809395/free-photo-of-an-ambulance-of-the-chicago-fire-department-on-the-street.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-            alt="Ambulance"
-            fill
-            className="object-cover "
+            src="/home/Home.svg"
+            alt="Emergency Services Illustration"
+            width={520}
+            height={520}
+            className="w-full h-[520px]"
           />
         </div>
-      </div>
-
-      {/* Nearby Ambulances Section */}
-      <div>
-        <h2 className="text-lg font-semibold mb-4">Nearby Ambulances</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {ambulanceData.map((ambulance) => (
-            <div
-              key={ambulance.id}
-              className="bg-white shadow-md rounded-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            >
-              <Image
-                src={ambulance.image}
-                alt="Ambulance"
-                width={300}
-                height={200}
-                className="object-cover w-full h-48"
-              />
-              <div className="p-4">
-                <h3 className="font-bold text-lg mb-2">
-                  Ambulance {ambulance.plate}
-                </h3>
-                <p className="text-sm text-gray-700 flex items-center gap-2">
-                  <PhoneIcon className="h-4 w-4 text-red-600" />
-                  {ambulance.phone}
-                </p>
-                <p className="text-sm text-gray-700 flex items-center gap-2 mt-1">
-                  <MapPinIcon className="h-4 w-4 text-blue-600" />
-                  {ambulance.distance} away
-                </p>
-                <button
-                  onClick={() => window.open(`tel:${ambulance.phone}`, "_self")}
-                  className="mt-4 bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700 transition"
-                >
-                  Call Now
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

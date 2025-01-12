@@ -33,10 +33,7 @@ export function EmergencyButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          size="lg"
-          className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold text-lg py-6 px-8 shadow-lg"
-        >
+        <Button className="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white font-bold rounded-md text-lg py-2 px-6 shadow-lg">
           <Ambulance className="mr-2 h-6 w-6" />
           Request Emergency Assistance
         </Button>

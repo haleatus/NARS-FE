@@ -1,7 +1,7 @@
 import SignInServer from "@/app/_components/auth/signin-server";
 import React from "react";
 
-const SignInPage = () => {
+const AdminSignInPage = () => {
   return (
     <div>
       <SignInServer />
@@ -9,4 +9,4 @@ const SignInPage = () => {
   );
 };
 
-export default SignInPage;
+export default AdminSignInPage;

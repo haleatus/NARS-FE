@@ -1,10 +1,10 @@
-import SignUpServer from "@/app/_components/auth/signup-server";
+import AdminSignUpServer from "@/app/_components/auth/admin-signup-server";
 import React from "react";
 
 const SignUpPage = () => {
   return (
     <div>
-      <SignUpServer />
+      <AdminSignUpServer />
     </div>
   );
 };

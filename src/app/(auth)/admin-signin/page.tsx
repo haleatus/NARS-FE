@@ -1,12 +1,12 @@
-import SignInServer from "@/app/_components/auth/signin-server";
+import AdminSignInServer from "@/app/_components/auth/admin-signin-server";
 import React from "react";
 
-const SignInPage = () => {
+const AdminSignInPage = () => {
   return (
     <div>
-      <SignInServer />
+      <AdminSignInServer />
     </div>
   );
 };
 
-export default SignInPage;
+export default AdminSignInPage;

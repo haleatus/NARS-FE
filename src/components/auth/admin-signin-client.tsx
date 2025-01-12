@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,18 +13,62 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Ambulance, LogIn, Mail, Lock } from "lucide-react";
+import { Ambulance, LogIn, Lock, User } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { adminSignIn } from "@/app/actions/auth/admin.action";
 
-export default function AdminSignInClient() {
+function SignInForm() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message === "unauthorized") {
+      toast.error("You are not signed in yet.");
+    }
+  }, [searchParams]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // Handle sign-in logic here
+
+    try {
+      const result = await adminSignIn({
+        username,
+        password,
+      });
+
+      if (result.success && result.data) {
+        toast.success("Sign in successful! Redirecting...");
+        // Reset form
+        setUsername("");
+        setPassword("");
+        // Redirect to home or the intended destination
+        const redirectTo = searchParams.get("redirectTo") || "/";
+        setTimeout(() => router.push(redirectTo), 1000);
+      } else if (result.error) {
+        // Handle field-specific errors
+        console.log("Full error response:", result.error);
+        const error = result.error as AuthErrorResponse;
+
+        // // For debugging
+        // console.log("Full error response:", result.error);
+        // console.log("Processed errors:", error);
+
+        // Show error toast
+        toast.error(error.message || "Invalid email or password");
+      }
+    } catch (error) {
+      console.log("Error in Signin Client : ", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -45,16 +89,19 @@ export default function AdminSignInClient() {
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="username">Username</Label>
                 <div className="relative">
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="m.smith@example.com"
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
+                    disabled={isLoading}
                     className="pl-10"
+                    placeholder="Enter your username"
                   />
-                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -63,8 +110,12 @@ export default function AdminSignInClient() {
                   <Input
                     id="password"
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={isLoading}
                     className="pl-10"
+                    placeholder="Enter your password"
                   />
                   <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 </div>
@@ -96,16 +147,22 @@ export default function AdminSignInClient() {
               Sign up
             </Link>
           </div>
-          <div className="text-sm text-center">
-            <Link
-              href="/forgot-password"
-              className="text-primary hover:underline"
-            >
-              Forgot your password?
-            </Link>
-          </div>
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function AdminSignInClient() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      }
+    >
+      <SignInForm />
+    </Suspense>
   );
 }

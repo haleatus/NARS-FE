@@ -1,14 +1,14 @@
-export const baseURL: string = "http://localhost:5000";
+export const baseURL: string = "http://localhost:3000";
 
 export const endpoints = {
   auth: {
-    // admin: {
-    //   signup: `${baseURL}/api/xploverse/admin/create`,
-    //   signin: `${baseURL}/api/xploverse/auth/admin/signin`,
-    // },
+    admin: {
+      signup: `${baseURL}/api/nars/admin/create`,
+      signin: `${baseURL}/api/nars/auth/admin/signin`,
+    },
     // user: {
-    //   signup: `${baseURL}/api/xploverse/user/create`,
-    //   signin: `${baseURL}/api/xploverse/auth/user/signin`,
+    //   signup: `${baseURL}/api/user/create`,
+    //   signin: `${baseURL}/api/auth/user/signin`,
     // },
   },
 };

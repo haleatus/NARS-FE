@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -14,17 +15,50 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Ambulance, UserPlus, Mail, Lock, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { adminSignUp } from "@/app/actions/auth/admin.action";
 
 export default function AdminSignUpClient() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // Handle sign-up logic here
+
+    try {
+      const result = await adminSignUp({
+        username,
+        email,
+        password,
+      });
+
+      if (result.success && result.data) {
+        toast.success("Signup successful! Redirecting...");
+        // Reset form
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        // Redirect after a short delay
+        setTimeout(() => router.push("/signin"), 1000);
+      } else if (result.error) {
+        // Handle field-specific errors
+        const error = result.error as AuthErrorResponse;
+
+        // Show error toast
+        toast.error(error.message);
+      }
+    } catch (error: any) {
+      console.log("Error in Signup Client : ", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -45,15 +79,19 @@ export default function AdminSignUpClient() {
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="username">Username</Label>
                 <div className="relative">
                   <Input
-                    id="name"
-                    placeholder="John Doe"
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     required
+                    disabled={isLoading}
+                    placeholder="Enter your username"
                     className="pl-10"
                   />
-                  <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <User className="absolute left-3 top-2 h-5 w-5 text-muted-foreground" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -62,11 +100,14 @@ export default function AdminSignUpClient() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="john.doe@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={isLoading}
                     className="pl-10"
+                    placeholder="Enter your email"
                   />
-                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-2 h-5 w-5 text-muted-foreground" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -75,22 +116,14 @@ export default function AdminSignUpClient() {
                   <Input
                     id="password"
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
+                    disabled={isLoading}
                     className="pl-10"
+                    placeholder="Enter your password"
                   />
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <div className="relative">
-                  <Input
-                    id="confirm-password"
-                    type="password"
-                    required
-                    className="pl-10"
-                  />
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-2 h-5 w-5 text-muted-foreground" />
                 </div>
               </div>
               <Button
@@ -116,7 +149,7 @@ export default function AdminSignUpClient() {
         <CardFooter>
           <div className="text-sm text-center w-full text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/signin" className="text-primary hover:underline">
+            <Link href="/admin-signin" className="text-primary hover:underline">
               Sign in
             </Link>
           </div>

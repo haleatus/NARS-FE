@@ -92,7 +92,7 @@ export default function AdminSignInClient() {
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-muted-foreground">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-primary hover:underline">
+            <Link href="/admin-signup" className="text-primary hover:underline">
               Sign up
             </Link>
           </div>

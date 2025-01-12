@@ -159,7 +159,7 @@ export async function adminSignIn(
   }
 }
 
-export async function userSignOut(): Promise<{
+export async function adminSignOut(): Promise<{
   success: boolean;
   error?: {
     message: string;
@@ -169,8 +169,8 @@ export async function userSignOut(): Promise<{
     const cookiesStore = await cookies();
 
     // Remove both cookies by setting their maxAge to 0
-    cookiesStore.delete("accessToken");
-    cookiesStore.delete("userData");
+    cookiesStore.delete("adminAccessToken");
+    cookiesStore.delete("adminData");
 
     return {
       success: true,

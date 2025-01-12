@@ -90,7 +90,7 @@ export async function adminSignIn(
       const cookiesStore = await cookies();
 
       // Set access token cookie
-      cookiesStore.set("accessToken", response.data.accessToken, {
+      cookiesStore.set("adminAccessToken", response.data.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
@@ -100,7 +100,7 @@ export async function adminSignIn(
       // Set user data cookie
       if (response.data.admin) {
         cookiesStore.set(
-          "userData",
+          "adminData",
           JSON.stringify({
             _id: response.data.admin._id,
             username: response.data.admin.username,

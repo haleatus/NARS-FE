@@ -36,7 +36,7 @@ export default function Home() {
             alt="Emergency Services Illustration"
             width={460}
             height={460}
-            className="w-full h-[460px]"
+            className="w-full h-[260px] md:h-[460px]"
           />
         </div>
       </main>

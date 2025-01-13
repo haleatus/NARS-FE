@@ -28,7 +28,7 @@ export default function SignUpClient() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-accent flex items-center justify-center p-4">
+    <div className="flex items-center justify-center p-4">
       <Card className="w-full max-w-md border-2 border-primary/10">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
@@ -74,18 +74,6 @@ export default function SignUpClient() {
                 <div className="relative">
                   <Input
                     id="password"
-                    type="password"
-                    required
-                    className="pl-10"
-                  />
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm Password</Label>
-                <div className="relative">
-                  <Input
-                    id="confirm-password"
                     type="password"
                     required
                     className="pl-10"

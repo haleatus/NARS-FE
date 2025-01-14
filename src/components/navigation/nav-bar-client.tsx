@@ -12,8 +12,10 @@ import {
 } from "@/components/ui/sheet";
 import { LucideGitCompareArrows, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { User } from "@/core/types/user.interface";
+import SignoutButton from "../auth/signout-button";
 
-export function NavigationBar() {
+export function NavigationBarClient({ user }: { user: User | null }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -85,25 +87,31 @@ export function NavigationBar() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/signin"
-              className={cn(
-                "text-gray-700 hover:text-red-600 relative py-1",
-                "after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:scale-x-0 after:bg-red-600 after:transition-transform after:duration-300",
-                isActiveLink("/signin") && "text-gray-900 after:scale-x-100"
-              )}
-            >
-              Signin
-            </Link>
-            <Link
-              href="/signup"
-              className={cn(
-                "bg-red-600 hover:bg-red-700 text-white pl-4 pr-3 py-1.5 rounded-full transition-colors",
-                isActiveLink("/signup") && "bg-black"
-              )}
-            >
-              Signup →
-            </Link>
+            {user ? (
+              <SignoutButton />
+            ) : (
+              <>
+                <Link
+                  href="/signin"
+                  className={cn(
+                    "text-gray-700 hover:text-red-600 relative py-1",
+                    "after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:scale-x-0 after:bg-red-600 after:transition-transform after:duration-300",
+                    isActiveLink("/signin") && "text-gray-900 after:scale-x-100"
+                  )}
+                >
+                  Signin
+                </Link>
+                <Link
+                  href="/signup"
+                  className={cn(
+                    "bg-red-600 hover:bg-red-700 text-white pl-4 pr-3 py-1.5 rounded-full transition-colors",
+                    isActiveLink("/signup") && "bg-black"
+                  )}
+                >
+                  Signup →
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Navigation */}
@@ -137,14 +145,20 @@ export function NavigationBar() {
                     </NavLink>
                   ))}
 
-                  <NavLink href="/signin">Sign In</NavLink>
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="w-full justify-start"
-                  >
-                    <NavLink href="/signup">Sign Up</NavLink>
-                  </Button>
+                  {user ? (
+                    <SignoutButton />
+                  ) : (
+                    <>
+                      <NavLink href="/signin">Sign In</NavLink>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        <NavLink href="/signup">Sign Up</NavLink>
+                      </Button>
+                    </>
+                  )}
                 </nav>
               </div>
             </SheetContent>

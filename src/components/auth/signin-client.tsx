@@ -13,7 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Ambulance, LogIn, Mail, Lock } from "lucide-react";
+import { Ambulance, LogIn, Lock, Phone } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { userSignIn } from "@/app/actions/auth/user.action";
@@ -62,8 +62,8 @@ function SignInForm() {
         // console.log("Full error response:", result.error);
         // console.log("Processed errors:", error);
 
-        if (error.message === "user already exists.") {
-          setErrors({ email: error.message });
+        if (error.message === "user doesnot exists.") {
+          setErrors({ contact: error.message });
         } else if (error.message === "password is incorrect.") {
           setErrors({ password: error.message });
         }
@@ -111,7 +111,7 @@ function SignInForm() {
                     }
                     placeholder="Enter your contact number"
                   />
-                  <Mail className="absolute left-3 top-2 h-5 w-5 text-muted-foreground" />
+                  <Phone className="absolute left-3 top-2 h-5 w-5 text-muted-foreground" />
                   {errors.contact && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.contact}

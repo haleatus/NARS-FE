@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 
 import React from "react";
 import { toast } from "sonner";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import { IoMdLogOut } from "react-icons/io";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 
 const SignoutButton = () => {
   const router = useRouter();

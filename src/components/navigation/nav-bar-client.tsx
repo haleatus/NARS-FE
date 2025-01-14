@@ -13,7 +13,7 @@ import {
 import { LucideGitCompareArrows, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { User } from "@/core/types/user.interface";
-import SignoutButton from "../auth/signout-button";
+import SignoutButton from "../auth/user/signout-button";
 
 export function NavigationBarClient({ user }: { user: User | null }) {
   const pathname = usePathname();

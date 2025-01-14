@@ -1,4 +1,4 @@
-import AdminSignUpClient from "@/components/auth/admin-signup-client";
+import AdminSignUpClient from "@/components/auth/admin/admin-signup-client";
 import React from "react";
 
 const AdminSignUpServer = () => {

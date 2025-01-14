@@ -56,10 +56,6 @@ function SignInForm() {
         console.log("Full error response:", result.error);
         const error = result.error as AuthErrorResponse;
 
-        // // For debugging
-        // console.log("Full error response:", result.error);
-        // console.log("Processed errors:", error);
-
         // Show error toast
         toast.error(error.message || "Invalid email or password");
       }

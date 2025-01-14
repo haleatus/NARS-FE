@@ -1,4 +1,4 @@
-import SignInClient from "@/components/auth/signin-client";
+import SignInClient from "@/components/auth/user/signin-client";
 import React from "react";
 
 const SignInServer = async () => {

@@ -1,4 +1,4 @@
-import AdminSignUpServer from "@/app/_components/auth/admin-signup-server";
+import AdminSignUpServer from "@/app/_components/auth/admin/admin-signup-server";
 import React from "react";
 
 const SignUpPage = () => {

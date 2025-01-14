@@ -1,4 +1,4 @@
-import SignUpServer from "@/app/_components/auth/signup-server";
+import SignUpServer from "@/app/_components/auth/user/signup-server";
 import React from "react";
 
 const SignUpPage = () => {

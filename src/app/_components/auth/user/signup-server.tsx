@@ -1,4 +1,4 @@
-import SignUpClient from "@/components/auth/signup-client";
+import SignUpClient from "@/components/auth/user/signup-client";
 import React from "react";
 
 const SignUpServer = () => {

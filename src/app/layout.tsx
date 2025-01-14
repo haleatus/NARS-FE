@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { NavigationBar } from "@/components/navigation/nav-bar";
 
 import { Inter, Work_Sans, Lora } from "next/font/google";
+import NavigationBarServer from "./_components/navigation/nav-bar-server";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,9 +39,11 @@ export default function RootLayout({
       <body
         className={`bg-gradient-to-br from-white to-[#FEE9E9] ${inter.variable} ${lora.variable} ${work_sans.variable}`}
       >
-        <NavigationBar />
-        <div className="max-w-8xl mx-auto px-4">{children}</div>
-        <Toaster />
+        <TooltipProvider>
+          <NavigationBarServer />
+          <div className="max-w-8xl mx-auto px-4">{children}</div>
+          <Toaster closeButton richColors />
+        </TooltipProvider>
       </body>
     </html>
   );

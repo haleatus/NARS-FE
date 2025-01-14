@@ -1,4 +1,5 @@
 import { Admin } from "./admin.interface";
+import { User } from "./user.interface";
 
 export interface AuthSuccessResponse {
   statusCode: number;
@@ -7,6 +8,7 @@ export interface AuthSuccessResponse {
   data: {
     accessToken?: string;
     admin?: Admin;
+    user?: User;
   };
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -13,18 +14,57 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Ambulance, UserPlus, Mail, Lock, User } from "lucide-react";
+import { Ambulance, UserPlus, Mail, Lock, User, Phone } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { toast } from "sonner";
+import { userSignUp } from "@/app/actions/auth/user.action";
 
 export default function SignUpClient() {
+  const [fullname, setFullname] = useState("");
+  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const router = useRouter();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // Handle sign-up logic here
+    setErrors({});
+
+    try {
+      const result = await userSignUp({
+        fullname,
+        contact,
+        email,
+        password,
+      });
+
+      if (result.success && result.data) {
+        toast.success("Signup successful! Redirecting...");
+        // Reset form
+        setFullname("");
+        setContact("");
+        setEmail("");
+        setPassword("");
+        // Redirect after a short delay
+        setTimeout(() => router.push("/signin"), 1000);
+      } else if (result.error) {
+        // Handle field-specific errors
+        const error = result.error as AuthErrorResponse;
+        setErrors({ message: error.message });
+
+        // Show error toast
+        toast.error(error.message);
+      }
+    } catch (error: any) {
+      console.log("Error in Signup Client : ", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -44,14 +84,23 @@ export default function SignUpClient() {
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
+              {errors.message && (
+                <p className="text-red-500 text-sm mt-1">{errors.message}</p>
+              )}
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="fullname">Full Name</Label>
                 <div className="relative">
                   <Input
                     id="name"
-                    placeholder="John Doe"
+                    type="text"
+                    value={fullname}
+                    onChange={(e) => setFullname(e.target.value)}
                     required
-                    className="pl-10"
+                    disabled={isLoading}
+                    className={
+                      errors.message ? "border-red-500 pl-10" : "pl-10"
+                    }
+                    placeholder="Enter your name"
                   />
                   <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 </div>
@@ -62,11 +111,34 @@ export default function SignUpClient() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="john.doe@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="pl-10"
+                    disabled={isLoading}
+                    className={
+                      errors.message ? "border-red-500 pl-10" : "pl-10"
+                    }
+                    placeholder="Enter your email"
                   />
                   <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contact">Contact</Label>
+                <div className="relative">
+                  <Input
+                    id="contact"
+                    type="text"
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className={
+                      errors.message ? "border-red-500 pl-10" : "pl-10"
+                    }
+                    placeholder="Enter your contact number"
+                  />
+                  <Phone className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -75,8 +147,14 @@ export default function SignUpClient() {
                   <Input
                     id="password"
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-10"
+                    disabled={isLoading}
+                    className={
+                      errors.message ? "border-red-500 pl-10" : " pl-10"
+                    }
+                    placeholder="Enter your password"
                   />
                   <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
                 </div>

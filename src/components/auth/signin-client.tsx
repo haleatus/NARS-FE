@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,18 +13,70 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Ambulance, LogIn, Mail, Lock } from "lucide-react";
+import { Ambulance, LogIn, Lock, Phone } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { userSignIn } from "@/app/actions/auth/user.action";
+import { AuthErrorResponse } from "@/core/types/auth.interface";
 
-export default function SignInClient() {
+function SignInForm() {
+  const [contact, setContact] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message === "unauthorized") {
+      toast.error("You are not signed in yet.");
+    }
+  }, [searchParams]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // Handle sign-in logic here
+    setErrors({});
+
+    try {
+      const result = await userSignIn({
+        contact,
+        password,
+      });
+
+      if (result.success && result.data) {
+        toast.success("Sign in successful! Redirecting...");
+        // Reset form
+        setContact("");
+        setPassword("");
+        // Redirect to home or the intended destination
+        const redirectTo = searchParams.get("redirectTo") || "/";
+        setTimeout(() => router.push(redirectTo), 1000);
+      } else if (result.error) {
+        // Handle field-specific errors
+        console.log("Full error response:", result.error);
+        const error = result.error as AuthErrorResponse;
+
+        // // For debugging
+        // console.log("Full error response:", result.error);
+        // console.log("Processed errors:", error);
+
+        if (error.message === "user doesnot exists.") {
+          setErrors({ contact: error.message });
+        } else if (error.message === "password is incorrect.") {
+          setErrors({ password: error.message });
+        }
+
+        // Show error toast
+        toast.error(error.message || "Invalid email or password");
+      }
+    } catch (error) {
+      console.log("Error in Signin Client : ", error);
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -45,16 +97,26 @@ export default function SignInClient() {
           <form onSubmit={handleSubmit}>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="contact">Contact</Label>
                 <div className="relative">
                   <Input
-                    id="email"
-                    type="email"
-                    placeholder="m.smith@example.com"
+                    id="contact"
+                    type="contact"
+                    value={contact}
+                    onChange={(e) => setContact(e.target.value)}
                     required
-                    className="pl-10"
+                    disabled={isLoading}
+                    className={
+                      errors.contact ? "border-red-500 pl-10" : "pl-10"
+                    }
+                    placeholder="Enter your contact number"
                   />
-                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Phone className="absolute left-3 top-2 h-5 w-5 text-muted-foreground" />
+                  {errors.contact && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.contact}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
@@ -63,10 +125,21 @@ export default function SignInClient() {
                   <Input
                     id="password"
                     type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="pl-10"
+                    disabled={isLoading}
+                    className={
+                      errors.password ? "border-red-500 pl-10" : "pl-10"
+                    }
+                    placeholder="Enter your password"
                   />
-                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-2 h-5 w-5 text-muted-foreground" />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
               </div>
               <Button
@@ -96,16 +169,22 @@ export default function SignInClient() {
               Sign up
             </Link>
           </div>
-          <div className="text-sm text-center">
-            <Link
-              href="/forgot-password"
-              className="text-primary hover:underline"
-            >
-              Forgot your password?
-            </Link>
-          </div>
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function SignInClient() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      }
+    >
+      <SignInForm />
+    </Suspense>
   );
 }

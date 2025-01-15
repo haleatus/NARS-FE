@@ -11,4 +11,8 @@ export const endpoints = {
       signin: `${baseURL}/api/nars/auth/user/signin`,
     },
   },
+  user: {
+    getAllUsers: `${baseURL}/api/nars/user/get-all`,
+    getCurrentUser: `${baseURL}/api/nars/user/me`,
+  },
 };

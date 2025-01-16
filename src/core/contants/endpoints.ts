@@ -18,4 +18,15 @@ export const endpoints = {
     getAllUsers: `${baseURL}/api/nars/user/get-all`,
     getCurrentUser: `${baseURL}/api/nars/user/me`,
   },
+  admin: {
+    ambulance: {
+      createAmbulance: `${baseURL}/api/nars/admin/ambulance/create`,
+      deleteAmbulance: `${baseURL}/api/nars/admin/ambulance/delete`,
+      updateAmbulance: `${baseURL}/api/nars/admin/ambulance/update`,
+    },
+  },
+  ambulance: {
+    getAllAmbulances: `${baseURL}/api/nars/ambulance/get-all`,
+    getAmbulanceById: `${baseURL}/api/nars/ambulance/get/:id`,
+  },
 };

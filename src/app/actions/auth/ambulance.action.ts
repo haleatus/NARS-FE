@@ -38,14 +38,19 @@ export async function ambulanceSignIn(
       });
 
       // Set user data cookie
-      if (response.data && response.data.user) {
+      if (response.data && response.data.ambulance) {
         cookiesStore.set(
           "ambulanceData",
           JSON.stringify({
-            _id: response.data.user._id,
-            fullname: response.data.user.fullname,
-            email: response.data.user.email,
-            contact: response.data.user.contact,
+            _id: response.data.ambulance._id,
+            driver_name: response.data.ambulance.driver_name,
+            ambulance_number: response.data.ambulance.ambulance_number,
+            contact: response.data.ambulance.contact,
+            location: {
+              latitude: response.data.ambulance.location.latitude,
+              longitude: response.data.ambulance.location.longitude,
+            },
+            status: response.data.ambulance.status,
           }),
           {
             httpOnly: true,

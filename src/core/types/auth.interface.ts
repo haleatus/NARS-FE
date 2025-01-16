@@ -1,4 +1,5 @@
 import { Admin } from "./admin.interface";
+import { Ambulance } from "./ambulance.interface";
 import { User } from "./user.interface";
 
 export interface AuthSuccessResponse {
@@ -9,6 +10,7 @@ export interface AuthSuccessResponse {
     accessToken?: string;
     admin?: Admin;
     user?: User;
+    ambulance?: Ambulance;
   };
 }
 

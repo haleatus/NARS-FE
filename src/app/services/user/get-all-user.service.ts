@@ -7,20 +7,39 @@ export const getAllUserService = async ({
 }: {
   accessToken: string;
 }) => {
-  const response = await fetch(endpoints.user.getAllUsers, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  try {
+    const res = await fetch(endpoints.user.getAllUsers, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
-  const usersData = await response.json();
+    if (!res.ok) {
+      if (res.status === 404) {
+        return {
+          statusCode: 404,
+          message: "No users found",
+          data: null,
+        };
+      }
+      return null;
+    }
 
-  if (!response.ok) {
-    const error = new Error(usersData.message || "Failed to fetch");
-    throw error;
+    // Safely parse JSON
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseError) {
+      console.error("Error parsing response:", parseError);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    // Log network errors but don't throw
+    console.error("Network error in getAllUserService:", error);
+    return null;
   }
-
-  return usersData;
 };

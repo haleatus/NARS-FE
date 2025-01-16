@@ -10,6 +10,9 @@ export const endpoints = {
       signup: `${baseURL}/api/nars/user/create`,
       signin: `${baseURL}/api/nars/auth/user/signin`,
     },
+    ambulance: {
+      signin: `${baseURL}/api/nars/auth/ambulance/signin`,
+    },
   },
   user: {
     getAllUsers: `${baseURL}/api/nars/user/get-all`,

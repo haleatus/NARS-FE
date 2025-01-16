@@ -16,10 +16,10 @@ import {
 import { Ambulance, LogIn, Lock, Phone } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { userSignIn } from "@/app/actions/auth/user.action";
 import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { ambulanceSignIn } from "@/app/actions/auth/ambulance.action";
 
-function SignInForm() {
+function AmbulanceSignInForm() {
   const [contact, setContact] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -40,7 +40,7 @@ function SignInForm() {
     setErrors({});
 
     try {
-      const result = await userSignIn({
+      const result = await ambulanceSignIn({
         contact,
         password,
       });
@@ -87,10 +87,10 @@ function SignInForm() {
             <Ambulance className="h-12 w-12 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold text-center text-primary">
-            Sign in to NARS
+            Ambulance Sign in
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your email and password to access your account
+            Enter your contact and password to access your account
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -164,18 +164,9 @@ function SignInForm() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-muted-foreground">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-primary hover:underline">
-              Sign up
-            </Link>
-          </div>
-          <div className="text-sm text-center text-muted-foreground">
-            Ambulance Sign In{" "}
-            <Link
-              href="/ambulance-signin"
-              className="text-primary hover:underline"
-            >
-              Click Here
+            Sign In as regular user{" "}
+            <Link href="/signin" className="text-primary hover:underline">
+              Sign In
             </Link>
           </div>
         </CardFooter>
@@ -184,7 +175,7 @@ function SignInForm() {
   );
 }
 
-export default function SignInClient() {
+export default function AmbulanceSignInClient() {
   return (
     <Suspense
       fallback={
@@ -193,7 +184,7 @@ export default function SignInClient() {
         </div>
       }
     >
-      <SignInForm />
+      <AmbulanceSignInForm />
     </Suspense>
   );
 }

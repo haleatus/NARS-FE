@@ -11,16 +11,16 @@ const GetAllAmbulanceClient = ({
   ambulanceData: Ambulance[];
 }) => {
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 font-work-sans">
       <h1 className="text-2xl font-bold mb-6">Ambulance Showcase</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {ambulanceData.map((ambulance) => (
           <Card key={ambulance._id} className="relative overflow-hidden">
             <Link
               href={`/ambulance/${ambulance._id}`}
-              className="absolute bottom-2 right-2"
+              className="absolute bottom-2 right-2 text-xs text-blue-500 cursor-pointer font-sans underline"
             >
-              View More
+              View More →
             </Link>
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">

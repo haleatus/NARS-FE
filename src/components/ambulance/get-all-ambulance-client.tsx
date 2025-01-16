@@ -3,6 +3,7 @@ import { MapPin, Phone } from "lucide-react";
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
+import Link from "next/link";
 
 const GetAllAmbulanceClient = ({
   ambulanceData,
@@ -14,7 +15,13 @@ const GetAllAmbulanceClient = ({
       <h1 className="text-2xl font-bold mb-6">Ambulance Showcase</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {ambulanceData.map((ambulance) => (
-          <Card key={ambulance._id} className="overflow-hidden">
+          <Card key={ambulance._id} className="relative overflow-hidden">
+            <Link
+              href={`/ambulance/${ambulance._id}`}
+              className="absolute bottom-2 right-2"
+            >
+              View More
+            </Link>
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
                 <h2 className="text-lg font-semibold">

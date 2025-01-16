@@ -10,5 +10,23 @@ export const endpoints = {
       signup: `${baseURL}/api/nars/user/create`,
       signin: `${baseURL}/api/nars/auth/user/signin`,
     },
+    ambulance: {
+      signin: `${baseURL}/api/nars/auth/ambulance/signin`,
+    },
+  },
+  user: {
+    getAllUsers: `${baseURL}/api/nars/user/get-all`,
+    getCurrentUser: `${baseURL}/api/nars/user/me`,
+  },
+  admin: {
+    ambulance: {
+      createAmbulance: `${baseURL}/api/nars/admin/ambulance/create`,
+      deleteAmbulance: `${baseURL}/api/nars/admin/ambulance/delete`,
+      updateAmbulance: `${baseURL}/api/nars/admin/ambulance/update`,
+    },
+  },
+  ambulance: {
+    getAllAmbulances: `${baseURL}/api/nars/ambulance/get-all`,
+    getAmbulanceById: `${baseURL}/api/nars/ambulance/get/:id`,
   },
 };

@@ -16,8 +16,6 @@ const GetAllUsersServer = async () => {
 
   const usersData = await getAllUsers({ accessToken });
 
-  console.log(usersData);
-
   if (!usersData) {
     return (
       <div>

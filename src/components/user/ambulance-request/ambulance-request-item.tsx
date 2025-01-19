@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserAmbulanceRequest } from "@/core/types/user/ambulance-request";
-import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 
 interface AmbulanceRequestItemProps {
   data: UserAmbulanceRequest;
@@ -18,6 +17,17 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
 
   const statusStyle =
     statusStyles[data.status] || "bg-gray-500 hover:bg-gray-600";
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
     <Card className="shadow-sm hover:shadow-md transition-shadow duration-200">
@@ -40,17 +50,13 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
           <div>
             <span className="font-medium">Created:</span>
             <p className="text-muted-foreground">
-              {formatDistanceToNow(new Date(data.createdAt), {
-                addSuffix: true,
-              })}
+              {formatDate(data.createdAt)}
             </p>
           </div>
           <div>
             <span className="font-medium">Last Updated:</span>
             <p className="text-muted-foreground">
-              {formatDistanceToNow(new Date(data.updatedAt), {
-                addSuffix: true,
-              })}
+              {formatDate(data.updatedAt)}
             </p>
           </div>
         </div>

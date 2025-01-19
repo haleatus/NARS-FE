@@ -35,8 +35,6 @@ const GetUserAmbulanceRequest = async () => {
     accessToken: accessToken,
   });
 
-  console.log("asugva''''''''''''", result);
-
   if (!result || !result.data) {
     return <ErrorMessage message="Failed to fetch ambulance requests" />;
   }

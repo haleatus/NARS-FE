@@ -28,6 +28,7 @@ import {
   Ambulance,
 } from "lucide-react";
 import { format } from "date-fns";
+import deleteUserAmbulanceRequests from "@/app/actions/user/ambulance-request/delete-ambulance-request.action";
 
 interface AmbulanceRequestItemProps {
   data: UserAmbulanceRequest;
@@ -67,14 +68,12 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/ambulance-requests/${data._id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const response = await deleteUserAmbulanceRequests({
+        accessToken,
+        requestId: data._id,
       });
 
-      if (!response.ok) {
+      if (!response) {
         throw new Error("Failed to delete request");
       }
 

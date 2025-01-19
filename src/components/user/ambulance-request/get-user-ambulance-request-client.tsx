@@ -17,7 +17,7 @@ const GetUserAmbulanceRequestClient: React.FC<Props> = ({
 }) => {
   const router = useRouter();
 
-  const handleUpdate = () => {
+  const handleUpdateAndDelete = () => {
     router.refresh();
   };
 
@@ -37,7 +37,8 @@ const GetUserAmbulanceRequestClient: React.FC<Props> = ({
       <AmbulanceRequestItem
         data={requests.data}
         accessToken={accessToken}
-        onUpdate={handleUpdate}
+        onUpdate={handleUpdateAndDelete}
+        onDelete={handleUpdateAndDelete}
       />
     </div>
   );

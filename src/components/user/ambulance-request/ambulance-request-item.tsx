@@ -1,13 +1,18 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserAmbulanceRequest } from "@/core/types/user/ambulance-request";
+import UpdateRequestDialog from "./update-requests-dialog";
 
 interface AmbulanceRequestItemProps {
   data: UserAmbulanceRequest;
+  accessToken: string;
+  onUpdate?: () => void;
 }
 
 export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
   data,
+  accessToken,
+  onUpdate,
 }) => {
   const statusStyles = {
     PENDING: "bg-yellow-500 hover:bg-yellow-600",
@@ -66,6 +71,17 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             Lat: {data.hospital_location.latitude}, Long:{" "}
             {data.hospital_location.longitude}
           </p>
+        </div>
+        <div className="pt-2">
+          <UpdateRequestDialog
+            requestId={data._id}
+            accessToken={accessToken}
+            ambulanceId={data.ambulance}
+            initialData={{
+              hospital_location: data.hospital_location,
+            }}
+            onSuccess={onUpdate}
+          />
         </div>
       </CardContent>
     </Card>

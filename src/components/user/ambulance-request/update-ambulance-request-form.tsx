@@ -1,18 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateAmbulanceRequestSchema } from "@/app/schema/user/ambulance-request";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import updateAmbulanceRequest from "@/app/actions/user/ambulance-request/update-ambulance-request.action";
 
 interface UpdateAmbulanceRequestFormProps {
   requestId: string;
   accessToken: string;
+  ambulanceId: string;
+  initialData?: {
+    hospital_location: {
+      latitude: string;
+      longitude: string;
+    };
+  };
   onSuccess?: () => void;
   onCancel?: () => void;
 }
@@ -20,6 +27,8 @@ interface UpdateAmbulanceRequestFormProps {
 export function UpdateAmbulanceRequestForm({
   requestId,
   accessToken,
+  ambulanceId,
+  initialData,
   onSuccess,
   onCancel,
 }: UpdateAmbulanceRequestFormProps) {
@@ -32,6 +41,18 @@ export function UpdateAmbulanceRequestForm({
       longitude: "",
     },
   });
+
+  // Initialize form with initial data when available
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        hospital_location: {
+          latitude: String(initialData.hospital_location.latitude),
+          longitude: String(initialData.hospital_location.longitude),
+        },
+      });
+    }
+  }, [initialData]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -59,11 +80,25 @@ export function UpdateAmbulanceRequestForm({
 
     try {
       // Validate the data
-      updateAmbulanceRequestSchema.parse(formData);
+      const parsedData = {
+        ...formData,
+        hospital_location: {
+          latitude: formData.hospital_location.latitude,
+          longitude: formData.hospital_location.longitude,
+        },
+      };
+
+      updateAmbulanceRequestSchema.parse(parsedData);
 
       const result = await updateAmbulanceRequest({
         accessToken,
-        updateAmbulanceRequestData: formData,
+        updateAmbulanceRequestData: {
+          ...parsedData,
+          hospital_location: {
+            latitude: String(parsedData.hospital_location.latitude),
+            longitude: String(parsedData.hospital_location.longitude),
+          },
+        },
         requestID: requestId,
       });
 
@@ -72,8 +107,7 @@ export function UpdateAmbulanceRequestForm({
         return;
       }
 
-      toast.success("Ambulance request created successfully");
-
+      toast.success("Ambulance request updated successfully");
       onSuccess?.();
     } catch (error: any) {
       if (error.errors) {
@@ -83,8 +117,7 @@ export function UpdateAmbulanceRequestForm({
           validationErrors[path] = err.message;
         });
         setErrors(validationErrors);
-
-        toast.error("Validation Error: Please check the form for errors");
+        toast.error("Please check the form for errors");
       } else {
         toast.error("An unexpected error occurred");
       }
@@ -94,88 +127,80 @@ export function UpdateAmbulanceRequestForm({
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
-      <CardHeader>
-        <CardTitle>Create Ambulance Request</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Hospital Location Fields */}
-          <div className="space-y-4">
-            <h3 className="font-medium">Hospital Location</h3>
-
-            <div>
-              <label
-                htmlFor="latitude"
-                className="block text-sm font-medium mb-1"
-              >
-                Latitude
-              </label>
-              <Input
-                id="latitude"
-                name="hospital_location.latitude"
-                value={formData.hospital_location.latitude}
-                onChange={handleInputChange}
-                placeholder="Enter latitude"
-                className={
-                  errors["hospital_location.latitude"] ? "border-red-500" : ""
-                }
-              />
-              {errors["hospital_location.latitude"] && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors["hospital_location.latitude"]}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="longitude"
-                className="block text-sm font-medium mb-1"
-              >
-                Longitude
-              </label>
-              <Input
-                id="longitude"
-                name="hospital_location.longitude"
-                value={formData.hospital_location.longitude}
-                onChange={handleInputChange}
-                placeholder="Enter longitude"
-                className={
-                  errors["hospital_location.longitude"] ? "border-red-500" : ""
-                }
-              />
-              {errors["hospital_location.longitude"] && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors["hospital_location.longitude"]}
-                </p>
-              )}
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex space-x-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-              disabled={isSubmitting}
+    <CardContent>
+      <div>{ambulanceId}</div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="latitude"
+              className="block text-sm font-medium mb-1"
             >
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
-                </>
-              ) : (
-                "Create Request"
-              )}
-            </Button>
+              Latitude
+            </label>
+            <Input
+              id="latitude"
+              name="hospital_location.latitude"
+              value={formData.hospital_location.latitude}
+              onChange={handleInputChange}
+              placeholder="Enter latitude"
+              className={
+                errors["hospital_location.latitude"] ? "border-red-500" : ""
+              }
+            />
+            {errors["hospital_location.latitude"] && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors["hospital_location.latitude"]}
+              </p>
+            )}
           </div>
-        </form>
-      </CardContent>
-    </Card>
+
+          <div>
+            <label
+              htmlFor="longitude"
+              className="block text-sm font-medium mb-1"
+            >
+              Longitude
+            </label>
+            <Input
+              id="longitude"
+              name="hospital_location.longitude"
+              value={formData.hospital_location.longitude}
+              onChange={handleInputChange}
+              placeholder="Enter longitude"
+              className={
+                errors["hospital_location.longitude"] ? "border-red-500" : ""
+              }
+            />
+            {errors["hospital_location.longitude"] && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors["hospital_location.longitude"]}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className="flex space-x-2 justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update Request"
+            )}
+          </Button>
+        </div>
+      </form>
+    </CardContent>
   );
 }

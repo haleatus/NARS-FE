@@ -47,7 +47,10 @@ const GetUserAmbulanceRequest = async () => {
 
   return (
     <Suspense fallback={<LoadingState />}>
-      <GetUserAmbulanceRequestClient requests={response} />
+      <GetUserAmbulanceRequestClient
+        requests={response}
+        accessToken={accessToken}
+      />
     </Suspense>
   );
 };

@@ -8,13 +8,19 @@ import {
 } from "@/core/types/user/ambulance-request";
 import { z } from "zod";
 
+type RequestResponse = {
+  success: boolean;
+  data: UserAmbulanceRequestResult | null;
+  error?: string;
+};
+
 const createAmbulanceRequest = async ({
   accessToken,
   createAmbulanceRequestData,
 }: {
   accessToken: string;
   createAmbulanceRequestData: z.infer<typeof createAmbulanceRequestSchema>;
-}): Promise<{ data: UserAmbulanceRequestResult | null; error?: string }> => {
+}): Promise<RequestResponse> => {
   try {
     // Validate the input data
     const validatedData = createAmbulanceRequestSchema.parse(
@@ -27,29 +33,48 @@ const createAmbulanceRequest = async ({
       data: validatedData,
     });
 
+    // Handle null response
     if (!res) {
-      return { data: null, error: "Failed to create ambulance request" };
+      return {
+        success: false,
+        data: null,
+        error: "Failed to create ambulance request",
+      };
     }
 
+    // Handle success response
     if (isSuccessResponse(res)) {
-      return { data: res };
+      return {
+        success: true,
+        data: res,
+      };
     }
 
+    // Handle error response from service
     return {
+      success: false,
       data: null,
       error: res.message || "Failed to create ambulance request",
     };
   } catch (error) {
+    // Handle validation errors
     if (error instanceof z.ZodError) {
       return {
+        success: false,
         data: null,
         error: error.errors.map((e) => `${e.message}`).join(", "),
       };
     }
 
-    console.error(error);
+    // Log unexpected errors
+    console.error("Unexpected error in createAmbulanceRequest:", error);
 
-    return { data: null, error: "An unexpected error occurred" };
+    // Handle unexpected errors
+    return {
+      success: false,
+      data: null,
+      error: "An unexpected error occurred",
+    };
   }
 };
 

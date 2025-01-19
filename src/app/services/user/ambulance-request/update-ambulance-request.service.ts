@@ -16,7 +16,7 @@ export const updateAmbulanceRequestsService = async ({
 }) => {
   try {
     const res = await fetch(
-      endpoints.user.ambulanceRequest.getUserAmbulanceRequests.replace(
+      endpoints.user.ambulanceRequest.updateAmbulanceRequest.replace(
         ":id",
         requestID
       ),

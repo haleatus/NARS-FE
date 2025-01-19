@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sheet";
 import { LucideGitCompareArrows, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { User } from "@/core/types/user.interface";
+import { User } from "@/core/types/user/user.interface";
 import SignoutButton from "../auth/user/signout-button";
 
 export function NavigationBarClient({ user }: { user: User | null }) {

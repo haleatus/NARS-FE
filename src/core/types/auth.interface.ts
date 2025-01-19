@@ -1,6 +1,6 @@
 import { Admin } from "./admin.interface";
 import { Ambulance } from "./ambulance.interface";
-import { User } from "./user.interface";
+import { User } from "./user/user.interface";
 
 export interface AuthSuccessResponse {
   statusCode: number;

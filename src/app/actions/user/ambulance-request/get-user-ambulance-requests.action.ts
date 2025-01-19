@@ -1,20 +1,24 @@
 "use server";
 
 import { getUserAmbulanceRequestsService } from "@/app/services/user/ambulance-request/get-user-ambulance-request.service";
+import {
+  isSuccessResponse,
+  UserAmbulanceRequestResult,
+} from "@/core/types/user/ambulance-request";
 
 const getUserAmbulanceRequests = async ({
   accessToken,
 }: {
   accessToken: string;
-}) => {
+}): Promise<{ data: UserAmbulanceRequestResult | null; error?: string }> => {
   try {
     const res = await getUserAmbulanceRequestsService({ accessToken });
 
     if (!res) {
-      return;
+      return { data: null, error: "Failed to fetch data" };
     }
 
-    if ("data" in res && res.statusCode === 200) {
+    if (isSuccessResponse(res)) {
       return { data: res };
     }
 
@@ -24,7 +28,7 @@ const getUserAmbulanceRequests = async ({
     };
   } catch (error) {
     console.error(error);
-    return;
+    return { data: null, error: "An unexpected error occurred" };
   }
 };
 

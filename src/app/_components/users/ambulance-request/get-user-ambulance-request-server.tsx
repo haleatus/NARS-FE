@@ -1,57 +1,54 @@
+import React, { Suspense } from "react";
 import getUserAmbulanceRequests from "@/app/actions/user/ambulance-request/get-user-ambulance-requests.action";
 import { getCurrentUserAccessToken } from "@/app/actions/user/get-current-user-access-token";
 import GetUserAmbulanceRequestClient from "@/components/user/ambulance-request/get-user-ambulance-request-client";
-import React from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
+import {
+  isSuccessResponse,
+  UserAmbulanceRequestResult,
+} from "@/core/types/user/ambulance-request";
+
+const ErrorMessage = ({ message }: { message: string }) => (
+  <Alert variant="destructive" className="max-w-2xl mx-auto my-4">
+    <AlertTitle>Error</AlertTitle>
+    <AlertDescription>{message}</AlertDescription>
+  </Alert>
+);
+
+const LoadingState = () => (
+  <div className="flex justify-center items-center min-h-[200px]">
+    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  </div>
+);
 
 const GetUserAmbulanceRequest = async () => {
   const accessToken = await getCurrentUserAccessToken();
 
   if (!accessToken) {
     return (
-      <div>
-        <h1>Unauthorized</h1>
-      </div>
+      <ErrorMessage message="You must be logged in to view ambulance requests" />
     );
   }
 
-  const ambulanceRequests = await getUserAmbulanceRequests({
+  const result = await getUserAmbulanceRequests({
     accessToken: accessToken,
   });
 
-  // Handle case where request failed
-  if (!ambulanceRequests) {
-    return (
-      <div className="p-4">
-        <h1 className="text-xl font-bold font-sans text-red-500 flex justify-center items-center">
-          Failed to fetch ambulance requests
-        </h1>
-      </div>
-    );
+  if (!result || !result.data) {
+    return <ErrorMessage message="Failed to fetch ambulance requests" />;
   }
 
-  // Handle case where no data was returned
-  if (!ambulanceRequests.data) {
-    return (
-      <div className="p-4 font-sans flex justify-center items-center">
-        <h1 className="text-xl font-bold">No Ambulance Requests Found</h1>
-      </div>
-    );
-  }
+  const response = result.data as UserAmbulanceRequestResult;
 
-  // Check if data array exists and has items
-  const requests = ambulanceRequests.data.data;
-  const hasRequests = Array.isArray(requests) && requests.length > 0;
+  if (!isSuccessResponse(response)) {
+    return <ErrorMessage message={response.message || "An error occurred"} />;
+  }
 
   return (
-    <div>
-      {hasRequests ? (
-        <GetUserAmbulanceRequestClient requests={ambulanceRequests.data} />
-      ) : (
-        <div className="p-4">
-          <h1 className="text-xl font-bold">No Ambulance Requests Found</h1>
-        </div>
-      )}
-    </div>
+    <Suspense fallback={<LoadingState />}>
+      <GetUserAmbulanceRequestClient requests={response} />
+    </Suspense>
   );
 };
 

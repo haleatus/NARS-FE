@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { CreateAmbulanceRequestForm } from "./create-ambulance-request-form";
 import { redirect } from "next/navigation";
+import { UpdateAmbulanceRequestForm } from "./update-ambulance-request-form";
 
-const CreateAmbulanceRequestClient = ({
+const UpdateAmbulanceRequestClient = ({
   id,
   accessToken,
 }: {
@@ -13,8 +13,8 @@ const CreateAmbulanceRequestClient = ({
 }) => {
   return (
     <div>
-      <CreateAmbulanceRequestForm
-        ambulanceId={id}
+      <UpdateAmbulanceRequestForm
+        requestId={id}
         accessToken={accessToken}
         onSuccess={() => {
           // Redirect to ambulance requests list or show success message
@@ -26,7 +26,7 @@ const CreateAmbulanceRequestClient = ({
             window.history.back();
           } else {
             // Redirect to a safe fallback
-            redirect("/ambulance");
+            redirect("/my-requests");
           }
         }}
       />
@@ -34,4 +34,4 @@ const CreateAmbulanceRequestClient = ({
   );
 };
 
-export default CreateAmbulanceRequestClient;
+export default UpdateAmbulanceRequestClient;

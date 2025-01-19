@@ -25,6 +25,7 @@ export function NavigationBarClient({ user }: { user: User | null }) {
     { href: "/admin", label: "Admin" },
     { href: "/dashboard", label: "Dashboard" },
     { href: "/profile", label: "Profile" },
+    { href: "/my-requests", label: "MyRequests" },
   ];
 
   const isActiveLink = (href: string) => {

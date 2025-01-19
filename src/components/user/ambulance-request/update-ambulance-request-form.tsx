@@ -2,18 +2,15 @@
 "use client";
 
 import { useState } from "react";
-import {
-  createAmbulanceRequestSchema,
-  updateAmbulanceRequestSchema,
-} from "@/app/schema/user/ambulance-request";
+import { updateAmbulanceRequestSchema } from "@/app/schema/user/ambulance-request";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import createAmbulanceRequest from "@/app/actions/user/ambulance-request/create-ambulance-request.action";
 import { toast } from "sonner";
+import updateAmbulanceRequest from "@/app/actions/user/ambulance-request/update-ambulance-request.action";
 
-interface CreateAmbulanceRequestFormProps {
+interface UpdateAmbulanceRequestFormProps {
   requestId: string;
   accessToken: string;
   onSuccess?: () => void;
@@ -25,7 +22,7 @@ export function UpdateAmbulanceRequestForm({
   accessToken,
   onSuccess,
   onCancel,
-}: CreateAmbulanceRequestFormProps) {
+}: UpdateAmbulanceRequestFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -66,7 +63,8 @@ export function UpdateAmbulanceRequestForm({
 
       const result = await updateAmbulanceRequest({
         accessToken,
-        createAmbulanceRequestData: formData,
+        updateAmbulanceRequestData: formData,
+        requestID: requestId,
       });
 
       if (result.error) {
@@ -102,15 +100,6 @@ export function UpdateAmbulanceRequestForm({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Hidden Ambulance ID field */}
-          <input type="hidden" name="ambulance" value={ambulanceId} />
-
-          {/* Display selected ambulance ID */}
-          <div className="p-4 bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground">Selected Ambulance</p>
-            <p className="font-medium">{ambulanceId}</p>
-          </div>
-
           {/* Hospital Location Fields */}
           <div className="space-y-4">
             <h3 className="font-medium">Hospital Location</h3>

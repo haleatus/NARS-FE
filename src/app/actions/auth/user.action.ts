@@ -1,6 +1,6 @@
 "use server";
 
-import { createUserSchema, signInUserSchema } from "@/app/schema/user";
+import { createUserSchema, signInUserSchema } from "@/app/schema/user/user";
 import {
   createUserService,
   signInUserService,

@@ -7,3 +7,10 @@ export const createAmbulanceRequestSchema = z.object({
     longitude: z.string().min(1, "Longitude must be at least 1 character."),
   }),
 });
+
+export const updateAmbulanceRequestSchema = z.object({
+  hospital_location: z.object({
+    latitude: z.string().min(1, "Latitude must be at least 1 character."),
+    longitude: z.string().min(1, "Longitude must be at least 1 character."),
+  }),
+});

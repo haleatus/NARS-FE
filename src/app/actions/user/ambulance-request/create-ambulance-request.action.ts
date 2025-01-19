@@ -21,15 +21,11 @@ const createAmbulanceRequest = async ({
       createAmbulanceRequestData
     );
 
-    console.log("validatedData=====", validatedData);
-
     // Call the service
     const res = await createAmbulanceRequestsService({
       accessToken,
       data: validatedData,
     });
-
-    console.log("ashla=====", res);
 
     if (!res) {
       return { data: null, error: "Failed to create ambulance request" };

@@ -21,7 +21,6 @@ export const createAmbulanceRequestsService = async ({
       },
       body: JSON.stringify(data),
     });
-    console.log(".sasasa-------", res);
 
     if (!res.ok) {
       if (res.status === 409) {

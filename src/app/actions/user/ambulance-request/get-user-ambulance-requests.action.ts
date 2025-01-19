@@ -18,8 +18,6 @@ const getUserAmbulanceRequests = async ({
       return { data: null, error: "Failed to fetch data" };
     }
 
-    console.log("asugva_________'", res);
-
     if (isSuccessResponse(res)) {
       return { data: res };
     }

@@ -6,12 +6,18 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 const GetAmbulanceByIdClient = ({
   ambulanceData,
 }: {
   ambulanceData: Ambulance;
 }) => {
+  const router = useRouter();
+
+  const handleRequestAmbulanceClick = () => {
+    router.push(`/ambulance/${ambulanceData._id}/create-request`);
+  };
   return (
     <div className="container mx-auto p-4 max-w-3xl font-sans">
       <h1 className="text-3xl font-bold mb-6 font-lora">Ambulance</h1>
@@ -70,7 +76,9 @@ const GetAmbulanceByIdClient = ({
           </div>
           <div className="flex justify-end space-x-4 mt-6">
             <Button variant="outline">Edit Details</Button>
-            <Button variant="default">Request Ambulance</Button>
+            <Button variant="default" onClick={handleRequestAmbulanceClick}>
+              Request Ambulance
+            </Button>
           </div>
         </CardContent>
       </Card>

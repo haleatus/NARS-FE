@@ -13,17 +13,15 @@ export const createAmbulanceRequestsService = async ({
   data: z.infer<typeof createAmbulanceRequestSchema>;
 }) => {
   try {
-    const res = await fetch(
-      endpoints.user.ambulanceRequest.getUserAmbulanceRequests,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(data),
-      }
-    );
+    const res = await fetch(endpoints.user.ambulanceRequest.requestAmbulance, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(data),
+    });
+    console.log(".sasasa-------", res);
 
     if (!res.ok) {
       if (res.status === 409) {

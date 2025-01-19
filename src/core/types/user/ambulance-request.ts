@@ -25,7 +25,8 @@ export interface UserAmbulanceRequestResponse {
     requester: string;
     hospital_location: HospitalLocation;
     status: "PENDING" | "ACCEPTED" | "REJECTED";
-  }[];
+    // }[];
+  };
 }
 
 // Error response type
@@ -44,5 +45,6 @@ export type UserAmbulanceRequestResult =
 export function isSuccessResponse(
   response: UserAmbulanceRequestResult
 ): response is UserAmbulanceRequestResponse {
-  return response.statusCode === 200 && Array.isArray(response.data);
+  // return response.statusCode === 200 && Array.isArray(response.data);
+  return response.statusCode === 200;
 }

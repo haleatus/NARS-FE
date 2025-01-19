@@ -1,9 +1,10 @@
 "use client";
 
 import { UserAmbulanceRequestResponse } from "@/core/types/user/ambulance-request";
-import React, { useMemo } from "react";
+// import React, { useMemo } from "react";
+import React from "react";
 import { AmbulanceRequestItem } from "./ambulance-request-item";
-import { Card } from "@/components/ui/card";
+// import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -19,23 +20,25 @@ interface Props {
 const GetUserAmbulanceRequestClient: React.FC<Props> = ({ requests }) => {
   const [statusFilter, setStatusFilter] = React.useState<string>("ALL");
 
-  const filteredRequests = useMemo(() => {
-    if (!Array.isArray(requests.data)) return [];
+  console.log("'''", requests);
 
-    return statusFilter === "ALL"
-      ? requests.data
-      : requests.data.filter((request) => request.status === statusFilter);
-  }, [requests.data, statusFilter]);
+  // const filteredRequests = useMemo(() => {
+  //   if (!Array.isArray(requests.data)) return [];
 
-  if (!Array.isArray(requests.data) || requests.data.length === 0) {
-    return (
-      <Card className="p-6 max-w-2xl mx-auto my-4">
-        <p className="text-center text-muted-foreground">
-          No ambulance requests found
-        </p>
-      </Card>
-    );
-  }
+  //   return statusFilter === "ALL"
+  //     ? requests.data
+  //     : requests.data.filter((request) => request.status === statusFilter);
+  // }, [requests.data, statusFilter]);
+
+  // if (!Array.isArray(requests.data) || requests.data.length === 0) {
+  //   return (
+  //     <Card className="p-6 max-w-2xl mx-auto my-4">
+  //       <p className="text-center text-muted-foreground">
+  //         No ambulance requests found
+  //       </p>
+  //     </Card>
+  //   );
+  // }
 
   return (
     <div className="container mx-auto p-4 space-y-4">
@@ -55,14 +58,15 @@ const GetUserAmbulanceRequestClient: React.FC<Props> = ({ requests }) => {
       </div>
 
       <div className="grid gap-4">
-        {filteredRequests.map((request) => (
+        {/* {filteredRequests.map((request) => (
           <AmbulanceRequestItem key={request._id} data={request} />
-        ))}
+        ))} */}
+        <AmbulanceRequestItem key={requests.data._id} data={requests.data} />
       </div>
 
-      <div className="text-sm text-muted-foreground text-center">
+      {/* <div className="text-sm text-muted-foreground text-center">
         Showing {filteredRequests.length} of {requests.data.length} requests
-      </div>
+      </div> */}
     </div>
   );
 };

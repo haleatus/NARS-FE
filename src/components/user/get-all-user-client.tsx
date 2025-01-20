@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/core/types/user.interface";
+import { User } from "@/core/types/user/user.interface";
 import React from "react";
 import { Card, CardContent } from "../ui/card";
 

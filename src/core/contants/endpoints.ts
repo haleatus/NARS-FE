@@ -17,6 +17,12 @@ export const endpoints = {
   user: {
     getAllUsers: `${baseURL}/api/nars/user/get-all`,
     getCurrentUser: `${baseURL}/api/nars/user/me`,
+    ambulanceRequest: {
+      requestAmbulance: `${baseURL}/api/nars/user/ambulance-request/create`,
+      getUserAmbulanceRequests: `${baseURL}/api/nars/user/ambulance-request/my-request`,
+      updateAmbulanceRequest: `${baseURL}/api/nars/user/ambulance-request/update/:id`,
+      deleteAmbulanceRequest: `${baseURL}/api/nars/user/ambulance-request/delete/:id`,
+    },
   },
   admin: {
     ambulance: {

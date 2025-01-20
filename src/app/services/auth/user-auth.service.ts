@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createUserSchema, signInUserSchema } from "@/app/schema/user";
+import { createUserSchema, signInUserSchema } from "@/app/schema/user/user";
 import { endpoints } from "@/core/contants/endpoints";
 import { AuthErrorResponse } from "@/core/types/auth.interface";
 import { z } from "zod";

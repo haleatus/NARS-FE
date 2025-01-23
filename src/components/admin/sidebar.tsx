@@ -29,11 +29,11 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <div className="w-64 bg-white shadow-md">
-      <div className="p-4">
-        <h1 className="text-2xl font-bold">Admin Panel</h1>
+    <div className="w-64 bg-white shadow-md rounded-lg font-work-sans">
+      <div className="p-2 flex justify-center items-center border-b">
+        <h1 className="text-xl font-bold font-lora">Admin User Name</h1>
       </div>
-      <nav className="mt-8">
+      <nav>
         <ul>
           {navItems.map((item) => (
             <li key={item.name}>

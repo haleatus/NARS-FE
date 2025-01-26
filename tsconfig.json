@@ -22,6 +22,13 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/app/actions/admin/ambulance/get-ambulance-request-by-id.action.ts",
+    "src/app/services/admin/ambulance/ambulance-request-by-id/.service.ts"
+  ],
   "exclude": ["node_modules"]
 }

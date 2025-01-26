@@ -28,7 +28,7 @@ const GetAllAmbulanceRequestClient: React.FC<AmbulanceRequestTableProps> = ({
   ambulanceRequestsData,
 }) => {
   return (
-    <div className="container mx-auto p-4 font-work-sans">
+    <div className="container mx-auto font-work-sans">
       <Table>
         <TableHeader>
           <TableRow>
@@ -133,7 +133,7 @@ const GetAllAmbulanceRequestClient: React.FC<AmbulanceRequestTableProps> = ({
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
-                        href={`/ambulance-request/${request._id}`}
+                        href={`/admin/ambulance-requests/${request._id}`}
                         className="flex justify-center items-center text-blue-500 hover:text-blue-700 transition-colors"
                       >
                         <Info className="w-5 h-5" />

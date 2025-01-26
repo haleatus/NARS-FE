@@ -8,7 +8,7 @@ export const getAllUserService = async ({
   accessToken: string;
 }) => {
   try {
-    const res = await fetch(endpoints.user.getAllUsers, {
+    const res = await fetch(endpoints.admin.user.getAllUsers, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

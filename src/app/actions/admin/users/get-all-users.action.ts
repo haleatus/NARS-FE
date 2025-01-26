@@ -1,6 +1,6 @@
 "use server";
 
-import { getAllUserService } from "@/app/services/user/get-all-user.service";
+import { getAllUserService } from "@/app/services/admin/users/get-all-user.service";
 
 const getAllUsers = async ({ accessToken }: { accessToken: string }) => {
   try {

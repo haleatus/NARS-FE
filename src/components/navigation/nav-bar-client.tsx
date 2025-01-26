@@ -23,7 +23,6 @@ export function NavigationBarClient({ user }: { user: User | null }) {
     { href: "/driver", label: "Driver" },
     { href: "/ambulance", label: "Ambulance" },
     { href: "/admin", label: "Admin" },
-    { href: "/dashboard", label: "Dashboard" },
     { href: "/profile", label: "Profile" },
     { href: "/my-requests", label: "MyRequests" },
   ];

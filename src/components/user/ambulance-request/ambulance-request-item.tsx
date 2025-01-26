@@ -96,7 +96,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               <User className="inline-block w-4 h-4 mr-1" />
-              {data.requester}
+              {data.requester.fullname}
             </p>
           </div>
           <Badge className={`${statusStyle.color} text-white px-3 py-1`}>
@@ -111,7 +111,9 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             <Ambulance className="w-4 h-4 text-blue-500" />
             <div>
               <p className="text-sm font-medium">Ambulance ID</p>
-              <p className="text-sm text-muted-foreground">{data.ambulance}</p>
+              <p className="text-sm text-muted-foreground">
+                {data.ambulance._id}
+              </p>
             </div>
           </div>
 
@@ -151,7 +153,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
           <UpdateRequestDialog
             requestId={data._id}
             accessToken={accessToken}
-            ambulanceId={data.ambulance}
+            ambulanceId={data.ambulance._id}
             initialData={{
               hospital_location: data.hospital_location,
             }}

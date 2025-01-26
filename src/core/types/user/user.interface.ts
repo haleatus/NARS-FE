@@ -5,5 +5,5 @@ export interface User {
   fullname: string;
   email: string;
   contact: string;
-  deletedAt: string | Date | null;
+  deletedAt?: string | Date | null;
 }

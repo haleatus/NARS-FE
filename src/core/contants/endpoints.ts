@@ -30,6 +30,14 @@ export const endpoints = {
       deleteAmbulance: `${baseURL}/api/nars/admin/ambulance/delete`,
       updateAmbulance: `${baseURL}/api/nars/admin/ambulance/update`,
     },
+    ambulanceRequest: {
+      getAllRequest: `${baseURL}/api/nars/admin/ambulance-request/get-all`,
+      getRequestById: `${baseURL}/api/nars/admin/ambulance-request/get/:id`,
+    },
+    user: {
+      getAllUsers: `${baseURL}/api/nars/admin/user/get-all`,
+      getUserById: `${baseURL}/api/nars/admin/user/get/:id`,
+    },
   },
   ambulance: {
     getAllAmbulances: `${baseURL}/api/nars/ambulance/get-all`,

@@ -2,17 +2,13 @@ import "server-only";
 
 import { endpoints } from "@/core/contants/endpoints";
 
-export const getAllUserService = async ({
-  accessToken,
-}: {
-  accessToken: string;
-}) => {
+const getAllAmbulanceRequestService = async (adminAccessToken: string) => {
   try {
-    const res = await fetch(endpoints.user.getAllUsers, {
+    const res = await fetch(endpoints.admin.ambulanceRequest.getAllRequest, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${adminAccessToken}`,
       },
     });
 
@@ -20,13 +16,12 @@ export const getAllUserService = async ({
       if (res.status === 404) {
         return {
           statusCode: 404,
-          message: "No users found",
+          message: "No ambulance found",
           data: null,
         };
       }
       return null;
     }
-
     // Safely parse JSON
     let data;
     try {
@@ -39,7 +34,9 @@ export const getAllUserService = async ({
     return data;
   } catch (error) {
     // Log network errors but don't throw
-    console.error("Network error in getAllUserService:", error);
+    console.error("Network error in getAllAmbulanceRequestService:", error);
     return null;
   }
 };
+
+export default getAllAmbulanceRequestService;

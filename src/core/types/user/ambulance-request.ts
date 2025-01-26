@@ -1,16 +1,19 @@
+import { Ambulance } from "../ambulance.interface";
+import { User } from "./user.interface";
+
 export interface HospitalLocation {
   latitude: string;
   longitude: string;
 }
 
 export interface UserAmbulanceRequest {
-  _id: string;
-  ambulance: string;
-  requester: string;
-  hospital_location: HospitalLocation;
-  status: "PENDING" | "ACCEPTED" | "REJECTED";
   createdAt: string;
   updatedAt: string;
+  _id: string;
+  ambulance: Ambulance;
+  requester: User;
+  hospital_location: HospitalLocation;
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
 }
 
 export interface UserAmbulanceRequestResponse {

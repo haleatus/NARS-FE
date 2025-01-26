@@ -2,7 +2,7 @@
 
 import { User } from "@/core/types/user/user.interface";
 import React from "react";
-import { Card, CardContent } from "../ui/card";
+import { Card, CardContent } from "../../ui/card";
 
 const GetAllUsersClient = ({ usersData }: { usersData: User[] }) => {
   return (

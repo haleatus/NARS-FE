@@ -2,13 +2,12 @@ import "server-only";
 
 import { endpoints } from "@/core/contants/endpoints";
 
-const getAllAmbulanceService = async (accessToken: string) => {
+const getAllAmbulanceService = async () => {
   try {
     const res = await fetch(endpoints.ambulance.getAllAmbulances, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
       },
     });
 

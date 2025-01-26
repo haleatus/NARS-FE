@@ -3,11 +3,9 @@
 import getAllAmbulanceService from "@/app/services/ambulance/get-all-ambulance.service";
 import { Ambulance } from "@/core/types/ambulance.interface";
 
-export async function getAllAmbulance(
-  accessToken: string
-): Promise<Ambulance[] | null> {
+export async function getAllAmbulance(): Promise<Ambulance[] | null> {
   try {
-    const response = await getAllAmbulanceService(accessToken);
+    const response = await getAllAmbulanceService();
 
     if (!response) {
       return null;

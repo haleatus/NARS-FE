@@ -1,14 +1,14 @@
 import { getAllAmbulance } from "@/app/actions/ambulance/get-all-ambulance.action";
-import GetAllAmbulanceClient from "@/components/ambulance/get-all-ambulance-client";
+import GetAllAmbulanceAdminClient from "@/components/admin/ambulance/get-all-ambulance-admin-client";
 import React from "react";
 
-const GetAllAmbulanceServer = async () => {
+const GetAllAmbulanceAdminServer = async () => {
   const ambulanceData = await getAllAmbulance();
 
   return (
     <div>
       {ambulanceData ? (
-        <GetAllAmbulanceClient ambulanceData={ambulanceData} />
+        <GetAllAmbulanceAdminClient ambulanceData={ambulanceData} />
       ) : (
         <div>No ambulance data found</div>
       )}
@@ -16,4 +16,4 @@ const GetAllAmbulanceServer = async () => {
   );
 };
 
-export default GetAllAmbulanceServer;
+export default GetAllAmbulanceAdminServer;

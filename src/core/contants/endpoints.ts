@@ -1,4 +1,5 @@
-export const baseURL: string = "http://localhost:3000";
+// export const baseURL: string = "http://localhost:3000";
+export const baseURL: string = "https://nars-server.onrender.com";
 
 export const endpoints = {
   auth: {

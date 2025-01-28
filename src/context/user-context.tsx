@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { User } from "../core/types/user/user.interface";
 import { useRouter } from "next/navigation";
-import getCurrentUser from "@/app/actions/user/auth/get-current-user-from-api.action";
+import getCurrentUser from "@/app/actions/user/auth/get-current-user.action";
 
 interface UserContextValue {
   user: User | null;
@@ -29,7 +29,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const fetchedUser = await getCurrentUser();
-      setUser(fetchedUser.data);
+      if (fetchedUser?.data) {
+        setUser(fetchedUser.data.user);
+      } else {
+        // If no data or error, set ambulance to null
+        setUser(null);
+      }
     } catch (error) {
       console.error("Failed to fetch user:", error);
       setUser(null);

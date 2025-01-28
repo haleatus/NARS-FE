@@ -31,7 +31,13 @@ export const AmbulanceProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const fetchedAmbulance = await getCurrentAmbulance();
-      setAmbulance(fetchedAmbulance.data);
+
+      if (fetchedAmbulance?.data) {
+        setAmbulance(fetchedAmbulance.data.ambulance);
+      } else {
+        // If no data or error, set ambulance to null
+        setAmbulance(null);
+      }
     } catch (error) {
       console.error("Failed to fetch user:", error);
       setAmbulance(null);

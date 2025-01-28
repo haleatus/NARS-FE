@@ -8,7 +8,8 @@ const getCurrentAdmin = async () => {
   const accessToken = cookieStore.get("adminAccessToken");
   try {
     if (!accessToken?.value) {
-      throw new Error("Admin Access token is missing");
+      // return null data
+      return { data: null };
     }
     const admin = await getCurrentAdminService(accessToken.value);
     return admin;

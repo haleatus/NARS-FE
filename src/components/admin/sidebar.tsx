@@ -11,6 +11,7 @@ import {
   UserCog,
   User,
 } from "lucide-react";
+import { useAdmin } from "@/context/admin-context";
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -27,11 +28,12 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { admin } = useAdmin();
 
   return (
     <div className="w-64 bg-white shadow-md rounded-lg font-work-sans">
       <div className="p-2 flex justify-center items-center border-b">
-        <h1 className="text-xl font-bold font-lora">Admin User Name</h1>
+        <h1 className="text-xl font-bold font-lora">{admin?.username}</h1>
       </div>
       <nav>
         <ul>

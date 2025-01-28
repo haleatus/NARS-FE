@@ -29,7 +29,13 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
     setLoading(true);
     try {
       const fetchedAdmin = await getCurrentAdmin();
-      setAdmin(fetchedAdmin.data);
+
+      if (fetchedAdmin?.data) {
+        setAdmin(fetchedAdmin.data.admin);
+      } else {
+        // If no data or error, set ambulance to null
+        setAdmin(null);
+      }
     } catch (error) {
       console.error("Failed to fetch user:", error);
       setAdmin(null);

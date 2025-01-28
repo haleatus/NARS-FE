@@ -8,7 +8,8 @@ const getCurrentAmbulance = async () => {
   const accessToken = cookieStore.get("ambulanceAccessToken");
   try {
     if (!accessToken?.value) {
-      throw new Error("Access token is missing");
+      // return null data
+      return { data: null };
     }
     const ambulance = await getCurrentAmbulanceService(accessToken.value);
     return ambulance;

@@ -39,8 +39,8 @@ export function NavigationBarClient() {
     if (ambulance) {
       return [
         { href: "/driver", label: "Driver" },
-        { href: "/profile", label: "Profile" },
-        { href: "/my-requests", label: "MyRequests" },
+        { href: "/ambulance-profile", label: "Profile" },
+        { href: "/ambulance-requests", label: "Requests" },
       ];
     }
 

@@ -8,7 +8,8 @@ const getCurrentUser = async () => {
   const accessToken = cookieStore.get("accessToken");
   try {
     if (!accessToken?.value) {
-      throw new Error("user Access token is missing");
+      // return null data
+      return { data: null };
     }
     const user = await getCurrentUserService(accessToken.value);
     return user;

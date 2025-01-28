@@ -59,7 +59,6 @@ export function CreateAmbulanceRequestForm({
     setErrors({});
 
     try {
-      // Validate the data
       createAmbulanceRequestSchema.parse(formData);
 
       const result = await createAmbulanceRequest({
@@ -74,19 +73,34 @@ export function CreateAmbulanceRequestForm({
 
       toast.success("Ambulance request created successfully");
 
-      onSuccess?.();
+      // Add this check before calling onSuccess
+      if (onSuccess) {
+        try {
+          onSuccess();
+        } catch (redirectError) {
+          // Ignore NEXT_REDIRECT errors
+          if (
+            !(redirectError instanceof Error) ||
+            redirectError.message !== "NEXT_REDIRECT"
+          ) {
+            throw redirectError;
+          }
+        }
+      }
     } catch (error: any) {
-      if (error.errors) {
-        const validationErrors: { [key: string]: string } = {};
-        error.errors.forEach((err: any) => {
-          const path = err.path.join(".");
-          validationErrors[path] = err.message;
-        });
-        setErrors(validationErrors);
-
-        toast.error("Validation Error: Please check the form for errors");
-      } else {
-        toast.error("An unexpected error occurred");
+      // Only show error toast for non-redirect errors
+      if (!(error instanceof Error) || error.message !== "NEXT_REDIRECT") {
+        if (error.errors) {
+          const validationErrors: { [key: string]: string } = {};
+          error.errors.forEach((err: any) => {
+            const path = err.path.join(".");
+            validationErrors[path] = err.message;
+          });
+          setErrors(validationErrors);
+          toast.error("Validation Error: Please check the form for errors");
+        } else {
+          toast.error("An unexpected error occurred");
+        }
       }
     } finally {
       setIsSubmitting(false);

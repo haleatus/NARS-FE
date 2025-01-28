@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/sheet";
 import { LucideGitCompareArrows, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { User } from "@/core/types/user/user.interface";
 import SignoutButton from "../auth/user/signout-button";
+import { useUser } from "@/context/user-context";
 
-export function NavigationBarClient({ user }: { user: User | null }) {
+export function NavigationBarClient() {
   const pathname = usePathname();
+  const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [

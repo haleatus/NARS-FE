@@ -10,39 +10,62 @@ import {
 } from "@/core/types/user/ambulance-request";
 
 const ErrorMessage = ({ message }: { message: string }) => (
-  <Alert variant="destructive" className="max-w-2xl mx-auto my-4">
+  <Alert variant="destructive">
     <AlertTitle>Error</AlertTitle>
     <AlertDescription>{message}</AlertDescription>
   </Alert>
 );
 
 const LoadingState = () => (
-  <div className="flex justify-center items-center min-h-[200px]">
-    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  <div className="flex items-center justify-center p-8">
+    <Loader2 className="h-8 w-8 animate-spin" />
   </div>
+);
+
+const NoDataState = () => (
+  <Alert>
+    <AlertTitle>No Requests Found</AlertTitle>
+    <AlertDescription>
+      You don&apos;t have any ambulance requests yet.
+    </AlertDescription>
+  </Alert>
 );
 
 const GetUserAmbulanceRequest = async () => {
   const accessToken = await getCurrentUserAccessToken();
 
   if (!accessToken) {
-    return (
-      <ErrorMessage message="You must be logged in to view ambulance requests" />
-    );
+    return <ErrorMessage message="Not authenticated. Please log in." />;
   }
 
   const result = await getUserAmbulanceRequests({
     accessToken: accessToken,
   });
 
+  // Handle null or undefined result
   if (!result || !result.data) {
-    return <ErrorMessage message="Failed to fetch ambulance requests" />;
+    return <NoDataState />;
   }
 
   const response = result.data as UserAmbulanceRequestResult;
 
+  // Check if response is valid and has data
   if (!isSuccessResponse(response)) {
-    return <ErrorMessage message={response.message || "An error occurred"} />;
+    return (
+      <ErrorMessage
+        message={
+          response?.message || "An error occurred while fetching requests"
+        }
+      />
+    );
+  }
+
+  // If response data is empty array or null
+  if (
+    !response.data ||
+    (Array.isArray(response.data) && response.data.length === 0)
+  ) {
+    return <NoDataState />;
   }
 
   return (

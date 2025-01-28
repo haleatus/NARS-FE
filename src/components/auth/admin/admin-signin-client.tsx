@@ -18,6 +18,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { AuthErrorResponse } from "@/core/types/auth.interface";
 import { adminSignIn } from "@/app/actions/auth/admin.action";
+import { useAdmin } from "@/context/admin-context";
 
 function SignInForm() {
   const [username, setUsername] = useState("");
@@ -25,6 +26,8 @@ function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const { refetchAdmin } = useAdmin();
 
   useEffect(() => {
     const message = searchParams.get("message");
@@ -48,6 +51,10 @@ function SignInForm() {
         // Reset form
         setUsername("");
         setPassword("");
+
+        // Refetch admin data and update context
+        await refetchAdmin();
+
         // Redirect to home or the intended destination
         const redirectTo = searchParams.get("redirectTo") || "/";
         setTimeout(() => router.push(redirectTo), 1000);

@@ -1,7 +1,12 @@
+import GetMyAmbulanceRequestServer from "@/app/_components/ambulance/requests/get-my-ambulance-request-server";
 import React from "react";
 
-const AmbulanceRequestsPage = () => {
-  return <div>Ambulance Requests</div>;
+const MyAmbulanceRequestsPage = () => {
+  return (
+    <div>
+      <GetMyAmbulanceRequestServer />
+    </div>
+  );
 };
 
-export default AmbulanceRequestsPage;
+export default MyAmbulanceRequestsPage;

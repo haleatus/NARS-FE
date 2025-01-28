@@ -18,12 +18,12 @@ const NavigationBarServer = async () => {
     isAmbulance: Boolean(ambulanceToken),
   };
 
-  // For debugging in development only
-  console.log("Auth State:", {
-    userToken: Boolean(userToken),
-    adminToken: Boolean(adminToken),
-    ambulanceToken: Boolean(ambulanceToken),
-  });
+  // For debugging purposes
+  // console.log("Auth State:", {
+  //   userToken: Boolean(userToken),
+  //   adminToken: Boolean(adminToken),
+  //   ambulanceToken: Boolean(ambulanceToken),
+  // });
 
   return (
     <>

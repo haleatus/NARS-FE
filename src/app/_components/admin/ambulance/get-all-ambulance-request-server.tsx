@@ -1,5 +1,5 @@
 import { getAllAmbulanceRequest } from "@/app/actions/admin/ambulance/get-all-ambulance-request.action";
-import { getCurrentAdminAccessToken } from "@/app/actions/admin/get-current-admin-access-token";
+import { getCurrentAdminAccessToken } from "@/app/actions/admin/auth/get-current-admin-access-token";
 import GetAllAmbulanceRequestClient from "@/components/admin/ambulance/get-all-ambulance-request-admin-client";
 import React from "react";
 

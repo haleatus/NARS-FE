@@ -7,6 +7,7 @@ import NavigationBarServer from "./_components/navigation/nav-bar-server";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider } from "@/context/user-context";
 import { AmbulanceProvider } from "@/context/ambulance-context";
+import { AdminProvider } from "@/context/admin-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,11 +44,13 @@ export default function RootLayout({
       >
         <UserProvider>
           <AmbulanceProvider>
-            <TooltipProvider>
-              <NavigationBarServer />
-              <div className="max-w-8xl mx-auto px-4">{children}</div>
-              <Toaster closeButton richColors />
-            </TooltipProvider>
+            <AdminProvider>
+              <TooltipProvider>
+                <NavigationBarServer />
+                <div className="max-w-8xl mx-auto px-4">{children}</div>
+                <Toaster closeButton richColors />
+              </TooltipProvider>
+            </AdminProvider>
           </AmbulanceProvider>
         </UserProvider>
       </body>

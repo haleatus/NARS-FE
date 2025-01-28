@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { User } from "../core/types/user/user.interface";
 import { useRouter } from "next/navigation";
-import getCurrentUserFromApi from "@/app/actions/user/get-current-user-from-api.action";
+import getCurrentUser from "@/app/actions/user/auth/get-current-user-from-api.action";
 
 interface UserContextValue {
   user: User | null;
@@ -28,7 +28,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const fetchUser = useCallback(async () => {
     setLoading(true);
     try {
-      const fetchedUser = await getCurrentUserFromApi();
+      const fetchedUser = await getCurrentUser();
       setUser(fetchedUser.data);
     } catch (error) {
       console.error("Failed to fetch user:", error);

@@ -1,4 +1,4 @@
-import { getCurrentUserAccessToken } from "@/app/actions/user/get-current-user-access-token";
+import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-user-access-token";
 import CreateAmbulanceRequestClient from "@/components/user/ambulance-request/create-ambuance-request-client";
 
 export default async function CreateAmbulanceRequestServer({

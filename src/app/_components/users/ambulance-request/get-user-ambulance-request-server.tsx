@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import getUserAmbulanceRequests from "@/app/actions/user/ambulance-request/get-user-ambulance-requests.action";
-import { getCurrentUserAccessToken } from "@/app/actions/user/get-current-user-access-token";
+import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-user-access-token";
 import GetUserAmbulanceRequestClient from "@/components/user/ambulance-request/get-user-ambulance-request-client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2 } from "lucide-react";

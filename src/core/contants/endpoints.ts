@@ -39,6 +39,10 @@ export const endpoints = {
       getAllUsers: `${baseURL}/api/nars/admin/user/get-all`,
       getUserById: `${baseURL}/api/nars/admin/user/get/:id`,
     },
+    auth: {
+      getCurrentAdmin: `${baseURL}/api/nars/admin/me`,
+      getAllAdmins: `${baseURL}/api/nars/admin/get-all`,
+    },
   },
   ambulance: {
     getAllAmbulances: `${baseURL}/api/nars/ambulance/get-all`,

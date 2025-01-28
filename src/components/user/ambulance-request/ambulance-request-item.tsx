@@ -86,6 +86,8 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
     }
   };
 
+  console.log("data", data);
+
   return (
     <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300">
       <CardHeader className="pb-2">
@@ -159,7 +161,6 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             }}
             onSuccess={() => {
               onUpdate?.();
-              toast.success("Request updated successfully");
             }}
           >
             <Button

@@ -13,16 +13,16 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Ambulance", href: "/admin/ambulance", icon: Ambulance },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Ambulance", href: "/dashboard/ambulance", icon: Ambulance },
   {
     name: "Ambulance Requests",
-    href: "/admin/ambulance-requests",
+    href: "/dashboard/ambulance-requests",
     icon: ClipboardList,
   },
-  { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Admin Users", href: "/admin/admin-users", icon: UserCog },
-  { name: "My Profile", href: "/admin/my-profile", icon: User },
+  { name: "Users", href: "/dashboard/users", icon: Users },
+  { name: "Admin Users", href: "/dashboard/admin-users", icon: UserCog },
+  { name: "My Profile", href: "/dashboard/my-profile", icon: User },
 ];
 
 export function Sidebar() {

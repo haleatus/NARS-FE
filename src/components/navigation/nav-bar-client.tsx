@@ -33,7 +33,7 @@ export function NavigationBarClient() {
 
   const getNavLinks = () => {
     if (admin) {
-      return [{ href: "/admin", label: "Admin" }];
+      return [{ href: "/dashboard", label: "Dashboard" }];
     }
 
     if (ambulance) {

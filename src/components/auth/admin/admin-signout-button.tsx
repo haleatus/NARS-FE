@@ -1,6 +1,5 @@
 "use client";
 
-import { userSignOut } from "@/app/actions/auth/user.action";
 import { useRouter } from "next/navigation";
 
 import React from "react";
@@ -8,21 +7,21 @@ import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { IoMdLogOut } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
-import { useUser } from "@/context/user-context";
+import { adminSignOut } from "@/app/actions/auth/admin.action";
+import { useAdmin } from "@/context/admin-context";
 
-const SignoutButton = () => {
+const AdminSignoutButton = () => {
   const router = useRouter();
-
-  const { refetchUser } = useUser();
+  const { refetchAdmin } = useAdmin();
 
   const handleSignOut = async () => {
-    const result = await userSignOut();
+    const result = await adminSignOut();
     if (result.success) {
-      // Refetch user data and update context
-      await refetchUser();
+      // Refetch admin data and update context
+      await refetchAdmin();
       toast.success("Sign out successful! Redirecting...");
       // Redirect to login page or update UI
-      router.push("/signin");
+      router.push("/admin-signin");
     } else {
       // Handle error
       toast.error(result.error?.message);
@@ -47,4 +46,4 @@ const SignoutButton = () => {
   );
 };
 
-export default SignoutButton;
+export default AdminSignoutButton;

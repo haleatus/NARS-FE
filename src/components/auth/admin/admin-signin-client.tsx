@@ -51,7 +51,7 @@ function SignInForm() {
       });
 
       if (result.success && result.data) {
-        toast.success("Sign in successful! Redirecting...");
+        toast.success("Admin Sign in successful! Redirecting...");
         // Reset form
         setUsername("");
         setPassword("");
@@ -62,7 +62,7 @@ function SignInForm() {
         await refetchUser();
 
         // Redirect to home or the intended destination
-        const redirectTo = searchParams.get("redirectTo") || "/";
+        const redirectTo = searchParams.get("redirectTo") || "/dashboard";
         setTimeout(() => router.push(redirectTo), 1000);
       } else if (result.error) {
         // Handle field-specific errors

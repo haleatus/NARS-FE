@@ -52,7 +52,7 @@ export function middleware(req: NextRequest) {
   }
 
   if (adminAuthToken && currentPath.startsWith("/admin-signin")) {
-    return NextResponse.redirect(new URL("/admin", req.url));
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   if (ambulanceAuthToken && currentPath.startsWith("/ambulance-signin")) {

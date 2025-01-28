@@ -18,6 +18,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { userSignIn } from "@/app/actions/auth/user.action";
 import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { useUser } from "@/context/user-context";
 
 function SignInForm() {
   const [contact, setContact] = useState("");
@@ -26,6 +27,7 @@ function SignInForm() {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { refetchUser } = useUser();
 
   useEffect(() => {
     const message = searchParams.get("message");
@@ -50,6 +52,10 @@ function SignInForm() {
         // Reset form
         setContact("");
         setPassword("");
+
+        // Trigger context refresh
+        await refetchUser();
+
         // Redirect to home or the intended destination
         const redirectTo = searchParams.get("redirectTo") || "/";
         setTimeout(() => router.push(redirectTo), 1000);

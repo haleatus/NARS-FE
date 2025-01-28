@@ -8,13 +8,17 @@ import { toast } from "sonner";
 import { Button } from "../../ui/button";
 import { IoMdLogOut } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
+import { useUser } from "@/context/user-context";
 
 const SignoutButton = () => {
   const router = useRouter();
 
+  const { refetchUser } = useUser();
+
   const handleSignOut = async () => {
     const result = await userSignOut();
     if (result.success) {
+      await refetchUser();
       toast.success("Sign out successful! Redirecting...");
       // Redirect to login page or update UI
       router.push("/signin");

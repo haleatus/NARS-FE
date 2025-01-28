@@ -23,16 +23,14 @@ const GetUserAmbulanceRequestClient: React.FC<Props> = ({
 
   if (!requests.data) {
     return (
-      <Card className="p-6 max-w-2xl mx-auto my-4">
-        <p className="text-center text-muted-foreground">
-          No ambulance request found
-        </p>
+      <Card className="p-4 text-center text-muted-foreground">
+        No ambulance requests found
       </Card>
     );
   }
 
   return (
-    <div className="container mx-auto p-4 font-work-sans">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <AmbulanceRequestItem
         data={requests.data}
         accessToken={accessToken}

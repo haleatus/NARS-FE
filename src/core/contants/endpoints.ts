@@ -52,7 +52,7 @@ export const endpoints = {
     },
     ambulanceRequests: {
       myRequests: `${baseURL}/api/nars/ambulance/ambulance-request/my-requests`,
-      requestAction: `${baseURL}/api/nars/ambulance/ambulance-request/action/:id`,
+      updateStatus: `${baseURL}/api/nars/ambulance/ambulance-request/action/:id`,
     },
   },
 };

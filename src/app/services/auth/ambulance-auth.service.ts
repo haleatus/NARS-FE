@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { signInAmbulanceSchema } from "@/app/schema/ambulance";
+import { signInAmbulanceSchema } from "@/app/schema/ambulance/ambulance";
 import { endpoints } from "@/core/contants/endpoints";
 import { AuthErrorResponse } from "@/core/types/auth.interface";
 import { z } from "zod";

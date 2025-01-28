@@ -9,7 +9,7 @@ export interface AmbulanceRequest {
   ambulance: Ambulance;
   requester: User;
   hospital_location: HospitalLocation;
-  status: "PENDING" | "ACCEPTED" | "REJECTED";
+  status: "PENDING" | "ENROUTE" | "COMPLETED" | "CANCELLED";
 }
 
 export interface AmbulanceRequestResponse {

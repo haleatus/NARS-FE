@@ -37,7 +37,6 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
           data={request}
           accessToken={accessToken}
           onUpdate={handleUpdateAndDelete}
-          onDelete={handleUpdateAndDelete}
         />
       ))}
     </div>

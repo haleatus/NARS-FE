@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState } from "react";
@@ -16,46 +15,43 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Pencil,
-  Trash2,
-  MapPin,
-  Calendar,
-  User,
-  Ambulance,
-} from "lucide-react";
+import { MapPin, Calendar, User, Ambulance } from "lucide-react";
 import { format } from "date-fns";
 import { AmbulanceRequest } from "@/core/types/ambulance/request";
+import updateMyAmbulanceRequestStatus from "@/app/actions/ambulance/requests/update-my-ambulance-request-status.action";
+import { toast } from "sonner";
 
 interface RequestItemProps {
   data: AmbulanceRequest;
   accessToken: string;
   onUpdate?: () => void;
-  onDelete?: () => void;
 }
 
 export const RequestItem: React.FC<RequestItemProps> = ({
   data,
   accessToken,
   onUpdate,
-  onDelete,
 }) => {
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  console.log("jajskajlllllll", data);
+  const [selectedStatus, setSelectedStatus] = useState(data.status);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const statusConfig = {
     PENDING: {
       color: "bg-yellow-500 hover:bg-yellow-600",
       icon: "🕒",
     },
-    ACCEPTED: {
+    COMPLETED: {
       color: "bg-green-500 hover:bg-green-600",
       icon: "✅",
     },
-    REJECTED: {
+    CANCELLED: {
       color: "bg-red-500 hover:bg-red-600",
       icon: "❌",
+    },
+    ENROUTE: {
+      color: "bg-blue-500 hover:bg-blue-600",
+      icon: "🚑",
     },
   } as const;
 
@@ -64,26 +60,26 @@ export const RequestItem: React.FC<RequestItemProps> = ({
     icon: "❓",
   };
 
-  // const handleDelete = async () => {
-  //   setIsDeleting(true);
-  //   try {
-  //     const response = await deleteUserAmbulanceRequests({
-  //       accessToken,
-  //       requestId: data._id,
-  //     });
+  const handleStatusUpdate = async () => {
+    setIsUpdating(true);
+    const result = await updateMyAmbulanceRequestStatus({
+      accessToken,
+      status: selectedStatus,
+      requestID: data._id,
+    });
 
-  //     if (!response) {
-  //       throw new Error("Failed to delete request");
-  //     }
+    console.log("result", result);
 
-  //     toast.success("Ambulance request deleted successfully");
-  //     onDelete?.();
-  //   } catch (error) {
-  //     toast.error("Failed to delete ambulance request");
-  //   } finally {
-  //     setIsDeleting(false);
-  //   }
-  // };
+    setIsUpdating(false);
+    setIsDialogOpen(false);
+
+    if (result.error) {
+      toast.error(`Failed to update status: ${result.error}`);
+    } else {
+      onUpdate?.();
+      toast.success("Status updated successfully.");
+    }
+  };
 
   return (
     <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300 font-work-sans">
@@ -147,55 +143,53 @@ export const RequestItem: React.FC<RequestItemProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-end gap-2">
-          {/* <UpdateRequestDialog
-            requestId={data._id}
-            accessToken={accessToken}
-            ambulanceId={data.ambulance._id}
-            initialData={{
-              hospital_location: data.hospital_location,
-            }}
-            onSuccess={() => {
-              onUpdate?.();
-            }}
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex gap-2 items-center"
-            >
-              <Pencil className="w-4 h-4" />
-              Edit
-            </Button>
-          </UpdateRequestDialog> */}
 
-          <AlertDialog>
+        <div className="space-y-2">
+          <select
+            className="border p-2 rounded-md w-full"
+            value={selectedStatus}
+            onChange={(e) =>
+              setSelectedStatus(
+                e.target.value as
+                  | "PENDING"
+                  | "ENROUTE"
+                  | "COMPLETED"
+                  | "CANCELLED"
+              )
+            }
+          >
+            {Object.keys(statusConfig).map((status) => (
+              <option key={status} value={status}>
+                {status}
+              </option>
+            ))}
+          </select>
+
+          <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button
-                variant="destructive"
+                variant="outline"
                 size="sm"
-                className="flex gap-2 items-center"
-                disabled={isDeleting}
+                className="w-full bg-blue-500 text-white"
               >
-                <Trash2 className="w-4 h-4" />
-                Delete
+                Change Status
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete Ambulance Request</AlertDialogTitle>
+                <AlertDialogTitle>Confirm Status Change</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to delete this ambulance request? This
-                  action cannot be undone.
+                  Are you sure you want to change the status to &quot;
+                  {selectedStatus}&quot;?
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  // onClick={handleDelete}
-                  className="bg-red-500 hover:bg-red-600"
+                  onClick={handleStatusUpdate}
+                  disabled={isUpdating}
                 >
-                  Delete
+                  {isUpdating ? "Updating..." : "Confirm"}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

@@ -6,8 +6,8 @@ import {
   AuthErrorResponse,
   AuthSuccessResponse,
 } from "@/core/types/auth.interface";
-import { signInAmbulanceSchema } from "@/app/schema/ambulance";
 import { signInAmbulanceService } from "@/app/services/auth/ambulance-auth.service";
+import { signInAmbulanceSchema } from "@/app/schema/ambulance/ambulance";
 
 export async function ambulanceSignIn(
   formData: z.infer<typeof signInAmbulanceSchema>

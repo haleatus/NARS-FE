@@ -77,6 +77,13 @@ export async function adminSignIn(
   error?: AuthErrorResponse;
 }> {
   try {
+    // Delete the existing access token and user data cookies to login as admin
+    const cookieStore = await cookies();
+    cookieStore.delete("accessToken");
+    cookieStore.delete("userData");
+    cookieStore.delete("ambulanceAccessToken");
+    cookieStore.delete("ambulanceData");
+
     // Validate the input data
     const validatedData = signInAdminSchema.parse(formData);
 

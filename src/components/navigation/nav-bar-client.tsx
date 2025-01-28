@@ -20,8 +20,6 @@ export function NavigationBarClient() {
   const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
 
-  console.log("user", user);
-
   const navLinks = [
     { href: "/driver", label: "Driver" },
     { href: "/ambulance", label: "Ambulance" },

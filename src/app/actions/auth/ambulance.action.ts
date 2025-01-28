@@ -17,6 +17,12 @@ export async function ambulanceSignIn(
   error?: AuthErrorResponse;
 }> {
   try {
+    const cookieStore = await cookies();
+    cookieStore.delete("accessToken");
+    cookieStore.delete("userData");
+    cookieStore.delete("adminAccessToken");
+    cookieStore.delete("adminData");
+
     // Validate the input data
     const validatedData = signInAmbulanceSchema.parse(formData);
 

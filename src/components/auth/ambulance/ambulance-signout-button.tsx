@@ -46,7 +46,7 @@ const AmbulanceSignoutButton = () => {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <span className="text-red-600">SignOut</span>
+          <span className="text-red-600">Ambulance SignOut</span>
         </TooltipContent>
       </Tooltip>
     </div>

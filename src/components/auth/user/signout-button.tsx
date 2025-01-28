@@ -46,7 +46,7 @@ const SignoutButton = () => {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <span className="text-red-600">SignOut</span>
+          <span className="text-red-600">User SignOut</span>
         </TooltipContent>
       </Tooltip>
     </div>

@@ -16,6 +16,8 @@ import SignoutButton from "../auth/user/signout-button";
 import { useUser } from "@/context/user-context";
 import { useAdmin } from "@/context/admin-context";
 import { useAmbulance } from "@/context/ambulance-context";
+import AmbulanceSignoutButton from "../auth/ambulance/ambulance-signout-button";
+import AdminSignoutButton from "../auth/admin/admin-signout-button";
 
 export function NavigationBarClient() {
   const pathname = usePathname();
@@ -29,13 +31,31 @@ export function NavigationBarClient() {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const navLinks = [
-    { href: "/driver", label: "Driver" },
-    { href: "/ambulance", label: "Ambulance" },
-    { href: "/admin", label: "Admin" },
-    { href: "/profile", label: "Profile" },
-    { href: "/my-requests", label: "MyRequests" },
-  ];
+  const getNavLinks = () => {
+    if (admin) {
+      return [{ href: "/admin", label: "Admin" }];
+    }
+
+    if (ambulance) {
+      return [
+        { href: "/driver", label: "Driver" },
+        { href: "/profile", label: "Profile" },
+        { href: "/my-requests", label: "MyRequests" },
+      ];
+    }
+
+    if (user) {
+      return [
+        { href: "/ambulance", label: "Ambulance" },
+        { href: "/profile", label: "Profile" },
+        { href: "/my-requests", label: "MyRequests" },
+      ];
+    }
+
+    return [{ href: "/ambulance", label: "Ambulance" }];
+  };
+
+  const navLinks = getNavLinks();
 
   const isActiveLink = (href: string) => {
     if (href === "/") {
@@ -97,8 +117,12 @@ export function NavigationBarClient() {
                 {link.label}
               </Link>
             ))}
-            {user ? (
-              <SignoutButton />
+            {user || admin || ambulance ? (
+              <>
+                {user && <SignoutButton />}
+                {admin && <AdminSignoutButton />}
+                {ambulance && <AmbulanceSignoutButton />}
+              </>
             ) : (
               <>
                 <Link
@@ -155,8 +179,12 @@ export function NavigationBarClient() {
                     </NavLink>
                   ))}
 
-                  {user ? (
-                    <SignoutButton />
+                  {user || admin || ambulance ? (
+                    <>
+                      {user && <SignoutButton />}
+                      {admin && <AdminSignoutButton />}
+                      {ambulance && <AmbulanceSignoutButton />}
+                    </>
                   ) : (
                     <>
                       <NavLink href="/signin">Sign In</NavLink>

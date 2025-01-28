@@ -43,5 +43,12 @@ export const endpoints = {
   ambulance: {
     getAllAmbulances: `${baseURL}/api/nars/ambulance/get-all`,
     getAmbulanceById: `${baseURL}/api/nars/ambulance/get/:id`,
+    auth: {
+      getCurrentAmbulance: `${baseURL}/api/nars/ambulance/me`,
+    },
+    ambulanceRequests: {
+      myRequests: `${baseURL}/api/nars/ambulance/ambulance-request/my-requests`,
+      requestAction: `${baseURL}/api/nars/ambulance/ambulance-request/action/:id`,
+    },
   },
 };

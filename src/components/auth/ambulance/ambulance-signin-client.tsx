@@ -19,6 +19,8 @@ import { toast } from "sonner";
 import { AuthErrorResponse } from "@/core/types/auth.interface";
 import { ambulanceSignIn } from "@/app/actions/auth/ambulance.action";
 import { useAmbulance } from "@/context/ambulance-context";
+import { useAdmin } from "@/context/admin-context";
+import { useUser } from "@/context/user-context";
 
 function AmbulanceSignInForm() {
   const [contact, setContact] = useState("");
@@ -28,6 +30,8 @@ function AmbulanceSignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const { refetchAdmin } = useAdmin();
+  const { refetchUser } = useUser();
   const { refetchAmbulance } = useAmbulance();
 
   useEffect(() => {
@@ -54,8 +58,10 @@ function AmbulanceSignInForm() {
         setContact("");
         setPassword("");
 
-        // Refetch ambulance data and update context
+        // Refetch and update context
         await refetchAmbulance();
+        await refetchUser();
+        await refetchAdmin();
 
         // Redirect to home or the intended destination
         const redirectTo = searchParams.get("redirectTo") || "/";

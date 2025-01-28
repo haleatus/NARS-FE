@@ -9,9 +9,14 @@ import { IoMdLogOut } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import { ambulanceSignOut } from "@/app/actions/auth/ambulance.action";
 import { useAmbulance } from "@/context/ambulance-context";
+import { useAdmin } from "@/context/admin-context";
+import { useUser } from "@/context/user-context";
 
 const AmbulanceSignoutButton = () => {
   const router = useRouter();
+
+  const { refetchAdmin } = useAdmin();
+  const { refetchUser } = useUser();
   const { refetchAmbulance } = useAmbulance();
 
   const handleSignOut = async () => {
@@ -19,6 +24,8 @@ const AmbulanceSignoutButton = () => {
     if (result.success) {
       // Refetch ambulance data and update context
       await refetchAmbulance();
+      await refetchUser();
+      await refetchAdmin();
       toast.success("Sign out successful! Redirecting...");
       // Redirect to login page or update UI
       router.push("/ambulance-signin");

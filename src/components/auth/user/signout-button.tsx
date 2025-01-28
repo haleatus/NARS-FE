@@ -9,17 +9,23 @@ import { Button } from "../../ui/button";
 import { IoMdLogOut } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import { useUser } from "@/context/user-context";
+import { useAdmin } from "@/context/admin-context";
+import { useAmbulance } from "@/context/ambulance-context";
 
 const SignoutButton = () => {
   const router = useRouter();
 
+  const { refetchAdmin } = useAdmin();
   const { refetchUser } = useUser();
+  const { refetchAmbulance } = useAmbulance();
 
   const handleSignOut = async () => {
     const result = await userSignOut();
     if (result.success) {
       // Refetch user data and update context
       await refetchUser();
+      await refetchAdmin();
+      await refetchAmbulance();
       toast.success("Sign out successful! Redirecting...");
       // Redirect to login page or update UI
       router.push("/signin");

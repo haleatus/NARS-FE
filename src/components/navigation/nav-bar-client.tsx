@@ -14,10 +14,19 @@ import { LucideGitCompareArrows, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import SignoutButton from "../auth/user/signout-button";
 import { useUser } from "@/context/user-context";
+import { useAdmin } from "@/context/admin-context";
+import { useAmbulance } from "@/context/ambulance-context";
 
 export function NavigationBarClient() {
   const pathname = usePathname();
   const { user } = useUser();
+  const { admin } = useAdmin();
+  const { ambulance } = useAmbulance();
+
+  console.log("user", user);
+  console.log("admin", admin);
+  console.log("ambulance", ambulance);
+
   const [isOpen, setIsOpen] = useState(false);
 
   const navLinks = [

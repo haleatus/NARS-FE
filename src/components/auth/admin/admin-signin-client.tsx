@@ -19,6 +19,8 @@ import { toast } from "sonner";
 import { AuthErrorResponse } from "@/core/types/auth.interface";
 import { adminSignIn } from "@/app/actions/auth/admin.action";
 import { useAdmin } from "@/context/admin-context";
+import { useUser } from "@/context/user-context";
+import { useAmbulance } from "@/context/ambulance-context";
 
 function SignInForm() {
   const [username, setUsername] = useState("");
@@ -28,6 +30,8 @@ function SignInForm() {
   const searchParams = useSearchParams();
 
   const { refetchAdmin } = useAdmin();
+  const { refetchUser } = useUser();
+  const { refetchAmbulance } = useAmbulance();
 
   useEffect(() => {
     const message = searchParams.get("message");
@@ -52,8 +56,10 @@ function SignInForm() {
         setUsername("");
         setPassword("");
 
-        // Refetch admin data and update context
+        // Refetch and update context
         await refetchAdmin();
+        await refetchAmbulance();
+        await refetchUser();
 
         // Redirect to home or the intended destination
         const redirectTo = searchParams.get("redirectTo") || "/";

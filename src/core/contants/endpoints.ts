@@ -1,5 +1,5 @@
-// export const baseURL: string = "http://localhost:3000";
-export const baseURL: string = "https://nars-server.onrender.com";
+export const baseURL: string =
+  process.env.BACKEND_BASE_URL || "http://localhost:3000";
 
 export const endpoints = {
   auth: {
@@ -39,9 +39,20 @@ export const endpoints = {
       getAllUsers: `${baseURL}/api/nars/admin/user/get-all`,
       getUserById: `${baseURL}/api/nars/admin/user/get/:id`,
     },
+    auth: {
+      getCurrentAdmin: `${baseURL}/api/nars/admin/me`,
+      getAllAdmins: `${baseURL}/api/nars/admin/get-all`,
+    },
   },
   ambulance: {
     getAllAmbulances: `${baseURL}/api/nars/ambulance/get-all`,
     getAmbulanceById: `${baseURL}/api/nars/ambulance/get/:id`,
+    auth: {
+      getCurrentAmbulance: `${baseURL}/api/nars/ambulance/me`,
+    },
+    ambulanceRequests: {
+      myRequests: `${baseURL}/api/nars/ambulance/ambulance-request/my-requests`,
+      updateStatus: `${baseURL}/api/nars/ambulance/ambulance-request/action/:id`,
+    },
   },
 };

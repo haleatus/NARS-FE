@@ -11,27 +11,29 @@ import {
   UserCog,
   User,
 } from "lucide-react";
+import { useAdmin } from "@/context/admin-context";
 
 const navItems = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Ambulance", href: "/admin/ambulance", icon: Ambulance },
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Ambulance", href: "/dashboard/ambulance", icon: Ambulance },
   {
     name: "Ambulance Requests",
-    href: "/admin/ambulance-requests",
+    href: "/dashboard/ambulance-requests",
     icon: ClipboardList,
   },
-  { name: "Users", href: "/admin/users", icon: Users },
-  { name: "Admin Users", href: "/admin/admin-users", icon: UserCog },
-  { name: "My Profile", href: "/admin/my-profile", icon: User },
+  { name: "Users", href: "/dashboard/users", icon: Users },
+  { name: "Admin Users", href: "/dashboard/admin-users", icon: UserCog },
+  { name: "My Profile", href: "/dashboard/my-profile", icon: User },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { admin } = useAdmin();
 
   return (
     <div className="w-64 bg-white shadow-md rounded-lg font-work-sans">
       <div className="p-2 flex justify-center items-center border-b">
-        <h1 className="text-xl font-bold font-lora">Admin User Name</h1>
+        <h1 className="text-xl font-bold font-lora">{admin?.username}</h1>
       </div>
       <nav>
         <ul>

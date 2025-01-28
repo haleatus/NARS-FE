@@ -77,6 +77,12 @@ export async function userSignIn(
   error?: AuthErrorResponse;
 }> {
   try {
+    const cookieStore = await cookies();
+    cookieStore.delete("adminAccessToken");
+    cookieStore.delete("adminData");
+    cookieStore.delete("ambulanceAccessToken");
+    cookieStore.delete("ambulanceData");
+
     // Validate the input data
     const validatedData = signInUserSchema.parse(formData);
 

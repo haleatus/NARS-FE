@@ -12,26 +12,56 @@ import {
 } from "@/components/ui/sheet";
 import { LucideGitCompareArrows, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { User } from "@/core/types/user/user.interface";
 import SignoutButton from "../auth/user/signout-button";
+import AmbulanceSignoutButton from "../auth/ambulance/ambulance-signout-button";
+import AdminSignoutButton from "../auth/admin/admin-signout-button";
+import { AuthState } from "@/core/types/auth-state.inteface";
+import { getNavLinks } from "@/core/utils/nav-links";
 
-export function NavigationBarClient({ user }: { user: User | null }) {
+interface NavigationBarClientProps {
+  authState: AuthState;
+}
+
+export function NavigationBarClient({ authState }: NavigationBarClientProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-
-  const navLinks = [
-    { href: "/driver", label: "Driver" },
-    { href: "/ambulance", label: "Ambulance" },
-    { href: "/admin", label: "Admin" },
-    { href: "/profile", label: "Profile" },
-    { href: "/my-requests", label: "MyRequests" },
-  ];
+  const navLinks = getNavLinks(authState);
 
   const isActiveLink = (href: string) => {
     if (href === "/") {
       return pathname === href;
     }
     return pathname?.startsWith(href);
+  };
+
+  const renderAuthButtons = () => {
+    if (authState.isAdmin) return <AdminSignoutButton />;
+    if (authState.isAmbulance) return <AmbulanceSignoutButton />;
+    if (authState.isUser) return <SignoutButton />;
+
+    return (
+      <>
+        <Link
+          href="/signin"
+          className={cn(
+            "text-gray-700 hover:text-red-600 relative py-1",
+            "after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:scale-x-0 after:bg-red-600 after:transition-transform after:duration-300",
+            isActiveLink("/signin") && "text-gray-900 after:scale-x-100"
+          )}
+        >
+          Sign in
+        </Link>
+        <Link
+          href="/signup"
+          className={cn(
+            "bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-full transition-colors",
+            isActiveLink("/signup") && "bg-black"
+          )}
+        >
+          Sign up →
+        </Link>
+      </>
+    );
   };
 
   const NavLink = ({
@@ -65,7 +95,7 @@ export function NavigationBarClient({ user }: { user: User | null }) {
             aria-label="NARS Home"
           >
             <LucideGitCompareArrows className="h-6 w-6" aria-hidden="true" />
-            NARS
+            <span>NARS</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -87,31 +117,7 @@ export function NavigationBarClient({ user }: { user: User | null }) {
                 {link.label}
               </Link>
             ))}
-            {user ? (
-              <SignoutButton />
-            ) : (
-              <>
-                <Link
-                  href="/signin"
-                  className={cn(
-                    "text-gray-700 hover:text-red-600 relative py-1",
-                    "after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-full after:scale-x-0 after:bg-red-600 after:transition-transform after:duration-300",
-                    isActiveLink("/signin") && "text-gray-900 after:scale-x-100"
-                  )}
-                >
-                  Signin
-                </Link>
-                <Link
-                  href="/signup"
-                  className={cn(
-                    "bg-red-600 hover:bg-red-700 text-white pl-4 pr-3 py-1.5 rounded-full transition-colors",
-                    isActiveLink("/signup") && "bg-black"
-                  )}
-                >
-                  Signup →
-                </Link>
-              </>
-            )}
+            {renderAuthButtons()}
           </div>
 
           {/* Mobile Navigation */}
@@ -144,21 +150,7 @@ export function NavigationBarClient({ user }: { user: User | null }) {
                       {link.label}
                     </NavLink>
                   ))}
-
-                  {user ? (
-                    <SignoutButton />
-                  ) : (
-                    <>
-                      <NavLink href="/signin">Sign In</NavLink>
-                      <Button
-                        asChild
-                        variant="outline"
-                        className="w-full justify-start"
-                      >
-                        <NavLink href="/signup">Sign Up</NavLink>
-                      </Button>
-                    </>
-                  )}
+                  {renderAuthButtons()}
                 </nav>
               </div>
             </SheetContent>

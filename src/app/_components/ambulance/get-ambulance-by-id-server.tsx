@@ -1,5 +1,5 @@
 import { getAmbulanceById } from "@/app/actions/ambulance/get-ambulance-by-id.action";
-import { getCurrentUserAccessToken } from "@/app/actions/user/get-current-user-access-token";
+import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-user-access-token";
 import GetAmbulanceByIdClient from "@/components/ambulance/get-ambulance-by-id-client";
 import React from "react";
 

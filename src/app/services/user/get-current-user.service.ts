@@ -2,11 +2,7 @@ import "server-only";
 
 import { endpoints } from "@/core/contants/endpoints";
 
-export const getCurrentUserService = async ({
-  accessToken,
-}: {
-  accessToken: string;
-}) => {
+export const getCurrentUserService = async (accessToken: string) => {
   const response = await fetch(endpoints.user.getCurrentUser, {
     method: "GET",
     headers: {
@@ -15,9 +11,11 @@ export const getCurrentUserService = async ({
     },
   });
 
-  if (response.ok) {
-    return response.json();
+  const userData = await response.json();
+
+  if (!response.ok) {
+    throw new Error(userData.message);
   }
 
-  return null;
+  return userData;
 };

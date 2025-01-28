@@ -6,8 +6,8 @@ import {
   AuthErrorResponse,
   AuthSuccessResponse,
 } from "@/core/types/auth.interface";
-import { signInAmbulanceSchema } from "@/app/schema/ambulance";
 import { signInAmbulanceService } from "@/app/services/auth/ambulance-auth.service";
+import { signInAmbulanceSchema } from "@/app/schema/ambulance/ambulance";
 
 export async function ambulanceSignIn(
   formData: z.infer<typeof signInAmbulanceSchema>
@@ -17,6 +17,12 @@ export async function ambulanceSignIn(
   error?: AuthErrorResponse;
 }> {
   try {
+    const cookieStore = await cookies();
+    cookieStore.delete("accessToken");
+    cookieStore.delete("userData");
+    cookieStore.delete("adminAccessToken");
+    cookieStore.delete("adminData");
+
     // Validate the input data
     const validatedData = signInAmbulanceSchema.parse(formData);
 

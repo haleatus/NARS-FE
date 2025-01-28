@@ -1,33 +1,20 @@
 import React, { Suspense } from "react";
 import getUserAmbulanceRequests from "@/app/actions/user/ambulance-request/get-user-ambulance-requests.action";
-import { getCurrentUserAccessToken } from "@/app/actions/user/get-current-user-access-token";
+import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-user-access-token";
 import GetUserAmbulanceRequestClient from "@/components/user/ambulance-request/get-user-ambulance-request-client";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
+import { Alert } from "@/components/ui/alert";
 import {
   isSuccessResponse,
   UserAmbulanceRequestResult,
 } from "@/core/types/user/ambulance-request";
-
-const ErrorMessage = ({ message }: { message: string }) => (
-  <Alert variant="destructive" className="max-w-2xl mx-auto my-4">
-    <AlertTitle>Error</AlertTitle>
-    <AlertDescription>{message}</AlertDescription>
-  </Alert>
-);
-
-const LoadingState = () => (
-  <div className="flex justify-center items-center min-h-[200px]">
-    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-  </div>
-);
+import { Loader2 } from "lucide-react";
 
 const GetUserAmbulanceRequest = async () => {
   const accessToken = await getCurrentUserAccessToken();
 
   if (!accessToken) {
     return (
-      <ErrorMessage message="You must be logged in to view ambulance requests" />
+      <Alert variant="destructive">Please log in to view your requests.</Alert>
     );
   }
 
@@ -35,18 +22,29 @@ const GetUserAmbulanceRequest = async () => {
     accessToken: accessToken,
   });
 
-  if (!result || !result.data) {
-    return <ErrorMessage message="Failed to fetch ambulance requests" />;
+  if (!result?.data) {
+    return <Alert>No ambulance requests found.</Alert>;
   }
 
   const response = result.data as UserAmbulanceRequestResult;
 
   if (!isSuccessResponse(response)) {
-    return <ErrorMessage message={response.message || "An error occurred"} />;
+    return (
+      <Alert variant="destructive">
+        {response?.message || "Failed to fetch requests."}
+      </Alert>
+    );
+  }
+
+  if (
+    !response.data ||
+    (Array.isArray(response.data) && response.data.length === 0)
+  ) {
+    return <Alert>You don&apos;t have any ambulance requests yet.</Alert>;
   }
 
   return (
-    <Suspense fallback={<LoadingState />}>
+    <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin mx-auto" />}>
       <GetUserAmbulanceRequestClient
         requests={response}
         accessToken={accessToken}

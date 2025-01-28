@@ -2,7 +2,7 @@
 
 import React from "react";
 import { CreateAmbulanceRequestForm } from "./create-ambulance-request-form";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const CreateAmbulanceRequestClient = ({
   id,
@@ -11,6 +11,7 @@ const CreateAmbulanceRequestClient = ({
   id: string;
   accessToken: string;
 }) => {
+  const router = useRouter();
   return (
     <div>
       <CreateAmbulanceRequestForm
@@ -18,7 +19,7 @@ const CreateAmbulanceRequestClient = ({
         accessToken={accessToken}
         onSuccess={() => {
           // Redirect to ambulance requests list or show success message
-          redirect("/my-requests");
+          router.push("/my-requests");
         }}
         onCancel={() => {
           if (window.history.length > 1) {
@@ -26,7 +27,7 @@ const CreateAmbulanceRequestClient = ({
             window.history.back();
           } else {
             // Redirect to a safe fallback
-            redirect("/ambulance");
+            router.push("/ambulance");
           }
         }}
       />

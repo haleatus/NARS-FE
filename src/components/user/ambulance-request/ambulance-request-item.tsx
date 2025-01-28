@@ -87,14 +87,14 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
   };
 
   return (
-    <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300">
-      <CardHeader className="pb-2">
+    <Card className="w-full shadow-lg hover:shadow-xl transition-all duration-300 font-work-sans">
+      <CardHeader className="p-3">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <CardTitle className="text-xl font-bold">
+            <CardTitle className="text-md font-bold">
               Request #{data._id.slice(-6)}
             </CardTitle>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm flex items-center text-muted-foreground">
               <User className="inline-block w-4 h-4 mr-1" />
               {data.requester.fullname}
             </p>
@@ -105,7 +105,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 px-4 pb-2 font-sans">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="flex items-center gap-2">
             <Ambulance className="w-4 h-4 text-blue-500" />
@@ -148,8 +148,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             </div>
           </div>
         </div>
-
-        <div className="flex justify-end gap-2 pt-4 border-t">
+        <div className="flex items-center justify-end gap-2">
           <UpdateRequestDialog
             requestId={data._id}
             accessToken={accessToken}
@@ -159,7 +158,6 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             }}
             onSuccess={() => {
               onUpdate?.();
-              toast.success("Request updated successfully");
             }}
           >
             <Button

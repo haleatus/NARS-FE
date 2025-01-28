@@ -8,16 +8,27 @@ import { Button } from "../../ui/button";
 import { IoMdLogOut } from "react-icons/io";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../ui/tooltip";
 import { ambulanceSignOut } from "@/app/actions/auth/ambulance.action";
+import { useAmbulance } from "@/context/ambulance-context";
+import { useAdmin } from "@/context/admin-context";
+import { useUser } from "@/context/user-context";
 
 const AmbulanceSignoutButton = () => {
   const router = useRouter();
 
+  const { refetchAdmin } = useAdmin();
+  const { refetchUser } = useUser();
+  const { refetchAmbulance } = useAmbulance();
+
   const handleSignOut = async () => {
     const result = await ambulanceSignOut();
     if (result.success) {
+      // Refetch ambulance data and update context
+      await refetchAmbulance();
+      await refetchUser();
+      await refetchAdmin();
       toast.success("Sign out successful! Redirecting...");
       // Redirect to login page or update UI
-      router.push("/ambbulance-signin");
+      router.push("/ambulance-signin");
     } else {
       // Handle error
       toast.error(result.error?.message);
@@ -35,7 +46,7 @@ const AmbulanceSignoutButton = () => {
           </Button>
         </TooltipTrigger>
         <TooltipContent>
-          <span className="text-red-600">SignOut</span>
+          <span className="text-red-600">Ambulance SignOut</span>
         </TooltipContent>
       </Tooltip>
     </div>

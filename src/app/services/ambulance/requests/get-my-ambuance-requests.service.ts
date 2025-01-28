@@ -1,0 +1,43 @@
+import "server-only";
+
+import { endpoints } from "@/core/contants/endpoints";
+
+export const getMyAmbulanceRequestsService = async ({
+  accessToken,
+}: {
+  accessToken: string;
+}) => {
+  try {
+    const res = await fetch(endpoints.ambulance.ambulanceRequests.myRequests, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        return {
+          statusCode: 404,
+          message: "No requests found",
+          data: null,
+        };
+      }
+      return null;
+    }
+
+    let data;
+    try {
+      data = await res.json();
+    } catch (parseError) {
+      console.error("Error parsing response:", parseError);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Network error in getMyAmbulanceRequestsService:", error);
+    return null;
+  }
+};

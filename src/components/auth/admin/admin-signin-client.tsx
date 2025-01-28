@@ -18,6 +18,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { AuthErrorResponse } from "@/core/types/auth.interface";
 import { adminSignIn } from "@/app/actions/auth/admin.action";
+import { useAdmin } from "@/context/admin-context";
+import { useUser } from "@/context/user-context";
+import { useAmbulance } from "@/context/ambulance-context";
 
 function SignInForm() {
   const [username, setUsername] = useState("");
@@ -25,6 +28,10 @@ function SignInForm() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const { refetchAdmin } = useAdmin();
+  const { refetchUser } = useUser();
+  const { refetchAmbulance } = useAmbulance();
 
   useEffect(() => {
     const message = searchParams.get("message");
@@ -44,12 +51,18 @@ function SignInForm() {
       });
 
       if (result.success && result.data) {
-        toast.success("Sign in successful! Redirecting...");
+        toast.success("Admin Sign in successful! Redirecting...");
         // Reset form
         setUsername("");
         setPassword("");
+
+        // Refetch and update context
+        await refetchAdmin();
+        await refetchAmbulance();
+        await refetchUser();
+
         // Redirect to home or the intended destination
-        const redirectTo = searchParams.get("redirectTo") || "/";
+        const redirectTo = searchParams.get("redirectTo") || "/dashboard";
         setTimeout(() => router.push(redirectTo), 1000);
       } else if (result.error) {
         // Handle field-specific errors

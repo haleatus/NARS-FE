@@ -1,4 +1,4 @@
-import { getCurrentAdminAccessToken } from "@/app/actions/admin/get-current-admin-access-token";
+import { getCurrentAdminAccessToken } from "@/app/actions/admin/auth/get-current-admin-access-token";
 import getAllUsers from "@/app/actions/admin/users/get-all-users.action";
 import GetAllUsersClient from "@/components/admin/users/get-all-user-client";
 import React from "react";

@@ -25,26 +25,26 @@ const GetAllUsersClient = ({ usersData }: { usersData: User[] }) => {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="text-center">Full Name</TableHead>
-            <TableHead className="text-center">Email</TableHead>
-            <TableHead className="text-center">Contact</TableHead>
+            <TableHead className="text-center w-1/4">Full Name</TableHead>
+            <TableHead className="text-center w-1/3">Email</TableHead>
+            <TableHead className="text-center w-1/4">Contact</TableHead>
             <TableHead className="text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {usersData.map((user) => (
             <TableRow key={user._id}>
-              <TableCell className="font-medium text-center">
-                <div className="flex items-center justify-center">
+              <TableCell className="font-medium text-center border-r border-gray-300">
+                <div className="flex items-center ">
                   <UserIcon className="w-4 h-4 mr-2" />
                   {user.fullname}
                 </div>
               </TableCell>
-              <TableCell className="text-center">
+              <TableCell className="border-r border-gray-300">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center">
                         <Mail className="w-4 h-4 mr-2" />
                         {user.email}
                       </div>
@@ -55,11 +55,11 @@ const GetAllUsersClient = ({ usersData }: { usersData: User[] }) => {
                   </Tooltip>
                 </TooltipProvider>
               </TableCell>
-              <TableCell className="text-center">
+              <TableCell className="border-r border-gray-300">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center ">
                         <Phone className="w-4 h-4 mr-2" />
                         {user.contact}
                       </div>

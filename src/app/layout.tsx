@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { Inter, Work_Sans, Lora } from "next/font/google";
 import NavigationBarServer from "./_components/navigation/nav-bar-server";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { UserProvider } from "@/context/user-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -39,11 +40,13 @@ export default function RootLayout({
       <body
         className={`bg-gradient-to-br from-white to-[#FEE9E9] ${inter.variable} ${lora.variable} ${work_sans.variable}`}
       >
-        <TooltipProvider>
-          <NavigationBarServer />
-          <div className="max-w-8xl mx-auto px-4">{children}</div>
-          <Toaster closeButton richColors />
-        </TooltipProvider>
+        <UserProvider>
+          <TooltipProvider>
+            <NavigationBarServer />
+            <div className="max-w-8xl mx-auto px-4">{children}</div>
+            <Toaster closeButton richColors />
+          </TooltipProvider>
+        </UserProvider>
       </body>
     </html>
   );

@@ -1,24 +1,20 @@
 "use server";
 
 import { getCurrentUserService } from "@/app/services/user/get-current-user.service";
+import { cookies } from "next/headers";
 
-export const getCurrentUserFromApi = async ({
-  accessToken,
-}: {
-  accessToken: string;
-}) => {
+const getCurrentUserFromApi = async () => {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken");
   try {
-    const res = await getCurrentUserService({ accessToken });
-
-    if (!res) {
-      return { data: null, error: "User not found" };
+    if (!accessToken?.value) {
+      throw new Error("Access token is missing");
     }
-
-    if ("data" in res && res.statusCode === 200) {
-      return { data: res.data };
-    }
+    const user = await getCurrentUserService(accessToken.value);
+    return user;
   } catch (error) {
-    console.error(error);
-    return;
+    return error;
   }
 };
+
+export default getCurrentUserFromApi;

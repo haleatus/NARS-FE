@@ -1,5 +1,5 @@
 import React from "react";
-import GetAllAmbulanceRequestServer from "@/app/_components/admin/ambulance/get-all-ambulance-request-server";
+import GetAllAmbulanceRequestServer from "@/app/_components/admin/ambulance-request/get-all-ambulance-request-server";
 
 const AdminAmbulanceRequestPage = () => {
   return (

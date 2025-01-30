@@ -4,33 +4,24 @@ import { createAmbulanceSchema } from "@/app/schema/admin/ambulance/ambulance.sc
 import createNewAmbulanceService from "@/app/services/admin/ambulance/create-ambulance.service";
 import { z } from "zod";
 
-const createAmbulanceAction = async ({
-  adminAccessToken,
-  createAmbulanceData,
-}: {
-  adminAccessToken: string;
-  createAmbulanceData: z.infer<typeof createAmbulanceSchema>;
-}) => {
+const createAmbulanceAction = async (
+  adminAccessToken: string,
+  createAmbulanceData: z.infer<typeof createAmbulanceSchema>
+) => {
   try {
     const validatedData = createAmbulanceSchema.parse(createAmbulanceData);
 
-    const res = await createNewAmbulanceService(
-      adminAccessToken,
-      validatedData
-    );
-
-    return res;
+    return await createNewAmbulanceService(adminAccessToken, validatedData);
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return {
-        data: null,
-        error: error.errors.map((e) => `${e.message}`).join(", "),
-      };
-    }
-
-    if (error instanceof Error) {
-      return { data: null, error: error.message };
-    }
+    return {
+      data: null,
+      error:
+        error instanceof z.ZodError
+          ? error.errors.map((e) => e.message).join(", ")
+          : error instanceof Error
+          ? error.message
+          : "An error occurred",
+    };
   }
 };
 

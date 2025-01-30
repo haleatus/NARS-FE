@@ -20,8 +20,7 @@ const createNewAmbulanceService = async (
   const result = await res.json();
 
   if (!res.ok) {
-    console.log(result);
-    return;
+    throw new Error(result.message);
   }
   return result;
 };

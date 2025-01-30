@@ -28,9 +28,9 @@ const createAmbulanceAction = async ({
       };
     }
 
-    console.log(error);
-
-    return { data: null, error: "An unexpected error occurred" };
+    if (error instanceof Error) {
+      return { data: null, error: error.message };
+    }
   }
 };
 

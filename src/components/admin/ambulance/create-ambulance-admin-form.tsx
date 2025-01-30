@@ -62,10 +62,7 @@ export function CreateAmbulanceForm({
     try {
       createAmbulanceSchema.parse(formData);
 
-      const result = await createAmbulanceAction({
-        adminAccessToken,
-        createAmbulanceData: formData,
-      });
+      const result = await createAmbulanceAction(adminAccessToken, formData);
 
       if (result.error) {
         toast.error(result.error);

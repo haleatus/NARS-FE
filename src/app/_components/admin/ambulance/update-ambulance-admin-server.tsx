@@ -1,8 +1,8 @@
 import { getCurrentAdminAccessToken } from "@/app/actions/admin/auth/get-current-admin-access-token";
-import CreateAmbulanceClient from "@/components/admin/ambulance/create-ambulance-admin-client";
+import UpdateAmbulanceClient from "@/components/admin/ambulance/update-ambulance-admin-client";
 import React from "react";
 
-const CreateAmbulanceServer = async () => {
+const UpdateAmbulanceServer = async () => {
   const adminAccessToken = await getCurrentAdminAccessToken();
 
   if (!adminAccessToken) {
@@ -15,9 +15,12 @@ const CreateAmbulanceServer = async () => {
 
   return (
     <div>
-      <CreateAmbulanceClient adminAccessToken={adminAccessToken} />
+      <UpdateAmbulanceClient
+        adminAccessToken={adminAccessToken}
+        ambulanceId={""}
+      />
     </div>
   );
 };
 
-export default CreateAmbulanceServer;
+export default UpdateAmbulanceServer;

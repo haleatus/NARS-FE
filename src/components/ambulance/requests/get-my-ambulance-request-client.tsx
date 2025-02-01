@@ -58,7 +58,7 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
       {statusTabs.map((status) => (
         <TabsContent key={status} value={status}>
           {filteredRequests.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-0 p-2">
               {filteredRequests.map((request) => (
                 <RequestItem
                   key={request._id}

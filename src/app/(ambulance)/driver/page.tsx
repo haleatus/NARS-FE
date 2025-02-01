@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapView } from "@/components/map/map-view";
 import { Badge } from "@/components/ui/badge";
+import GetMyAmbulanceRequestServer from "@/app/_components/ambulance/requests/get-my-ambulance-request-server";
+import MapView from "@/components/map/map-view";
 
 export default function DriverDashboard() {
   return (
@@ -16,7 +17,12 @@ export default function DriverDashboard() {
           <CardTitle>Current Location & Route</CardTitle>
         </CardHeader>
         <CardContent>
-          <MapView className="h-[400px] w-full rounded-md" />
+          <div className="flex justify-between items-center gap-2">
+            <MapView className="h-[400px] w-1/2 rounded-md overflow-hidden" />
+            <div className="w-1/2 h-[400px] rounded-md bg-background">
+              <GetMyAmbulanceRequestServer />
+            </div>
+          </div>
         </CardContent>
       </Card>
 

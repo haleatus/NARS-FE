@@ -7,11 +7,7 @@ export function middleware(req: NextRequest) {
   const ambulanceAuthToken = req.cookies.get("ambulanceAccessToken");
 
   const protectedUserRoutes = ["/profile", "/my-requests"];
-  const protectedAmbulanceRoutes = [
-    "/driver",
-    "/ambulance-profile",
-    "/ambulance-requests",
-  ];
+  const protectedAmbulanceRoutes = ["/driver", "/ambulance-profile"];
   const protectedAdminRoutes = ["/dashboard"];
   const currentPath = req.nextUrl.pathname;
 

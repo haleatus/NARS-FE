@@ -32,6 +32,8 @@ const MapView: React.FC<MapViewProps> = ({
       style: "mapbox://styles/mapbox/streets-v12",
       center: initialCenter,
       zoom: initialZoom,
+      maxZoom: 18,
+      minZoom: 2,
     });
 
     // Add navigation controls

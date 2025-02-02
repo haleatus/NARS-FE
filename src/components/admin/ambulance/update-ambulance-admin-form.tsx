@@ -2,15 +2,13 @@
 "use client";
 
 import { useState } from "react";
-import { createAmbulanceSchema } from "@/app/schema/admin/ambulance/ambulance.schema";
-import { updateAmbulanceSchema } from "@/app/schema/admin/ambulance/ambulance.schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import createAmbulanceAction from "@/app/actions/admin/ambulance/create-ambulance.action";
 import updateAmbulanceAction from "@/app/actions/admin/ambulance/update-ambulance.action";
 import { toast } from "sonner";
+import { updateAmbulanceSchema } from "@/app/schema/admin/ambulance/ambulance.schema";
 
 interface UpdateAmbulanceFormProps {
   adminAccessToken: string;
@@ -64,7 +62,7 @@ export function UpdateAmbulanceForm({
     setErrors({});
 
     try {
-      createAmbulanceSchema.parse(formData);
+      updateAmbulanceSchema.parse(formData);
 
       const result = await updateAmbulanceAction(
         adminAccessToken,

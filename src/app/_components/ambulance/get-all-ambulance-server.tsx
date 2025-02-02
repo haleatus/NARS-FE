@@ -5,6 +5,8 @@ import React from "react";
 const GetAllAmbulanceServer = async () => {
   const ambulanceData = await getAllAmbulance();
 
+  console.log("ambulanceData", ambulanceData);
+
   return (
     <div>
       {ambulanceData ? (

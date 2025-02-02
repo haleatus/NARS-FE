@@ -8,6 +8,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { UserProvider } from "@/context/user-context";
 import { AmbulanceProvider } from "@/context/ambulance-context";
 import { AdminProvider } from "@/context/admin-context";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 const inter = Inter({
   subsets: ["latin"],

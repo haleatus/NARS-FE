@@ -1,31 +1,69 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface MapViewProps {
   className?: string;
+  initialCenter?: [number, number];
+  initialZoom?: number;
 }
 
-export function MapView({ className }: MapViewProps) {
-  const [isLoading, setIsLoading] = useState(true);
+const MapView: React.FC<MapViewProps> = ({
+  className,
+  initialCenter = [-74.5, 40], // Default to New York area
+  initialZoom = 9,
+}) => {
+  const mapContainer = useRef<HTMLDivElement | null>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
 
   useEffect(() => {
-    // Simulate map loading
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    if (!mapContainer.current) return;
 
-  return (
-    <div className={className}>
-      {isLoading ? (
-        <div className="h-full w-full animate-pulse bg-muted" />
-      ) : (
-        <div className="h-full w-full bg-muted flex items-center justify-center">
-          <p className="text-muted-foreground">
-            Map View (Integration Required)
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
+    // Replace with your actual Mapbox access token
+    mapboxgl.accessToken = process.env
+      .NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN as string;
+
+    if (map.current) return; // Initialize map only once
+
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: initialCenter,
+      zoom: initialZoom,
+      maxZoom: 18,
+      minZoom: 2,
+    });
+
+    // Add navigation controls
+    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+    // Add user location control
+    map.current.addControl(
+      new mapboxgl.GeolocateControl({
+        positionOptions: {
+          enableHighAccuracy: true,
+        },
+        trackUserLocation: true,
+        showUserHeading: true,
+      })
+    );
+
+    // Error handling for map load
+    map.current.on("error", (e: mapboxgl.ErrorEvent) => {
+      console.error("Mapbox error:", e.error);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      if (map.current) {
+        map.current.remove();
+      }
+    };
+  }, [initialCenter, initialZoom]);
+
+  return <div ref={mapContainer} className={className} />;
+};
+
+export default MapView;

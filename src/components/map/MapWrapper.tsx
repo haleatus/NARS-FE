@@ -8,12 +8,16 @@ interface MapWrapperProps {
   className?: string;
   ambulanceData: Ambulance[];
   initialZoom: number;
+  userLocation?: [number, number];
+  showRouteToAmbulance?: string;
 }
 
 const MapWrapper: React.FC<MapWrapperProps> = ({
   className,
   ambulanceData,
   initialZoom,
+  userLocation,
+  showRouteToAmbulance,
 }) => {
   // Use a default center point (can be adjusted based on your needs)
   const center: [number, number] = React.useMemo(() => {
@@ -32,6 +36,8 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
         ambulanceData={ambulanceData}
         center={center}
         initialZoom={initialZoom}
+        userLocation={userLocation}
+        showRouteToAmbulance={showRouteToAmbulance}
       />
     </div>
   );

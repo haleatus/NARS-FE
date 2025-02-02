@@ -5,11 +5,9 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Ambulance, MapPin } from "lucide-react";
-// import MapClientWrapper from "@/components/map/MapWrapper";
+import { Ambulance } from "lucide-react";
 import { getAllAmbulance } from "@/app/actions/ambulance/get-all-ambulance.action";
-import GetAllAmbulanceClient from "@/components/ambulance/get-all-ambulance-client";
-import MapWrapper from "@/components/map/MapWrapper";
+import AmbulanceClient from "@/components/ambulance/ambulance-client";
 
 export default async function AmbulanceDashboard() {
   const ambulanceData = await getAllAmbulance();
@@ -28,39 +26,7 @@ export default async function AmbulanceDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-2 gap-6 h-[440px]">
-              <div className="relative rounded-lg overflow-hidden shadow-inner">
-                {ambulanceData ? (
-                  <MapWrapper
-                    className="h-full w-full"
-                    ambulanceData={ambulanceData}
-                    initialZoom={12}
-                  />
-                ) : (
-                  <div>No ambulance data found</div>
-                )}
-                <div className="absolute top-2 left-2 bg-white bg-opacity-90 rounded-md p-2 shadow">
-                  <div className="flex items-center gap-2 text-sm font-medium">
-                    <MapPin className="h-4 w-4 text-blue-500" />
-                    Current Locations
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-lg shadow-inner overflow-hidden">
-                <div className="p-4 bg-gray-50 border-b border-gray-200">
-                  <h3 className="text-lg font-semibold text-gray-700">
-                    Ambulance List
-                  </h3>
-                </div>
-                <div className="overflow-y-auto h-[calc(100%-3.5rem)]">
-                  {ambulanceData ? (
-                    <GetAllAmbulanceClient ambulanceData={ambulanceData} />
-                  ) : (
-                    <div>No ambulance data found</div>
-                  )}
-                </div>
-              </div>
-            </div>
+            <AmbulanceClient ambulanceData={ambulanceData} />
           </CardContent>
         </Card>
       </div>

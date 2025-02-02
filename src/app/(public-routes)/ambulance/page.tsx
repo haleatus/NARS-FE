@@ -6,16 +6,17 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Ambulance, MapPin } from "lucide-react";
-import UserMapView from "@/components/map/user-map-view";
+// import MapClientWrapper from "@/components/map/MapWrapper";
 import { getAllAmbulance } from "@/app/actions/ambulance/get-all-ambulance.action";
 import GetAllAmbulanceClient from "@/components/ambulance/get-all-ambulance-client";
+import MapWrapper from "@/components/map/MapWrapper";
 
 export default async function AmbulanceDashboard() {
   const ambulanceData = await getAllAmbulance();
 
   return (
     <div className="font-lora">
-      <div className="container  mx-auto p-4 space-y-8">
+      <div className="container mx-auto p-4 space-y-8">
         <Card className="shadow-lg border border-gray-200">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl flex items-center gap-2">
@@ -30,7 +31,7 @@ export default async function AmbulanceDashboard() {
             <div className="grid md:grid-cols-2 gap-6 h-[440px]">
               <div className="relative rounded-lg overflow-hidden shadow-inner">
                 {ambulanceData ? (
-                  <UserMapView
+                  <MapWrapper
                     className="h-full w-full"
                     ambulanceData={ambulanceData}
                     initialZoom={12}

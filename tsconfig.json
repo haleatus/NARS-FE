@@ -27,8 +27,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/app/actions/admin/ambulance/get-ambulance-request-by-id.action.ts",
-    "src/app/services/admin/ambulance/ambulance-request-by-id/.service.ts"
+    "src/app/actions/admin/ambulance-request/get-ambulance-request-by-id.action.ts",
+    "src/app/services/admin/ambulance-request/ambulance-request-by-id/.service.ts"
   ],
   "exclude": ["node_modules"]
 }

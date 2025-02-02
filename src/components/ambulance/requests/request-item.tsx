@@ -1,8 +1,6 @@
 "use client";
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,22 +36,11 @@ export const RequestItem: React.FC<RequestItemProps> = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const statusConfig = {
-    PENDING: { color: "bg-yellow-500", icon: "🕒" },
-    COMPLETED: { color: "bg-green-500", icon: "✅" },
-    CANCELLED: { color: "bg-red-500", icon: "✖" },
-    ENROUTE: { color: "bg-blue-500", icon: "🚑" },
-  } as const;
-
   const dropdownStatusConfig = {
+    PENDING: { color: "text-yellow-500", icon: "🕒" },
     COMPLETED: { color: "text-green-500", icon: "✅" },
     CANCELLED: { color: "text-red-500", icon: "✖" },
     ENROUTE: { color: "text-blue-500", icon: "🚑" },
-  };
-
-  const statusStyle = statusConfig[data.status] || {
-    color: "bg-gray-500",
-    icon: "❓",
   };
 
   const handleStatusUpdate = async () => {
@@ -98,9 +85,6 @@ export const RequestItem: React.FC<RequestItemProps> = ({
                 }`}
               />
             </CardTitle>
-            <Badge className={`${statusStyle.color} text-white px-2 py-1`}>
-              {statusStyle.icon} {data.status}
-            </Badge>
           </div>
         </CardHeader>
         <motion.div
@@ -136,7 +120,9 @@ export const RequestItem: React.FC<RequestItemProps> = ({
                 className="flex-grow border rounded p-2 text-sm border-black/50 bg-white dark:bg-gray-800 transition-colors duration-200"
                 value={selectedStatus}
                 onChange={(e) =>
-                  setSelectedStatus(e.target.value as keyof typeof statusConfig)
+                  setSelectedStatus(
+                    e.target.value as keyof typeof dropdownStatusConfig
+                  )
                 }
               >
                 {Object.entries(dropdownStatusConfig).map(
@@ -155,7 +141,7 @@ export const RequestItem: React.FC<RequestItemProps> = ({
                 <AlertDialogTrigger asChild>
                   <Button
                     variant="outline"
-                    size="md"
+                    size="sm"
                     className="bg-blue-500 text-white rounded font-mono font-bold hover:bg-blue-600 transition-colors duration-200"
                   >
                     Update

@@ -9,7 +9,6 @@ export const getNavLinks = (authState: AuthState): NavLink[] => {
     return [
       { href: "/driver", label: "Driver" },
       { href: "/ambulance-profile", label: "Profile" },
-      { href: "/ambulance-requests", label: "Requests" },
     ];
   }
 

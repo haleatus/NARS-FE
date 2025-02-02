@@ -1,4 +1,4 @@
-import GetAmbulanceRequestByIdServer from "@/app/_components/admin/ambulance/get-ambulance-request-by-id-server";
+import GetAmbulanceRequestByIdServer from "@/app/_components/admin/ambulance-request/get-ambulance-request-by-id-server";
 import React from "react";
 
 interface PageProps {

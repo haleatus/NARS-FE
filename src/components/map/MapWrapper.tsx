@@ -1,8 +1,7 @@
-"use client";
-
 import React from "react";
 import Map from "./Map";
 import { Ambulance } from "@/core/types/ambulance.interface";
+import RouteDistanceCalculator from "./RouteDIstanceCalculator";
 
 interface MapWrapperProps {
   className?: string;
@@ -19,7 +18,6 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
   userLocation,
   showRouteToAmbulance,
 }) => {
-  // Use a default center point (can be adjusted based on your needs)
   const center: [number, number] = React.useMemo(() => {
     if (ambulanceData.length > 0) {
       return [
@@ -30,6 +28,19 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
     return [-73.935242, 40.73061]; // Default coordinates
   }, [ambulanceData]);
 
+  const selectedAmbulance = React.useMemo(() => {
+    if (!showRouteToAmbulance) return null;
+    return ambulanceData.find((a) => a._id === showRouteToAmbulance);
+  }, [ambulanceData, showRouteToAmbulance]);
+
+  const ambulanceLocation = React.useMemo(() => {
+    if (!selectedAmbulance) return null;
+    return [
+      Number(selectedAmbulance.location.longitude),
+      Number(selectedAmbulance.location.latitude),
+    ] as [number, number];
+  }, [selectedAmbulance]);
+
   return (
     <div className={className}>
       <Map
@@ -39,6 +50,14 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
         userLocation={userLocation}
         showRouteToAmbulance={showRouteToAmbulance}
       />
+      <div className="absolute bottom-0 right-0 z-50">
+        {userLocation && ambulanceLocation && (
+          <RouteDistanceCalculator
+            userLocation={userLocation}
+            ambulanceLocation={ambulanceLocation}
+          />
+        )}
+      </div>
     </div>
   );
 };

@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Ambulance } from "@/core/types/ambulance.interface";
+import { IHospital } from "@/core/types/hospital.interface";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 
@@ -13,6 +14,7 @@ interface MapProps {
   initialZoom: number;
   userLocation?: [number, number];
   showRouteToAmbulance?: string;
+  hospitalData: IHospital[] | null;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -21,6 +23,7 @@ const Map: React.FC<MapProps> = ({
   initialZoom,
   userLocation = [85.333606, 27.705665],
   showRouteToAmbulance,
+  hospitalData,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
@@ -192,7 +195,33 @@ const Map: React.FC<MapProps> = ({
         ]);
       }
     });
-  }, [ambulanceData, showRouteToAmbulance, userLocation]);
+
+    // Check if hospitalData is an array before iterating over it
+    if (Array.isArray(hospitalData)) {
+      hospitalData.forEach((hospital) => {
+        const el = document.createElement("div");
+        el.className = "hospital-marker";
+        el.style.width = "21px";
+        el.style.height = "21px";
+        el.style.backgroundImage = "url(/hospital-icon.svg)"; // Add this icon to your public folder
+        el.style.backgroundSize = "cover";
+        el.style.cursor = "pointer";
+
+        const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+          <div class="p-3 max-w-xs">
+            <h3 class="font-semibold text-lg">${hospital.name}</h3>
+          </div>
+        `);
+
+        new mapboxgl.Marker(el)
+          .setLngLat([hospital.longitude, hospital.latitude])
+          .setPopup(popup)
+          .addTo(map.current!);
+      });
+    } else {
+      console.warn("hospitalData is not an array or is null");
+    }
+  }, [ambulanceData, showRouteToAmbulance, userLocation, hospitalData]);
 
   return (
     <>
@@ -213,6 +242,14 @@ const Map: React.FC<MapProps> = ({
           background-color: #3b82f6;
           border: 2px solid white;
           border-radius: 50%;
+        }
+        .hospital-marker {
+          background-color: #34d399; /* Light green for hospital marker */
+          border-radius: 50%;
+          transition: transform 0.2s;
+        }
+        .hospital-marker:hover {
+          transform: scale(1.1);
         }
       `}</style>
     </>

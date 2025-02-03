@@ -5,11 +5,14 @@ import MapWrapper from "../map/MapWrapper";
 import { MapPin } from "lucide-react";
 import GetAllAmbulanceClient from "./get-all-ambulance-client";
 import { Ambulance } from "@/core/types/ambulance.interface";
+import { IHospitalSuccessResponse } from "@/core/types/hospital.interface";
 
 const AmbulanceClient = ({
   ambulanceData,
+  hospitalData,
 }: {
   ambulanceData: Ambulance[] | null;
+  hospitalData: IHospitalSuccessResponse | null;
 }) => {
   const [selectedAmbulanceForRoute, setSelectedAmbulanceForRoute] = useState<
     string | undefined
@@ -26,6 +29,7 @@ const AmbulanceClient = ({
               initialZoom={12}
               showRouteToAmbulance={selectedAmbulanceForRoute}
               userLocation={[85.333606, 27.705665]}
+              hospitalData={hospitalData}
             />
           ) : (
             <div>No ambulance data found</div>

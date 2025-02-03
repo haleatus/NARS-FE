@@ -8,9 +8,11 @@ import {
 import { Ambulance } from "lucide-react";
 import { getAllAmbulance } from "@/app/actions/ambulance/get-all-ambulance.action";
 import AmbulanceClient from "@/components/ambulance/ambulance-client";
+import { getAllHospitalService } from "@/app/services/hospital/hospital.service";
 
 export default async function AmbulanceDashboard() {
   const ambulanceData = await getAllAmbulance();
+  const hospitalData = await getAllHospitalService();
 
   return (
     <div className="font-lora">
@@ -26,7 +28,10 @@ export default async function AmbulanceDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AmbulanceClient ambulanceData={ambulanceData} />
+            <AmbulanceClient
+              ambulanceData={ambulanceData}
+              hospitalData={hospitalData}
+            />
           </CardContent>
         </Card>
       </div>

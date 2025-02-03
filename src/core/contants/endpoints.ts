@@ -55,4 +55,7 @@ export const endpoints = {
       updateStatus: `${baseURL}/api/nars/ambulance/ambulance-request/action/:id`,
     },
   },
+  hospital: {
+    getAllHospital: `${baseURL}/api/nars/hospital/get-all`,
+  },
 };

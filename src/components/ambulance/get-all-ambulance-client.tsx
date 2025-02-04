@@ -60,7 +60,7 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                 <MapPin className="w-4 h-4 mr-2" />
                 {ambulance.location.latitude}, {ambulance.location.longitude}
               </div>
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center font-sans">
                 <Button
                   variant="outline"
                   size="sm"
@@ -93,15 +93,10 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                       accessToken={accessToken}
                       onSuccess={() => {
                         setIsDialogOpen(false); // Close dialog on success
-                        router.push("/my-requests");
+                        router.refresh();
                       }}
                       onCancel={() => {
                         setIsDialogOpen(false); // Close dialog on cancel
-                        if (window.history.length > 1) {
-                          window.history.back();
-                        } else {
-                          router.push("/ambulance");
-                        }
                       }}
                     />
                   </DialogContent>

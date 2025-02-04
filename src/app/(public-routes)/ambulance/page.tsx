@@ -10,11 +10,19 @@ import { getAllAmbulance } from "@/app/actions/ambulance/get-all-ambulance.actio
 import AmbulanceClient from "@/components/ambulance/ambulance-client";
 import { getAllHospitalService } from "@/app/services/hospital/hospital.service";
 import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-user-access-token";
+import getUserAmbulanceRequests from "@/app/actions/user/ambulance-request/get-user-ambulance-requests.action";
+import { UserAmbulanceRequestResponse } from "@/core/types/user/ambulance-request";
 
 export default async function AmbulanceDashboard() {
   const ambulanceData = await getAllAmbulance();
   const hospitalData = await getAllHospitalService();
   const accessToken = (await getCurrentUserAccessToken()) ?? "";
+
+  const myAmbulanceRequest = await getUserAmbulanceRequests({
+    accessToken: accessToken,
+  });
+
+  const myRequestExists = myAmbulanceRequest?.data ? true : false;
 
   return (
     <div className="font-lora">
@@ -34,6 +42,8 @@ export default async function AmbulanceDashboard() {
               ambulanceData={ambulanceData}
               hospitalData={hospitalData}
               accessToken={accessToken}
+              myRequestExists={myRequestExists}
+              requests={myAmbulanceRequest.data as UserAmbulanceRequestResponse}
             />
           </CardContent>
         </Card>

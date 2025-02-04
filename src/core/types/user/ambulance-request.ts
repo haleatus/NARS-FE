@@ -26,6 +26,7 @@ export interface UserAmbulanceRequestResponse {
 // Error response type
 export interface UserAmbulanceRequestError {
   statusCode: number;
+  timestamp: string;
   message: string;
   data: null;
 }

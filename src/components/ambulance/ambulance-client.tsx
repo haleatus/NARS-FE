@@ -6,15 +6,21 @@ import { MapPin } from "lucide-react";
 import GetAllAmbulanceClient from "./get-all-ambulance-client";
 import { Ambulance } from "@/core/types/ambulance.interface";
 import { IHospitalSuccessResponse } from "@/core/types/hospital.interface";
+import { UserAmbulanceRequestResponse } from "@/core/types/user/ambulance-request";
+import GetUserAmbulanceRequestClient from "../user/ambulance-request/get-user-ambulance-request-client";
 
 const AmbulanceClient = ({
   ambulanceData,
   hospitalData,
   accessToken,
+  requests,
+  myRequestExists,
 }: {
   ambulanceData: Ambulance[] | null;
   hospitalData: IHospitalSuccessResponse | null;
   accessToken: string;
+  myRequestExists: boolean;
+  requests: UserAmbulanceRequestResponse;
 }) => {
   const [selectedAmbulanceForRoute, setSelectedAmbulanceForRoute] = useState<
     string | undefined
@@ -44,22 +50,38 @@ const AmbulanceClient = ({
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-inner overflow-hidden">
-          <div className="p-4 bg-gray-50 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-700">
-              Ambulance List
-            </h3>
-          </div>
-          <div className="overflow-y-auto h-[calc(100%-3.5rem)]">
-            {ambulanceData ? (
-              <GetAllAmbulanceClient
-                ambulanceData={ambulanceData}
-                onNavigateToAmbulance={setSelectedAmbulanceForRoute}
+          {myRequestExists ? (
+            <>
+              <div className="p-4 bg-gray-50 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-700">
+                  My Current Ambulance Request
+                </h3>
+              </div>
+              <GetUserAmbulanceRequestClient
+                requests={requests}
                 accessToken={accessToken}
               />
-            ) : (
-              <div>No ambulance data found</div>
-            )}
-          </div>
+            </>
+          ) : (
+            <>
+              <div className="p-4 bg-gray-50 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-700">
+                  Ambulance List
+                </h3>
+              </div>
+              <div className="overflow-y-auto h-[calc(100%-3.5rem)]">
+                {ambulanceData ? (
+                  <GetAllAmbulanceClient
+                    ambulanceData={ambulanceData}
+                    onNavigateToAmbulance={setSelectedAmbulanceForRoute}
+                    accessToken={accessToken}
+                  />
+                ) : (
+                  <div>No ambulance data found</div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

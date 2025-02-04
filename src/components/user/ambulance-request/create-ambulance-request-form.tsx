@@ -108,7 +108,7 @@ export function CreateAmbulanceRequestForm({
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card className="w-full max-w-lg mx-auto font-sans">
       <CardHeader>
         <CardTitle>Create Ambulance Request</CardTitle>
       </CardHeader>

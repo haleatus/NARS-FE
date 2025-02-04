@@ -9,10 +9,12 @@ import { Ambulance } from "lucide-react";
 import { getAllAmbulance } from "@/app/actions/ambulance/get-all-ambulance.action";
 import AmbulanceClient from "@/components/ambulance/ambulance-client";
 import { getAllHospitalService } from "@/app/services/hospital/hospital.service";
+import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-user-access-token";
 
 export default async function AmbulanceDashboard() {
   const ambulanceData = await getAllAmbulance();
   const hospitalData = await getAllHospitalService();
+  const accessToken = (await getCurrentUserAccessToken()) ?? "";
 
   return (
     <div className="font-lora">
@@ -31,6 +33,7 @@ export default async function AmbulanceDashboard() {
             <AmbulanceClient
               ambulanceData={ambulanceData}
               hospitalData={hospitalData}
+              accessToken={accessToken}
             />
           </CardContent>
         </Card>

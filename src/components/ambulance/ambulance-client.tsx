@@ -10,9 +10,11 @@ import { IHospitalSuccessResponse } from "@/core/types/hospital.interface";
 const AmbulanceClient = ({
   ambulanceData,
   hospitalData,
+  accessToken,
 }: {
   ambulanceData: Ambulance[] | null;
   hospitalData: IHospitalSuccessResponse | null;
+  accessToken: string;
 }) => {
   const [selectedAmbulanceForRoute, setSelectedAmbulanceForRoute] = useState<
     string | undefined
@@ -52,6 +54,7 @@ const AmbulanceClient = ({
               <GetAllAmbulanceClient
                 ambulanceData={ambulanceData}
                 onNavigateToAmbulance={setSelectedAmbulanceForRoute}
+                accessToken={accessToken}
               />
             ) : (
               <div>No ambulance data found</div>

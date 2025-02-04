@@ -29,7 +29,7 @@ const AmbulanceClient = ({
   return (
     <div>
       <div className="grid md:grid-cols-2 gap-6 h-[440px]">
-        <div className="relative rounded-lg overflow-hidden shadow-inner">
+        <div className="relative rounded-lg overflow-hidden shadow-inner border-2 border-red-700">
           {ambulanceData ? (
             <MapWrapper
               className="h-full w-full"
@@ -49,7 +49,7 @@ const AmbulanceClient = ({
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-inner overflow-hidden">
+        <div className="bg-white rounded-lg shadow-inner overflow-hidden  border-2 border-black/30">
           {myRequestExists ? (
             <>
               <div className="p-4 bg-gray-50 border-b border-gray-200">

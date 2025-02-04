@@ -26,6 +26,7 @@ import {
   Calendar,
   User,
   Ambulance,
+  X,
 } from "lucide-react";
 import { format } from "date-fns";
 import deleteUserAmbulanceRequests from "@/app/actions/user/ambulance-request/delete-ambulance-request.action";
@@ -148,7 +149,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-2 font-sans">
           <UpdateRequestDialog
             requestId={data._id}
             accessToken={accessToken}
@@ -178,25 +179,25 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
                 className="flex gap-2 items-center"
                 disabled={isDeleting}
               >
-                <Trash2 className="w-4 h-4" />
-                Delete
+                <X className="w-4 h-4" />
+                Cancel
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="font-sans">
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete Ambulance Request</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to delete this ambulance request? This
+                  Are you sure you want to cancel this ambulance request? This
                   action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>No</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   className="bg-red-500 hover:bg-red-600"
                 >
-                  Delete
+                  Sure
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

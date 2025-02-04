@@ -6,7 +6,6 @@ import React, { useState } from "react"; // Added useState import
 import { Card, CardContent } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import Link from "next/link";
 import { CreateAmbulanceRequestForm } from "../user/ambulance-request/create-ambulance-request-form";
 import { useRouter } from "next/navigation";
 import {
@@ -62,12 +61,6 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                 {ambulance.location.latitude}, {ambulance.location.longitude}
               </div>
               <div className="flex justify-between items-center">
-                <Link
-                  href={`/ambulance/${ambulance._id}`}
-                  className="text-xs text-blue-500 cursor-pointer font-sans underline"
-                >
-                  View More →
-                </Link>
                 <Button
                   variant="outline"
                   size="sm"

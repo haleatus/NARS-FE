@@ -27,6 +27,18 @@ import {
 } from "@/components/ui/dialog";
 import { UpdateAmbulanceForm } from "./update-ambulance-admin-form";
 import { useRouter } from "next/navigation";
+import deleteAmbulanceAction from "@/app/actions/admin/ambulance/delete-ambulance.action";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const GetAllAmbulanceAdminClient = ({
   adminAccessToken,
@@ -39,6 +51,10 @@ const GetAllAmbulanceAdminClient = ({
     null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [ambulanceToDelete, setAmbulanceToDelete] = useState<Ambulance | null>(
+    null
+  );
 
   const router = useRouter();
 
@@ -50,6 +66,35 @@ const GetAllAmbulanceAdminClient = ({
   const closeModal = () => {
     setSelectedAmbulance(null);
     setIsModalOpen(false);
+  };
+
+  const openDeleteDialog = (ambulance: Ambulance) => {
+    setAmbulanceToDelete(ambulance);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!ambulanceToDelete) return;
+
+    try {
+      const result = await deleteAmbulanceAction(
+        adminAccessToken,
+        ambulanceToDelete._id
+      );
+
+      if (result.error) {
+        toast.success(result.error);
+      } else {
+        toast.success("Ambulance deleted successfully");
+        router.refresh();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      toast.error("Failed to delete ambulance");
+    }
+
+    setIsDeleteDialogOpen(false);
+    setAmbulanceToDelete(null);
   };
 
   const onSuccess = () => {
@@ -141,7 +186,11 @@ const GetAllAmbulanceAdminClient = ({
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="smallicon">
+                    <Button
+                      variant="ghost"
+                      size="smallicon"
+                      onClick={() => openDeleteDialog(ambulance)}
+                    >
                       <Trash className="w-4 h-4 text-red-500" />
                     </Button>
                   </TooltipTrigger>
@@ -171,6 +220,32 @@ const GetAllAmbulanceAdminClient = ({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              ambulance record with number:{" "}
+              {ambulanceToDelete?.ambulance_number}.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-500 hover:bg-red-600"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

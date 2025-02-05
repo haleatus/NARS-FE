@@ -24,6 +24,10 @@ export default async function AmbulanceDashboard() {
   const ambulanceData = await getAllAmbulance();
   const hospitalData = await getAllHospitalService();
 
+  if (!ambulanceData || !hospitalData) {
+    return <div>Loading...</div>;
+  }
+
   const myAmbulanceRequest = await getUserAmbulanceRequests({
     accessToken: accessToken,
   });

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/card";
 import { Ambulance, UserPlus, Mail, Lock, User, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { AuthErrorResponse } from "@/core/interface/auth.interface";
 import { toast } from "sonner";
 import { userSignUp } from "@/app/actions/auth/user.action";
 

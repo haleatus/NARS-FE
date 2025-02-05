@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/tooltip";
 import { MapPin, User, Ambulance, Calendar, Info } from "lucide-react";
 import Link from "next/link";
-import { UserAmbulanceRequest } from "@/core/types/user/ambulance-request";
+import { UserAmbulanceRequest } from "@/core/interface/user/ambulance-request";
 
 interface AmbulanceRequestTableProps {
   ambulanceRequestsData: UserAmbulanceRequest[];
@@ -85,17 +85,12 @@ const GetAllAmbulanceRequestClient: React.FC<AmbulanceRequestTableProps> = ({
                     <TooltipTrigger asChild>
                       <div className="flex items-center justify-center">
                         <Ambulance className="w-4 h-4 mr-2" />
-                        {request.ambulance}
+                        {request.ambulance.ambulance_number}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>TODO: req ambulance data</p>
-                      {/* <p>Driver: {request.ambulance.driver_name}</p>
+                      <p>Driver: {request.ambulance.driver_name}</p>
                       <p>Contact: {request.ambulance.contact}</p>
-                      <p>
-                        Location: {request.ambulance.location.latitude},{" "}
-                        {request.ambulance.location.longitude}
-                      </p> */}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

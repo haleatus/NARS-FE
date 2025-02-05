@@ -1,4 +1,4 @@
-import { AuthState, NavLink } from "../types/auth-state.inteface";
+import { AuthState, NavLink } from "../interface/auth-state.inteface";
 
 export const getNavLinks = (authState: AuthState): NavLink[] => {
   if (authState.isAdmin) {

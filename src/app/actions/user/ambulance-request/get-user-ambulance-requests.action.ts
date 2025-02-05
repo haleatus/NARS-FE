@@ -4,7 +4,7 @@ import { getUserAmbulanceRequestsService } from "@/app/services/user/ambulance-r
 import {
   isSuccessResponse,
   UserAmbulanceRequestResult,
-} from "@/core/types/user/ambulance-request";
+} from "@/core/interface/user/ambulance-request";
 
 const getUserAmbulanceRequests = async ({
   accessToken,

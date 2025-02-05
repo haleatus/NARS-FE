@@ -16,7 +16,7 @@ import {
 import { Ambulance, LogIn, Lock, User } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { AuthErrorResponse } from "@/core/interface/auth.interface";
 import { adminSignIn } from "@/app/actions/auth/admin.action";
 import { useAdmin } from "@/context/admin-context";
 import { useUser } from "@/context/user-context";

@@ -1,5 +1,5 @@
 import { NavigationBarClient } from "@/components/navigation/nav-bar-client";
-import { AuthState } from "@/core/types/auth-state.inteface";
+import { AuthState } from "@/core/interface/auth-state.inteface";
 import { cookies } from "next/headers";
 import React from "react";
 

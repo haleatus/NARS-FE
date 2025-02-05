@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, User, Ambulance, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
-import type { AmbulanceRequest } from "@/core/types/ambulance/request";
+import type { AmbulanceRequest } from "@/core/interface/ambulance/request";
 import updateMyAmbulanceRequestStatus from "@/app/actions/ambulance/requests/update-my-ambulance-request-status.action";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -24,13 +24,17 @@ interface RequestItemProps {
   data: AmbulanceRequest;
   accessToken: string;
   onUpdate?: () => void;
+  onNavigate?: (request: AmbulanceRequest) => void;
 }
 
 export const RequestItem: React.FC<RequestItemProps> = ({
   data,
   accessToken,
   onUpdate,
+  onNavigate,
 }) => {
+  console.log("data", data);
+
   const [selectedStatus, setSelectedStatus] = useState(data.status);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -39,7 +43,6 @@ export const RequestItem: React.FC<RequestItemProps> = ({
   const dropdownStatusConfig = {
     PENDING: { color: "text-yellow-500", icon: "🕒" },
     COMPLETED: { color: "text-green-500", icon: "✅" },
-    CANCELLED: { color: "text-red-500", icon: "✖" },
     ENROUTE: { color: "text-blue-500", icon: "🚑" },
   };
 
@@ -101,8 +104,8 @@ export const RequestItem: React.FC<RequestItemProps> = ({
               />
               <InfoItem
                 icon={<Ambulance className="w-4 h-4" />}
-                label="Ambulance ID"
-                value={data.ambulance._id}
+                label="Ambulance Driver Name"
+                value={data.ambulance.driver_name}
               />
               <InfoItem
                 icon={<MapPin className="w-4 h-4" />}
@@ -116,6 +119,13 @@ export const RequestItem: React.FC<RequestItemProps> = ({
               />
             </div>
             <div className="flex items-center space-x-2">
+              <Button
+                onClick={() => onNavigate?.(data)}
+                className="w-full bg-blue-500 text-white hover:bg-blue-600"
+              >
+                <MapPin className="w-4 h-4 mr-2" />
+                Navigate
+              </Button>
               <select
                 className="flex-grow border rounded p-2 text-sm border-black/50 bg-white dark:bg-gray-800 transition-colors duration-200"
                 value={selectedStatus}
@@ -137,6 +147,7 @@ export const RequestItem: React.FC<RequestItemProps> = ({
                   )
                 )}
               </select>
+
               <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogTrigger asChild>
                   <Button

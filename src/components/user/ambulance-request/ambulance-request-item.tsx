@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { UserAmbulanceRequest } from "@/core/types/user/ambulance-request";
+import { UserAmbulanceRequest } from "@/core/interface/user/ambulance-request";
 // import UpdateRequestDialog from "./update-requests-dialog";
 import { toast } from "sonner";
 import {
@@ -19,8 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, User, Ambulance, X } from "lucide-react";
-import { format } from "date-fns";
+import { MapPin, User, Ambulance, X, PhoneCall, UserCog2 } from "lucide-react";
 import deleteUserAmbulanceRequests from "@/app/actions/user/ambulance-request/delete-ambulance-request.action";
 
 interface AmbulanceRequestItemProps {
@@ -103,8 +102,10 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
           <div className="flex items-center gap-2">
             <Ambulance className="w-4 h-4 text-blue-500" />
             <div>
-              <p className="text-sm font-medium">Ambulance ID</p>
-              <p className="text-sm text-muted-foreground">{data.ambulance}</p>
+              <p className="text-sm font-medium">Ambulance Plate</p>
+              <p className="text-sm text-muted-foreground">
+                {data.ambulance.ambulance_number}
+              </p>
             </div>
           </div>
 
@@ -120,21 +121,21 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-green-500" />
+            <PhoneCall className="w-4 h-4 text-green-500" />
             <div>
-              <p className="text-sm font-medium">Created</p>
+              <p className="text-sm font-medium">Contact</p>
               <p className="text-sm text-muted-foreground">
-                {format(new Date(data.createdAt), "PPp")}
+                {data.ambulance.contact}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-purple-500" />
+            <UserCog2 className="w-4 h-4 text-purple-500" />
             <div>
-              <p className="text-sm font-medium">Last Updated</p>
+              <p className="text-sm font-medium">Driver Name</p>
               <p className="text-sm text-muted-foreground">
-                {format(new Date(data.updatedAt), "PPp")}
+                {data.ambulance.driver_name}
               </p>
             </div>
           </div>

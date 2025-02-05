@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { UserAmbulanceRequestResponse } from "@/core/types/user/ambulance-request";
+import { UserAmbulanceRequestResponse } from "@/core/interface/user/ambulance-request";
 import React from "react";
 import { AmbulanceRequestItem } from "./ambulance-request-item";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { IHospital } from "@/core/types/hospital.interface";
+import { IHospital } from "@/core/interface/hospital.interface";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "lucide-react";
 

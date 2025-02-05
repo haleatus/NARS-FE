@@ -5,17 +5,22 @@ import { useState } from "react";
 import { RequestItem } from "./request-item";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import type { AmbulanceRequestResponse } from "@/core/types/ambulance/request";
+import type {
+  AmbulanceRequest,
+  AmbulanceRequestResponse,
+} from "@/core/interface/ambulance/request";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Props {
   requests: AmbulanceRequestResponse;
   accessToken: string;
+  onNavigate?: (request: AmbulanceRequest) => void;
 }
 
 const GetMyAmbulanceRequestClient: React.FC<Props> = ({
   requests,
   accessToken,
+  onNavigate,
 }) => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("PENDING");
@@ -32,7 +37,7 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
     );
   }
 
-  const statusTabs = ["PENDING", "ENROUTE", "CANCELLED", "COMPLETED"] as const;
+  const statusTabs = ["PENDING", "ENROUTE", "COMPLETED"] as const;
 
   const filteredRequests = requests.data.filter(
     (request) => request.status === activeTab
@@ -42,9 +47,9 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
     <Tabs
       defaultValue="PENDING"
       onValueChange={setActiveTab}
-      className="w-full"
+      className="w-full p-2"
     >
-      <TabsList className="grid w-full grid-cols-4 bg-gray-100">
+      <TabsList className="grid w-full grid-cols-3 bg-gray-100">
         {statusTabs.map((status) => (
           <TabsTrigger
             key={status}
@@ -58,13 +63,14 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
       {statusTabs.map((status) => (
         <TabsContent key={status} value={status}>
           {filteredRequests.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-0 p-2">
+            <div className="grid grid-cols-1 gap-4 pt-0">
               {filteredRequests.map((request) => (
                 <RequestItem
                   key={request._id}
                   data={request}
                   accessToken={accessToken}
                   onUpdate={handleUpdateAndDelete}
+                  onNavigate={onNavigate}
                 />
               ))}
             </div>

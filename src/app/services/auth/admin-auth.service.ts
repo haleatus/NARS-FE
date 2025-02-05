@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAdminSchema, signInAdminSchema } from "@/app/schema/admin";
 import { endpoints } from "@/core/contants/endpoints";
-import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { AuthErrorResponse } from "@/core/interface/auth.interface";
 import { z } from "zod";
 
 export const createAdminService = async (

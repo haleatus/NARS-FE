@@ -9,17 +9,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import updateAmbulanceAction from "@/app/actions/admin/ambulance/update-ambulance.action";
 import { toast } from "sonner";
 import { updateAmbulanceSchema } from "@/app/schema/admin/ambulance/ambulance.schema";
+import { Ambulance } from "@/core/interface/ambulance.interface";
+import Map, { Marker, NavigationControl } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface UpdateAmbulanceFormProps {
   adminAccessToken: string;
-  ambulanceId: string;
+  ambulanceData: Ambulance;
   onSuccess?: () => void;
   onCancel?: () => void;
 }
 
 export function UpdateAmbulanceForm({
   adminAccessToken,
-  ambulanceId,
+  ambulanceData,
   onSuccess,
   onCancel,
 }: UpdateAmbulanceFormProps) {
@@ -27,19 +30,24 @@ export function UpdateAmbulanceForm({
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [formData, setFormData] = useState({
-    driver_name: "",
-    ambulance_number: "",
-    contact: "",
-    password: "",
+    driver_name: ambulanceData.driver_name,
+    ambulance_number: ambulanceData.ambulance_number,
+    contact: ambulanceData.contact,
     location: {
-      latitude: "",
-      longitude: "",
+      latitude: ambulanceData.location.latitude,
+      longitude: ambulanceData.location.longitude,
     },
+  });
+
+  const [viewState, setViewState] = useState({
+    latitude: 27.70885, // Default latitude
+    longitude: 85.321741, // Default longitude
+    zoom: 12,
   });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    if (name.includes("hospital_location.")) {
+    if (name.includes("location.")) {
       const field = name.split(".")[1];
       setFormData((prev) => ({
         ...prev,
@@ -56,6 +64,17 @@ export function UpdateAmbulanceForm({
     }
   };
 
+  const handleMapClick = (event: any) => {
+    const { lngLat } = event;
+    setFormData((prev) => ({
+      ...prev,
+      location: {
+        latitude: lngLat.lat.toString(),
+        longitude: lngLat.lng.toString(),
+      },
+    }));
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
@@ -66,7 +85,7 @@ export function UpdateAmbulanceForm({
 
       const result = await updateAmbulanceAction(
         adminAccessToken,
-        ambulanceId,
+        ambulanceData._id,
         formData
       );
 
@@ -77,12 +96,10 @@ export function UpdateAmbulanceForm({
 
       toast.success("Ambulance updated successfully");
 
-      // Add this check before calling onSuccess
       if (onSuccess) {
         try {
           onSuccess();
         } catch (redirectError) {
-          // Ignore NEXT_REDIRECT errors
           if (
             !(redirectError instanceof Error) ||
             redirectError.message !== "NEXT_REDIRECT"
@@ -92,7 +109,6 @@ export function UpdateAmbulanceForm({
         }
       }
     } catch (error: any) {
-      // Only show error toast for non-redirect errors
       if (!(error instanceof Error) || error.message !== "NEXT_REDIRECT") {
         if (error.errors) {
           const validationErrors: { [key: string]: string } = {};
@@ -114,12 +130,13 @@ export function UpdateAmbulanceForm({
   return (
     <Card className="w-full max-w-lg mx-auto">
       <CardHeader>
-        <CardTitle>Update Ambulance </CardTitle>
+        <CardTitle>
+          Update Ambulance {ambulanceData.ambulance_number}{" "}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Ambulance Driver Fields */}
-
           <div>
             <label
               htmlFor="driver_name"
@@ -179,30 +196,29 @@ export function UpdateAmbulanceForm({
             )}
           </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium mb-1"
-            >
-              Password
-            </label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              value={formData.password}
-              onChange={handleInputChange}
-              placeholder="Enter password"
-              className={errors.password ? "border-red-500" : ""}
-            />
-            {errors.password && (
-              <p className="text-sm text-red-500 mt-1">{errors.password}</p>
-            )}
-          </div>
-
-          {/* Albulance Location Fields */}
+          {/* Map Picker for Location */}
           <div className="space-y-4">
             <h3 className="font-medium">Location</h3>
+            <div className="h-64 w-full">
+              <Map
+                {...viewState}
+                mapStyle="mapbox://styles/mapbox/streets-v11"
+                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+                onMove={(evt) => setViewState(evt.viewState)}
+                onClick={handleMapClick}
+                minZoom={5}
+                maxZoom={20}
+              >
+                <NavigationControl />
+                {formData.location.latitude && formData.location.longitude && (
+                  <Marker
+                    latitude={parseFloat(formData.location.latitude)}
+                    longitude={parseFloat(formData.location.longitude)}
+                  />
+                )}
+              </Map>
+            </div>
+
             <div>
               <label
                 htmlFor="latitude"
@@ -212,7 +228,7 @@ export function UpdateAmbulanceForm({
               </label>
               <Input
                 id="latitude"
-                name="hospital_location.latitude"
+                name="location.latitude"
                 value={formData.location.latitude}
                 onChange={handleInputChange}
                 placeholder="Enter latitude"
@@ -234,7 +250,7 @@ export function UpdateAmbulanceForm({
               </label>
               <Input
                 id="longitude"
-                name="hospital_location.longitude"
+                name="location.longitude"
                 value={formData.location.longitude}
                 onChange={handleInputChange}
                 placeholder="Enter longitude"
@@ -262,10 +278,10 @@ export function UpdateAmbulanceForm({
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating...
+                  Updating...
                 </>
               ) : (
-                "Create Ambulance"
+                "Update Ambulance"
               )}
             </Button>
           </div>

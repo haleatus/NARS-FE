@@ -1,8 +1,8 @@
 import React from "react";
 import Map from "./Map";
-import { Ambulance } from "@/core/types/ambulance.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 import RouteDistanceCalculator from "./RouteDIstanceCalculator";
-import { IHospital } from "@/core/types/hospital.interface";
+import { IHospital } from "@/core/interface/hospital.interface";
 
 interface MapWrapperProps {
   className?: string;

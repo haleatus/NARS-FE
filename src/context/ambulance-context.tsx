@@ -10,7 +10,7 @@ import React, {
 } from "react";
 import { useRouter } from "next/navigation";
 import getCurrentAmbulance from "@/app/actions/ambulance/auth/get-current-ambulance.action";
-import { Ambulance } from "@/core/types/ambulance.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 
 interface AmbulanceContextValue {
   ambulance: Ambulance | null;

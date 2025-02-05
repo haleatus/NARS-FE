@@ -4,8 +4,8 @@
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { Ambulance } from "@/core/types/ambulance.interface";
-import { IHospital } from "@/core/types/hospital.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
+import { IHospital } from "@/core/interface/hospital.interface";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 

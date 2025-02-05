@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import MapWrapper from "../map/MapWrapper";
-import { MapPin } from "lucide-react";
 import GetAllAmbulanceClient from "./get-all-ambulance-client";
 import { Ambulance } from "@/core/types/ambulance.interface";
 import {
@@ -39,7 +38,6 @@ const AmbulanceClient = ({
     setShowRouteToHospital(true);
   };
 
-  console.log("selectedHospital", selectedHospital);
   return (
     <div>
       <div className="relative grid md:grid-cols-3 gap-4 h-[440px]">
@@ -57,12 +55,6 @@ const AmbulanceClient = ({
           ) : (
             <div>No ambulance data found</div>
           )}
-          <div className="absolute top-2 left-2 bg-white bg-opacity-90 rounded-md p-2 shadow">
-            <div className="flex items-center gap-2 text-sm font-medium">
-              <MapPin className="h-4 w-4 text-blue-500" />
-              Ambulance Locations
-            </div>
-          </div>
         </div>
         <div className="space-y-4 h-full overflow-y-auto border-2 border-red-400 rounded-lg shadow-inner">
           <HospitalList
@@ -85,6 +77,8 @@ const AmbulanceClient = ({
               <GetUserAmbulanceRequestClient
                 requests={requests}
                 accessToken={accessToken}
+                onNavigateToAmbulance={setSelectedAmbulanceForRoute}
+                onNavigateToHospital={handleNavigateToHospital}
               />
             </>
           ) : (

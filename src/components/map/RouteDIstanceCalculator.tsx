@@ -65,18 +65,18 @@ const RouteDistanceCalculator: React.FC<RouteDistanceCalculatorProps> = ({
   }
 
   return (
-    <Card className="w-full">
-      <CardContent className="p-4">
-        <div className="flex flex-col gap-3">
+    <Card className="w-full bg-white/50 font-sans font-semibold">
+      <CardContent className="p-2">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <Route className="h-5 w-5 text-blue-500" />
-            <span className="text-sm">
+            <Route className="size-3 text-blue-500" />
+            <span className="text-xs">
               Distance: <strong>{routeInfo?.distance} km</strong>
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-blue-500" />
-            <span className="text-sm">
+            <Clock className="size-3 text-blue-500" />
+            <span className="text-xs">
               Estimated arrival: <strong>{routeInfo?.duration} minutes</strong>
             </span>
           </div>

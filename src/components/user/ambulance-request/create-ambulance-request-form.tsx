@@ -1,20 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client";
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createAmbulanceRequestSchema } from "@/app/schema/user/ambulance-request";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2, MapPin } from "lucide-react";
 import createAmbulanceRequest from "@/app/actions/user/ambulance-request/create-ambulance-request.action";
 import { toast } from "sonner";
+import { IHospital } from "@/core/types/hospital.interface";
 
 interface CreateAmbulanceRequestFormProps {
   ambulanceId: string;
   accessToken: string;
   onSuccess?: () => void;
   onCancel?: () => void;
+  selectedHospital: IHospital | null;
 }
 
 export function CreateAmbulanceRequestForm({
@@ -22,6 +21,7 @@ export function CreateAmbulanceRequestForm({
   accessToken,
   onSuccess,
   onCancel,
+  selectedHospital,
 }: CreateAmbulanceRequestFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -34,27 +34,27 @@ export function CreateAmbulanceRequestForm({
     },
   });
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    if (name.includes("hospital_location.")) {
-      const field = name.split(".")[1];
+  // Update form data when selectedHospital changes
+  useEffect(() => {
+    if (selectedHospital) {
       setFormData((prev) => ({
         ...prev,
         hospital_location: {
-          ...prev.hospital_location,
-          [field]: value,
+          latitude: selectedHospital.latitude.toString(),
+          longitude: selectedHospital.longitude.toString(),
         },
       }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
     }
-  };
+  }, [selectedHospital]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!selectedHospital) {
+      toast.error("Please select a hospital first");
+      return;
+    }
+
     setIsSubmitting(true);
     setErrors({});
 
@@ -73,12 +73,10 @@ export function CreateAmbulanceRequestForm({
 
       toast.success("Ambulance request created successfully");
 
-      // Add this check before calling onSuccess
       if (onSuccess) {
         try {
           onSuccess();
         } catch (redirectError) {
-          // Ignore NEXT_REDIRECT errors
           if (
             !(redirectError instanceof Error) ||
             redirectError.message !== "NEXT_REDIRECT"
@@ -88,7 +86,6 @@ export function CreateAmbulanceRequestForm({
         }
       }
     } catch (error: any) {
-      // Only show error toast for non-redirect errors
       if (!(error instanceof Error) || error.message !== "NEXT_REDIRECT") {
         if (error.errors) {
           const validationErrors: { [key: string]: string } = {};
@@ -108,13 +105,12 @@ export function CreateAmbulanceRequestForm({
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card className="w-full max-w-lg mx-auto font-sans">
       <CardHeader>
         <CardTitle>Create Ambulance Request</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Hidden Ambulance ID field */}
           <input type="hidden" name="ambulance" value={ambulanceId} />
 
           {/* Display selected ambulance ID */}
@@ -123,57 +119,35 @@ export function CreateAmbulanceRequestForm({
             <p className="font-medium">{ambulanceId}</p>
           </div>
 
-          {/* Hospital Location Fields */}
+          {/* Display Selected Hospital */}
           <div className="space-y-4">
             <h3 className="font-medium">Hospital Location</h3>
 
-            <div>
-              <label
-                htmlFor="latitude"
-                className="block text-sm font-medium mb-1"
-              >
-                Latitude
-              </label>
-              <Input
-                id="latitude"
-                name="hospital_location.latitude"
-                value={formData.hospital_location.latitude}
-                onChange={handleInputChange}
-                placeholder="Enter latitude"
-                className={
-                  errors["hospital_location.latitude"] ? "border-red-500" : ""
-                }
-              />
-              {errors["hospital_location.latitude"] && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors["hospital_location.latitude"]}
+            {selectedHospital ? (
+              <div className="p-4 bg-muted rounded-lg space-y-2">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <p className="font-medium">{selectedHospital.name}</p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Latitude: {selectedHospital.latitude}
                 </p>
-              )}
-            </div>
-
-            <div>
-              <label
-                htmlFor="longitude"
-                className="block text-sm font-medium mb-1"
-              >
-                Longitude
-              </label>
-              <Input
-                id="longitude"
-                name="hospital_location.longitude"
-                value={formData.hospital_location.longitude}
-                onChange={handleInputChange}
-                placeholder="Enter longitude"
-                className={
-                  errors["hospital_location.longitude"] ? "border-red-500" : ""
-                }
-              />
-              {errors["hospital_location.longitude"] && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors["hospital_location.longitude"]}
+                <p className="text-sm text-muted-foreground">
+                  Longitude: {selectedHospital.longitude}
                 </p>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-muted rounded-lg text-center">
+                <p className="text-sm text-muted-foreground">
+                  Please select a hospital first
+                </p>
+              </div>
+            )}
+            {errors["hospital_location"] && (
+              <p className="text-red-500 text-sm">
+                {errors["hospital_location"]}
+              </p>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -186,7 +160,7 @@ export function CreateAmbulanceRequestForm({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !selectedHospital}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

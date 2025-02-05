@@ -66,9 +66,10 @@ const GetAmbulanceRequestByIdClient: React.FC<AmbulanceRequestTableProps> = ({
           <CardContent>
             <div className="mb-2">
               <span className="font-semibold">Driver:</span>{" "}
-              {ambulanceRequestsData.ambulance.driver_name}
+              {ambulanceRequestsData.ambulance}
+              {/* {ambulanceRequestsData.ambulance.driver_name} */}
             </div>
-            <div className="mb-2">
+            {/* <div className="mb-2">
               <span className="font-semibold">Ambulance Number:</span>{" "}
               {ambulanceRequestsData.ambulance.ambulance_number}
             </div>
@@ -82,7 +83,7 @@ const GetAmbulanceRequestByIdClient: React.FC<AmbulanceRequestTableProps> = ({
               <span className="font-semibold">Location:</span>{" "}
               {ambulanceRequestsData.ambulance.location.latitude},{" "}
               {ambulanceRequestsData.ambulance.location.longitude}
-            </div>
+            </div> */}
           </CardContent>
         </Card>
 

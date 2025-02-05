@@ -1,4 +1,4 @@
-import { Ambulance } from "../ambulance.interface";
+// import { Ambulance } from "../ambulance.interface";
 import { User } from "./user.interface";
 
 export interface HospitalLocation {
@@ -10,7 +10,8 @@ export interface UserAmbulanceRequest {
   createdAt: string;
   updatedAt: string;
   _id: string;
-  ambulance: Ambulance;
+  // ambulance: Ambulance;
+  ambulance: string;
   requester: User;
   hospital_location: HospitalLocation;
   status: "PENDING" | "ACCEPTED" | "REJECTED";
@@ -26,6 +27,7 @@ export interface UserAmbulanceRequestResponse {
 // Error response type
 export interface UserAmbulanceRequestError {
   statusCode: number;
+  timestamp: string;
   message: string;
   data: null;
 }

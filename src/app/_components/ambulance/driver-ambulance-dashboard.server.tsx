@@ -1,15 +1,14 @@
-import React, { Suspense } from "react";
-import { Alert } from "@/components/ui/alert";
-import { Loader2 } from "lucide-react";
 import { getCurrentAmbulanceAccessToken } from "@/app/actions/ambulance/auth/get-current-ambulance-access-token";
 import getMyAmbulanceRequests from "@/app/actions/ambulance/requests/get-my-ambulance-requests.action";
+import DriverAmbulanceDashboardClient from "@/components/ambulance/driver-ambulance-dashboard.client";
+import { Alert } from "@/components/ui/alert";
 import {
   AmbulanceRequestResult,
   isSuccessResponse,
 } from "@/core/types/ambulance/request";
-import GetMyAmbulanceRequestClient from "@/components/ambulance/requests/get-my-ambulance-request-client";
+import React from "react";
 
-const GetMyAmbulanceRequest = async () => {
+const DriverAmbulanceDashboardServer = async () => {
   const accessToken = await getCurrentAmbulanceAccessToken();
 
   if (!accessToken) {
@@ -44,13 +43,10 @@ const GetMyAmbulanceRequest = async () => {
   }
 
   return (
-    <Suspense fallback={<Loader2 className="h-8 w-8 animate-spin mx-auto" />}>
-      <GetMyAmbulanceRequestClient
-        requests={response}
-        accessToken={accessToken}
-      />
-    </Suspense>
+    <div>
+      <DriverAmbulanceDashboardClient accessToken="" requests={response} />
+    </div>
   );
 };
 
-export default GetMyAmbulanceRequest;
+export default DriverAmbulanceDashboardServer;

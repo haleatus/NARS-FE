@@ -8,6 +8,10 @@ const GetAllAmbulanceAdminServer = async () => {
 
   const adminAccessToken = await getCurrentAdminAccessToken();
 
+  if (!ambulanceData) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div>
       {ambulanceData ? (

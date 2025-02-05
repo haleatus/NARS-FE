@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,7 +9,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -39,13 +37,13 @@ export default function AdminSignUpClient() {
       });
 
       if (result.success && result.data) {
-        toast.success("Signup successful! Redirecting...");
+        toast.success("Admin created successful! Redirecting...");
         // Reset form
         setUsername("");
         setEmail("");
         setPassword("");
         // Redirect after a short delay
-        setTimeout(() => router.push("/signin"), 1000);
+        setTimeout(() => router.push("/dashboard/admin-users"), 1000);
       } else if (result.error) {
         // Handle field-specific errors
         const error = result.error as AuthErrorResponse;
@@ -62,7 +60,7 @@ export default function AdminSignUpClient() {
   };
 
   return (
-    <div className="flex items-center justify-center p-4">
+    <div className="flex items-center justify-center">
       <Card className="w-full max-w-md border-2 border-primary/10">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
@@ -72,7 +70,7 @@ export default function AdminSignUpClient() {
             Create an admin account
           </CardTitle>
           <CardDescription className="text-center">
-            Enter your details to create your NARS account
+            Enter the details to create an admini NARS
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -139,21 +137,13 @@ export default function AdminSignUpClient() {
                 ) : (
                   <>
                     <UserPlus className="mr-2 h-5 w-5" />
-                    Sign Up
+                    Create Admin
                   </>
                 )}
               </Button>
             </div>
           </form>
         </CardContent>
-        <CardFooter>
-          <div className="text-sm text-center w-full text-muted-foreground">
-            Already have an account?{" "}
-            <Link href="/admin-signin" className="text-primary hover:underline">
-              Sign in
-            </Link>
-          </div>
-        </CardFooter>
       </Card>
     </div>
   );

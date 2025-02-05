@@ -44,11 +44,13 @@ const AmbulanceClient = ({
   return (
     <div>
       <div
-        className={`relative grid transition-all duration-300 ease-in-out gap-4 h-[440px] ${
-          myRequestExists ? "md:grid-cols-2" : "md:grid-cols-3"
-        }`}
+        className={`relative grid transition-all duration-300 ease-in-out gap-4 h-[440px] md:grid-cols-3`}
       >
-        <div className="relative rounded-lg overflow-hidden shadow-inner border-2 border-red-700">
+        <div
+          className={`relative rounded-lg overflow-hidden shadow-inner border-2 border-red-700 ${
+            myRequestExists && "col-span-1"
+          }`}
+        >
           {ambulanceData ? (
             <MapWrapper
               className="h-full w-full"
@@ -75,7 +77,11 @@ const AmbulanceClient = ({
             />
           </div>
         )}
-        <div className="bg-white rounded-lg shadow-inner overflow-hidden  border-2 border-black/30">
+        <div
+          className={`bg-white rounded-lg shadow-inner overflow-hidden  border-2 border-black/30 ${
+            myRequestExists && "col-span-2"
+          }`}
+        >
           {myRequestExists ? (
             <>
               <div className="p-4 bg-gray-50 border-b border-gray-200">

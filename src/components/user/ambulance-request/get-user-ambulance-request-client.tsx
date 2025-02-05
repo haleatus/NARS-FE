@@ -39,8 +39,9 @@ const GetUserAmbulanceRequestClient: React.FC<Props> = ({
 
   const handleNavigate = (requests: any) => {
     if (onNavigateToAmbulance) {
-      onNavigateToAmbulance(requests.data.ambulance);
+      onNavigateToAmbulance(requests.data.ambulance._id);
     }
+
     onNavigateToHospital({
       name: "",
       amenity: "",

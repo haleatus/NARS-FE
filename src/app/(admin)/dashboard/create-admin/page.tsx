@@ -1,7 +1,7 @@
 import AdminSignUpServer from "@/app/_components/auth/admin/admin-signup-server";
 import React from "react";
 
-const SignUpPage = () => {
+const AdminCreatePage = () => {
   return (
     <div>
       <AdminSignUpServer />
@@ -9,4 +9,4 @@ const SignUpPage = () => {
   );
 };
 
-export default SignUpPage;
+export default AdminCreatePage;

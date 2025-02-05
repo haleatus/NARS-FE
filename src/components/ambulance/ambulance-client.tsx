@@ -5,9 +5,13 @@ import MapWrapper from "../map/MapWrapper";
 import { MapPin } from "lucide-react";
 import GetAllAmbulanceClient from "./get-all-ambulance-client";
 import { Ambulance } from "@/core/types/ambulance.interface";
-import { IHospitalSuccessResponse } from "@/core/types/hospital.interface";
+import {
+  IHospital,
+  IHospitalSuccessResponse,
+} from "@/core/types/hospital.interface";
 import { UserAmbulanceRequestResponse } from "@/core/types/user/ambulance-request";
 import GetUserAmbulanceRequestClient from "../user/ambulance-request/get-user-ambulance-request-client";
+import HospitalList from "../map/HospitalLists";
 
 const AmbulanceClient = ({
   ambulanceData,
@@ -22,13 +26,22 @@ const AmbulanceClient = ({
   myRequestExists: boolean;
   requests: UserAmbulanceRequestResponse;
 }) => {
+  const [selectedHospital, setSelectedHospital] = useState<IHospital | null>(
+    null
+  );
+  const [showRouteToHospital, setShowRouteToHospital] = useState(false);
   const [selectedAmbulanceForRoute, setSelectedAmbulanceForRoute] = useState<
     string | undefined
   >();
 
+  const handleNavigateToHospital = (hospital: IHospital) => {
+    setSelectedHospital(hospital);
+    setShowRouteToHospital(true);
+  };
+
   return (
     <div>
-      <div className="grid md:grid-cols-2 gap-6 h-[440px]">
+      <div className="relative grid md:grid-cols-3 gap-4 h-[440px]">
         <div className="relative rounded-lg overflow-hidden shadow-inner border-2 border-red-700">
           {ambulanceData ? (
             <MapWrapper
@@ -37,7 +50,8 @@ const AmbulanceClient = ({
               initialZoom={12}
               showRouteToAmbulance={selectedAmbulanceForRoute}
               userLocation={[85.333606, 27.705665]}
-              hospitalData={hospitalData}
+              selectedHospital={selectedHospital}
+              showRouteToHospital={showRouteToHospital}
             />
           ) : (
             <div>No ambulance data found</div>
@@ -48,6 +62,14 @@ const AmbulanceClient = ({
               Ambulance Locations
             </div>
           </div>
+        </div>
+        <div className="space-y-4 h-full overflow-y-auto border-2 border-red-400 rounded-lg shadow-inner">
+          <HospitalList
+            hospitals={hospitalData?.data || []}
+            onSelectHospital={setSelectedHospital}
+            onNavigateToHospital={handleNavigateToHospital}
+            selectedHospital={selectedHospital}
+          />
         </div>
         <div className="bg-white rounded-lg shadow-inner overflow-hidden  border-2 border-black/30">
           {myRequestExists ? (

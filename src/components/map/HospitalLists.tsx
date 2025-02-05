@@ -1,26 +1,69 @@
 import React from "react";
-import hospitalData from "@/data/hospital-data.json";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { IHospital } from "@/core/types/hospital.interface";
+import { Navigation } from "lucide-react";
 
-const HospitalList = () => {
+interface HospitalListProps {
+  hospitals: IHospital[];
+  onSelectHospital: (hospital: IHospital | null) => void;
+  onNavigateToHospital: (hospital: IHospital) => void;
+  selectedHospital: IHospital | null;
+}
+
+const HospitalList: React.FC<HospitalListProps> = ({
+  hospitals,
+  onSelectHospital,
+  onNavigateToHospital,
+  selectedHospital,
+}) => {
   return (
-    <div className="p-4 bg-gray-100">
-      <h2 className="text-2xl font-bold mb-4">Hospitals</h2>
-      {hospitalData.length === 0 ? (
-        <p>No hospitals found.</p>
-      ) : (
-        <ul className="space-y-2">
-          {hospitalData.map((hospital, index) => (
-            <li key={index} className="bg-white p-3 rounded-lg shadow-md">
-              <h3 className="font-semibold">{hospital.name}</h3>
-              <div className="text-gray-600">
-                <p>Latitude: {hospital.latitude}</p>
-                <p>Longitude: {hospital.longitude}</p>
+    <Card className="w-full h-full">
+      <CardHeader>
+        <CardTitle>Nearby Hospitals</CardTitle>
+      </CardHeader>
+      <ScrollArea className="h-[calc(100%-4rem)] px-2">
+        <CardContent>
+          {hospitals.length > 0 ? (
+            hospitals.map((hospital, index) => (
+              <div
+                key={index}
+                className="p-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex justify-between items-start gap-4">
+                  <div
+                    className={`flex-1 cursor-pointer ${
+                      selectedHospital?.name === hospital.name
+                        ? "text-blue-600"
+                        : ""
+                    }`}
+                    onClick={() => onSelectHospital(hospital)}
+                  >
+                    <h3 className="font-semibold text-sm mb-1">
+                      {hospital.name}
+                    </h3>
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => onNavigateToHospital(hospital)}
+                  >
+                    <Navigation size={16} />
+                    Navigate
+                  </Button>
+                </div>
               </div>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+            ))
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              No hospitals found
+            </div>
+          )}
+        </CardContent>
+      </ScrollArea>
+    </Card>
   );
 };
 

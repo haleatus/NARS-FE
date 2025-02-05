@@ -2,7 +2,7 @@ import React from "react";
 import Map from "./Map";
 import { Ambulance } from "@/core/types/ambulance.interface";
 import RouteDistanceCalculator from "./RouteDIstanceCalculator";
-import { IHospitalSuccessResponse } from "@/core/types/hospital.interface";
+import { IHospital } from "@/core/types/hospital.interface";
 
 interface MapWrapperProps {
   className?: string;
@@ -10,7 +10,8 @@ interface MapWrapperProps {
   initialZoom: number;
   userLocation?: [number, number];
   showRouteToAmbulance?: string;
-  hospitalData: IHospitalSuccessResponse | null;
+  selectedHospital: IHospital | null;
+  showRouteToHospital?: boolean;
 }
 
 const MapWrapper: React.FC<MapWrapperProps> = ({
@@ -19,7 +20,8 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
   initialZoom,
   userLocation,
   showRouteToAmbulance,
-  hospitalData,
+  selectedHospital,
+  showRouteToHospital,
 }) => {
   const center: [number, number] = React.useMemo(() => {
     if (ambulanceData.length > 0) {
@@ -52,7 +54,8 @@ const MapWrapper: React.FC<MapWrapperProps> = ({
         initialZoom={initialZoom}
         userLocation={userLocation}
         showRouteToAmbulance={showRouteToAmbulance}
-        hospitalData={hospitalData ? hospitalData.data : null}
+        selectedHospital={selectedHospital}
+        showRouteToHospital={showRouteToHospital}
       />
       <div className="absolute bottom-0 right-0 z-50">
         {userLocation && ambulanceLocation && (

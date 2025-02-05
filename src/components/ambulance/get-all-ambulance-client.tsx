@@ -32,7 +32,7 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
 
   return (
     <div className="container mx-auto p-4 font-work-sans">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {ambulanceData.map((ambulance) => (
           <Card key={ambulance._id} className="relative overflow-hidden">
             <CardContent className="p-4">

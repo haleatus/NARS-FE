@@ -140,6 +140,7 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                     size="sm"
                     onClick={() => onNavigateToAmbulance?.(ambulance._id)}
                     className="flex items-center gap-2"
+                    disabled={ambulance.status === "OCCUPIED" ? true : false}
                   >
                     <Navigation className="w-4 h-4" />
                     Navigate
@@ -153,6 +154,9 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                           setIsDialogOpen(true);
                         }}
                         className="flex items-center gap-2"
+                        disabled={
+                          ambulance.status === "OCCUPIED" ? true : false
+                        }
                       >
                         <Plus className="w-4 h-4" />
                         Request

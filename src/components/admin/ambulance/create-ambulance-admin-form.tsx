@@ -9,6 +9,8 @@ import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import createAmbulanceAction from "@/app/actions/admin/ambulance/create-ambulance.action";
 import { toast } from "sonner";
+import Map, { Marker, NavigationControl } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 
 interface CreateAmbulanceFormProps {
   adminAccessToken: string;
@@ -35,9 +37,15 @@ export function CreateAmbulanceForm({
     },
   });
 
+  const [viewState, setViewState] = useState({
+    latitude: 27.70885, // Default latitude
+    longitude: 85.321741, // Default longitude
+    zoom: 12,
+  });
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    if (name.includes("hospital_location.")) {
+    if (name.includes("location.")) {
       const field = name.split(".")[1];
       setFormData((prev) => ({
         ...prev,
@@ -52,6 +60,17 @@ export function CreateAmbulanceForm({
         [name]: value,
       }));
     }
+  };
+
+  const handleMapClick = (event: any) => {
+    const { lngLat } = event;
+    setFormData((prev) => ({
+      ...prev,
+      location: {
+        latitude: lngLat.lat.toString(),
+        longitude: lngLat.lng.toString(),
+      },
+    }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -69,14 +88,12 @@ export function CreateAmbulanceForm({
         return;
       }
 
-      toast.success("Ambulance  created successfully");
+      toast.success("Ambulance created successfully");
 
-      // Add this check before calling onSuccess
       if (onSuccess) {
         try {
           onSuccess();
         } catch (redirectError) {
-          // Ignore NEXT_REDIRECT errors
           if (
             !(redirectError instanceof Error) ||
             redirectError.message !== "NEXT_REDIRECT"
@@ -86,7 +103,6 @@ export function CreateAmbulanceForm({
         }
       }
     } catch (error: any) {
-      // Only show error toast for non-redirect errors
       if (!(error instanceof Error) || error.message !== "NEXT_REDIRECT") {
         if (error.errors) {
           const validationErrors: { [key: string]: string } = {};
@@ -108,12 +124,11 @@ export function CreateAmbulanceForm({
   return (
     <Card className="w-full max-w-lg mx-auto">
       <CardHeader>
-        <CardTitle>Create Ambulance </CardTitle>
+        <CardTitle>Create Ambulance</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Ambulance Driver Fields */}
-
           <div>
             <label
               htmlFor="driver_name"
@@ -194,9 +209,29 @@ export function CreateAmbulanceForm({
             )}
           </div>
 
-          {/* Albulance Location Fields */}
+          {/* Map Picker for Location */}
           <div className="space-y-4">
             <h3 className="font-medium">Location</h3>
+            <div className="h-64 w-full">
+              <Map
+                {...viewState}
+                mapStyle="mapbox://styles/mapbox/streets-v11"
+                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
+                onMove={(evt) => setViewState(evt.viewState)}
+                onClick={handleMapClick}
+                minZoom={5}
+                maxZoom={20}
+              >
+                <NavigationControl />
+                {formData.location.latitude && formData.location.longitude && (
+                  <Marker
+                    latitude={parseFloat(formData.location.latitude)}
+                    longitude={parseFloat(formData.location.longitude)}
+                  />
+                )}
+              </Map>
+            </div>
+
             <div>
               <label
                 htmlFor="latitude"
@@ -206,7 +241,7 @@ export function CreateAmbulanceForm({
               </label>
               <Input
                 id="latitude"
-                name="hospital_location.latitude"
+                name="location.latitude"
                 value={formData.location.latitude}
                 onChange={handleInputChange}
                 placeholder="Enter latitude"
@@ -228,7 +263,7 @@ export function CreateAmbulanceForm({
               </label>
               <Input
                 id="longitude"
-                name="hospital_location.longitude"
+                name="location.longitude"
                 value={formData.location.longitude}
                 onChange={handleInputChange}
                 placeholder="Enter longitude"

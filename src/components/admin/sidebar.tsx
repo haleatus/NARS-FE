@@ -10,6 +10,7 @@ import {
   Users,
   UserCog,
   User,
+  UserPlus2,
 } from "lucide-react";
 import { useAdmin } from "@/context/admin-context";
 
@@ -24,6 +25,11 @@ const navItems = [
   { name: "Users", href: "/dashboard/users", icon: Users },
   { name: "Admin Users", href: "/dashboard/admin-users", icon: UserCog },
   { name: "My Profile", href: "/dashboard/my-profile", icon: User },
+  {
+    name: "Create Ambulance",
+    href: "/dashboard/ambulance/create",
+    icon: UserPlus2,
+  },
 ];
 
 export function Sidebar() {

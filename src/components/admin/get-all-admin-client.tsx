@@ -15,8 +15,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Mail, UserIcon, Info } from "lucide-react";
-import Link from "next/link";
+import { Mail, UserIcon } from "lucide-react";
 import { Admin } from "@/core/interface/admin.interface";
 
 const GetAllAdminClient = ({ adminsData }: { adminsData: Admin[] }) => {
@@ -28,7 +27,6 @@ const GetAllAdminClient = ({ adminsData }: { adminsData: Admin[] }) => {
             <TableHead className="text-center">Username</TableHead>
             <TableHead className="text-center">Email</TableHead>
             <TableHead className="text-center">Created</TableHead>
-            <TableHead className="text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -73,24 +71,6 @@ const GetAllAdminClient = ({ adminsData }: { adminsData: Admin[] }) => {
                           ? admin.createdAt.toLocaleDateString()
                           : admin.createdAt}
                       </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </TableCell>
-              <TableCell className="text-center">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                        // href={`/users/${user._id}`}
-                        href={`#`}
-                        className="text-blue-500 hover:text-blue-700 transition-colors flex justify-center items-center"
-                      >
-                        <Info className="w-5 h-5" />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>View Admin Details</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

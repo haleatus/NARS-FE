@@ -138,9 +138,14 @@ const HospitalList: React.FC<HospitalListProps> = ({
   };
 
   return (
-    <Card className="w-full h-full">
+    <Card className="w-full h-full font-sans">
       <CardHeader>
-        <CardTitle>Nearby Hospitals</CardTitle>
+        <CardTitle>
+          Nearby Hospitals{" "}
+          <span className="text-xs text-blue-500">
+            (Click on hospital name to select)
+          </span>
+        </CardTitle>
         <div className="relative">
           <Input
             placeholder="Search nearby hospitals..."
@@ -155,19 +160,21 @@ const HospitalList: React.FC<HospitalListProps> = ({
           Showing hospitals within {maxDistance}km
         </div>
       </CardHeader>
-      <ScrollArea className="h-[calc(100%-10rem)] px-2">
+      <ScrollArea className="h-[calc(100%-10rem)] ">
         <CardContent>
           {nearbyHospitals.length > 0 ? (
             nearbyHospitals.map((hospital, index) => (
               <div
                 key={index}
-                className="p-4 border-b last:border-b-0 hover:bg-gray-50 transition-colors"
+                className={`p-2 border-b last:border-b-0 hover:bg-red-100 transition-colors ${
+                  selectedHospital?.name === hospital.name ? "bg-blue-200" : ""
+                }`}
               >
-                <div className="flex justify-between items-start gap-4">
+                <div className={`flex justify-between items-start gap-4  `}>
                   <div
                     className={`flex-1 cursor-pointer ${
                       selectedHospital?.name === hospital.name
-                        ? "text-blue-600"
+                        ? "text-blue-800"
                         : ""
                     }`}
                     onClick={() => onSelectHospital(hospital)}

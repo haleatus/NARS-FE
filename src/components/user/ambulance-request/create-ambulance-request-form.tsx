@@ -14,6 +14,8 @@ interface CreateAmbulanceRequestFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
   selectedHospital: IHospital | null;
+  ambulanceNumber: string;
+  ambulanceDriver: string;
 }
 
 export function CreateAmbulanceRequestForm({
@@ -21,6 +23,8 @@ export function CreateAmbulanceRequestForm({
   accessToken,
   onSuccess,
   onCancel,
+  ambulanceNumber,
+  ambulanceDriver,
   selectedHospital,
 }: CreateAmbulanceRequestFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,7 +120,8 @@ export function CreateAmbulanceRequestForm({
           {/* Display selected ambulance ID */}
           <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">Selected Ambulance</p>
-            <p className="font-medium">{ambulanceId}</p>
+            <p className="font-medium">{ambulanceDriver}</p>
+            <p className="font-medium">{ambulanceNumber}</p>
           </div>
 
           {/* Display Selected Hospital */}

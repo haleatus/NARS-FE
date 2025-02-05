@@ -1,7 +1,7 @@
 "use client";
 
 import { Ambulance } from "@/core/interface/ambulance.interface";
-import { MapPin, Phone, Info } from "lucide-react";
+import { MapPin, Phone, Edit, Trash } from "lucide-react";
 import React from "react";
 import {
   Table,
@@ -12,13 +12,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import Link from "next/link";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
 
 const GetAllAmbulanceAdminClient = ({
   ambulanceData,
@@ -93,21 +93,26 @@ const GetAllAmbulanceAdminClient = ({
                 </TooltipProvider>
               </TableCell>
               <TableCell className="text-center">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                        href={`/ambulance/${ambulance._id}`}
-                        className="flex justify-center items-center text-blue-500 hover:text-blue-700 transition-colors"
-                      >
-                        <Info className="w-5 h-5" />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>View More Details</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="smallicon">
+                      <Edit className="w-4 h-4 text-blue-500" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Edit Details</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="smallicon">
+                      <Trash className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Delete Details</p>
+                  </TooltipContent>
+                </Tooltip>
               </TableCell>
             </TableRow>
           ))}

@@ -41,7 +41,10 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
   selectedHospital,
 }) => {
   const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // Added dialog state
+  const [selectedAmbulance, setSelectedAmbulance] = useState<Ambulance | null>(
+    null
+  );
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Calculate distance between two points
   const calculateDistance = (
@@ -151,6 +154,7 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                         variant="outline"
                         size="sm"
                         onClick={() => {
+                          setSelectedAmbulance(ambulance);
                           setIsDialogOpen(true);
                         }}
                         className="flex items-center gap-2"
@@ -166,18 +170,23 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                       <DialogHeader className="hidden">
                         <DialogTitle>Request Ambulance</DialogTitle>
                       </DialogHeader>
-                      <CreateAmbulanceRequestForm
-                        ambulanceId={ambulance._id}
-                        accessToken={accessToken}
-                        selectedHospital={selectedHospital}
-                        onSuccess={() => {
-                          setIsDialogOpen(false); // Close dialog on success
-                          router.refresh();
-                        }}
-                        onCancel={() => {
-                          setIsDialogOpen(false); // Close dialog on cancel
-                        }}
-                      />
+
+                      {selectedAmbulance && (
+                        <CreateAmbulanceRequestForm
+                          ambulanceId={selectedAmbulance._id}
+                          ambulanceNumber={selectedAmbulance.ambulance_number}
+                          ambulanceDriver={selectedAmbulance.driver_name}
+                          accessToken={accessToken}
+                          selectedHospital={selectedHospital}
+                          onSuccess={() => {
+                            setIsDialogOpen(false); // Close dialog on success
+                            router.refresh();
+                          }}
+                          onCancel={() => {
+                            setIsDialogOpen(false); // Close dialog on cancel
+                          }}
+                        />
+                      )}
                     </DialogContent>
                   </Dialog>
                 </div>

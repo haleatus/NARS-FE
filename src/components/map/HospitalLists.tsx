@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,7 +27,7 @@ const HospitalList: React.FC<HospitalListProps> = ({
   onNavigateToHospital,
   selectedHospital,
   userLocation,
-  maxDistance = 10,
+  maxDistance = 8,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
 

@@ -90,7 +90,7 @@ const AmbulanceClient = ({
             <>
               <div className="p-4 bg-gray-50 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-700">
-                  Ambulance List
+                  Nearby Ambulances
                 </h3>
               </div>
               <div className="overflow-y-auto h-[calc(100%-3.5rem)]">
@@ -99,6 +99,8 @@ const AmbulanceClient = ({
                     ambulanceData={ambulanceData}
                     onNavigateToAmbulance={setSelectedAmbulanceForRoute}
                     accessToken={accessToken}
+                    userLocation={[85.333606, 27.705665]}
+                    maxDistance={8}
                   />
                 ) : (
                   <div>No ambulance data found</div>

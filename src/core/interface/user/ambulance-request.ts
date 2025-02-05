@@ -28,7 +28,7 @@ export interface UserAmbulanceRequestError {
   statusCode: number;
   timestamp: string;
   message: string;
-  data: null;
+  data: null | {};
 }
 
 // Union type for all possible responses
@@ -40,5 +40,9 @@ export type UserAmbulanceRequestResult =
 export function isSuccessResponse(
   response: UserAmbulanceRequestResult
 ): response is UserAmbulanceRequestResponse {
-  return response.statusCode === 200 && response.data !== null;
+  return (
+    response.statusCode === 200 &&
+    response.data !== null &&
+    Object.keys(response.data).length !== 0
+  );
 }

@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserAmbulanceRequest } from "@/core/types/user/ambulance-request";
-import UpdateRequestDialog from "./update-requests-dialog";
+// import UpdateRequestDialog from "./update-requests-dialog";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -19,14 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Pencil,
-  Trash2,
-  MapPin,
-  Calendar,
-  User,
-  Ambulance,
-} from "lucide-react";
+import { MapPin, Calendar, User, Ambulance, X } from "lucide-react";
 import { format } from "date-fns";
 import deleteUserAmbulanceRequests from "@/app/actions/user/ambulance-request/delete-ambulance-request.action";
 
@@ -111,9 +104,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             <Ambulance className="w-4 h-4 text-blue-500" />
             <div>
               <p className="text-sm font-medium">Ambulance ID</p>
-              <p className="text-sm text-muted-foreground">
-                {data.ambulance._id}
-              </p>
+              <p className="text-sm text-muted-foreground">{data.ambulance}</p>
             </div>
           </div>
 
@@ -148,11 +139,11 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-end gap-2">
-          <UpdateRequestDialog
+        <div className="flex items-center justify-end gap-2 font-sans">
+          {/* <UpdateRequestDialog
             requestId={data._id}
             accessToken={accessToken}
-            ambulanceId={data.ambulance._id}
+            ambulanceId={data.ambulance}
             initialData={{
               hospital_location: data.hospital_location,
             }}
@@ -168,7 +159,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
               <Pencil className="w-4 h-4" />
               Edit
             </Button>
-          </UpdateRequestDialog>
+          </UpdateRequestDialog> */}
 
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -178,25 +169,25 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
                 className="flex gap-2 items-center"
                 disabled={isDeleting}
               >
-                <Trash2 className="w-4 h-4" />
-                Delete
+                <X className="w-4 h-4" />
+                Cancel
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="font-sans">
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete Ambulance Request</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to delete this ambulance request? This
+                  Are you sure you want to cancel this ambulance request? This
                   action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>No</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDelete}
                   className="bg-red-500 hover:bg-red-600"
                 >
-                  Delete
+                  Sure
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

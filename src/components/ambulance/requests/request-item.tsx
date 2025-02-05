@@ -76,8 +76,8 @@ export const RequestItem: React.FC<RequestItemProps> = ({
           <div className="flex justify-between items-center">
             <CardTitle className="text-md flex items-center gap-2 font-sans">
               Request By
-              <span className="text-md font-bold uppercase">
-                {data.requester.fullname.split(" ")[0]}
+              <span className="text-xs">
+                {data.requester.fullname.split(" ")[0]} | {data.requester.email}
               </span>
               <ChevronDown
                 className={`ml-2 w-4 h-4 transition-transform duration-300 ${

@@ -48,7 +48,9 @@ export default function RootLayout({
             <AdminProvider>
               <TooltipProvider>
                 <NavigationBarServer />
-                <div className="max-w-8xl mx-auto px-4">{children}</div>
+                <div className="max-w-8xl mx-auto px-4 font-sans">
+                  {children}
+                </div>
                 <Toaster closeButton richColors />
               </TooltipProvider>
             </AdminProvider>

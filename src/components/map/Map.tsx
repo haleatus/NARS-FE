@@ -1,11 +1,24 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import React, { useEffect, useRef } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { Ambulance } from "@/core/types/ambulance.interface";
+import { IHospital } from "@/core/types/hospital.interface";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
+
+// Nepal bounds coordinates
+// const NEPAL_BOUNDS: [[number, number], [number, number]] = [
+//   [80.0884, 26.3478], // Southwest coordinates
+//   [88.2039, 30.4227], // Northeast coordinates
+// ];
+
+const BAGMATI_BOUNDS: [[number, number], [number, number]] = [
+  [83.7439, 27.2324], // Southwest coordinates (approx.)
+  [86.2362, 28.218], // Northeast coordinates (approx.)
+];
 
 interface MapProps {
   ambulanceData: Ambulance[];
@@ -13,6 +26,8 @@ interface MapProps {
   initialZoom: number;
   userLocation?: [number, number];
   showRouteToAmbulance?: string;
+  selectedHospital: IHospital | null;
+  showRouteToHospital?: boolean;
 }
 
 const Map: React.FC<MapProps> = ({
@@ -21,21 +36,27 @@ const Map: React.FC<MapProps> = ({
   initialZoom,
   userLocation = [85.333606, 27.705665],
   showRouteToAmbulance,
+  selectedHospital,
+  showRouteToHospital,
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
-  const routeLayer = useRef<string | null>(null);
-  const routeSource = useRef<string | null>(null);
+  const routeLayers = useRef<string[]>([]);
+  const routeSources = useRef<string[]>([]);
+
+  const hospitalMarker = useRef<mapboxgl.Marker | null>(null);
 
   useEffect(() => {
     if (!mapContainer.current) return;
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: "mapbox://styles/mapbox/navigation-day-v1",
+      style: "mapbox://styles/mapbox/light-v11",
       center: center,
+      maxBounds: BAGMATI_BOUNDS, // Restrict map panning to Bagmati Province
       zoom: initialZoom,
+      minZoom: 6, // Set minimum zoom level
     });
 
     const nav = new mapboxgl.NavigationControl();
@@ -46,19 +67,35 @@ const Map: React.FC<MapProps> = ({
     };
   }, []);
 
+  // Function to clear all existing routes
+  const clearExistingRoutes = () => {
+    if (!map.current) return;
+
+    // Remove all existing route layers
+    routeLayers.current.forEach((layerId) => {
+      if (map.current?.getLayer(layerId)) {
+        map.current.removeLayer(layerId);
+      }
+    });
+
+    // Remove all existing route sources
+    routeSources.current.forEach((sourceId) => {
+      if (map.current?.getSource(sourceId)) {
+        map.current.removeSource(sourceId);
+      }
+    });
+
+    // Clear the arrays
+    routeLayers.current = [];
+    routeSources.current = [];
+  };
+
   // Function to draw route
   const drawRoute = async (start: [number, number], end: [number, number]) => {
     if (!map.current) return;
 
-    // Remove existing route if any
-    if (routeLayer.current && routeSource.current) {
-      if (map.current.getLayer(routeLayer.current)) {
-        map.current.removeLayer(routeLayer.current);
-      }
-      if (map.current.getSource(routeSource.current)) {
-        map.current.removeSource(routeSource.current);
-      }
-    }
+    // Clear all existing routes before drawing a new one
+    clearExistingRoutes();
 
     try {
       const query = await fetch(
@@ -92,16 +129,16 @@ const Map: React.FC<MapProps> = ({
           "line-cap": "round",
         },
         paint: {
-          "line-color": "#3b82f6",
+          "line-color": "#ef4444",
           "line-width": 4,
           "line-opacity": 0.75,
         },
       });
 
-      routeSource.current = sourceId;
-      routeLayer.current = layerId;
+      // Store the new route's layer and source IDs
+      routeSources.current.push(sourceId);
+      routeLayers.current.push(layerId);
 
-      // Fit bounds to show the entire route
       const coordinates = route;
       const bounds = coordinates.reduce(
         (bounds: mapboxgl.LngLatBounds, coord: number[]) => {
@@ -112,6 +149,7 @@ const Map: React.FC<MapProps> = ({
 
       map.current.fitBounds(bounds, {
         padding: 50,
+        maxZoom: 15,
       });
     } catch (error) {
       console.error("Error fetching route:", error);
@@ -119,18 +157,63 @@ const Map: React.FC<MapProps> = ({
   };
 
   useEffect(() => {
+    if (!map.current || !selectedHospital) return;
+
+    // Clear any existing routes when hospital changes
+    clearExistingRoutes();
+
+    // Clear existing hospital marker
+    if (hospitalMarker.current) {
+      hospitalMarker.current.remove();
+    }
+
+    const el = document.createElement("div");
+    el.className = "hospital-marker";
+    el.style.width = "24px";
+    el.style.height = "24px";
+    el.style.backgroundImage = "url(/hospital-icon.svg)";
+    el.style.backgroundSize = "cover";
+    el.style.cursor = "pointer";
+
+    const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+      <div class="p-3 max-w-xs">
+        <h3 class="font-semibold text-lg mb-2">${selectedHospital.name}</h3>
+      </div>
+    `);
+
+    hospitalMarker.current = new mapboxgl.Marker(el)
+      .setLngLat([selectedHospital.longitude, selectedHospital.latitude])
+      .setPopup(popup)
+      .addTo(map.current);
+
+    map.current.flyTo({
+      center: [selectedHospital.longitude, selectedHospital.latitude],
+      zoom: 15,
+      duration: 1000,
+    });
+
+    if (showRouteToHospital && userLocation) {
+      drawRoute(userLocation, [
+        selectedHospital.longitude,
+        selectedHospital.latitude,
+      ]);
+    }
+  }, [selectedHospital, showRouteToHospital]);
+
+  useEffect(() => {
     if (!map.current) return;
 
-    // Clear existing markers
+    // Clear existing routes when ambulance selection changes
+    clearExistingRoutes();
+
     markers.current.forEach((marker) => marker.remove());
     markers.current = [];
 
-    // Add user location marker
     const userEl = document.createElement("div");
     userEl.className = "user-marker";
     userEl.style.width = "21px";
     userEl.style.height = "21px";
-    userEl.style.backgroundImage = "url(/user-location.svg)"; // Add this icon to your public folder
+    userEl.style.backgroundImage = "url(/user-location.svg)";
     userEl.style.backgroundSize = "cover";
 
     new mapboxgl.Marker(userEl)
@@ -140,7 +223,6 @@ const Map: React.FC<MapProps> = ({
       )
       .addTo(map.current);
 
-    // Add ambulance markers
     ambulanceData.forEach((ambulance) => {
       const el = document.createElement("div");
       el.className = "marker";
@@ -184,7 +266,6 @@ const Map: React.FC<MapProps> = ({
 
       markers.current.push(marker);
 
-      // Draw route if this is the selected ambulance
       if (showRouteToAmbulance === ambulance._id) {
         drawRoute(userLocation, [
           parseFloat(ambulance.location.longitude),
@@ -195,7 +276,7 @@ const Map: React.FC<MapProps> = ({
   }, [ambulanceData, showRouteToAmbulance, userLocation]);
 
   return (
-    <>
+    <div className="w-full h-full">
       <div ref={mapContainer} className="w-full h-full" />
       <style jsx global>{`
         .mapboxgl-popup-content {
@@ -203,10 +284,12 @@ const Map: React.FC<MapProps> = ({
           border-radius: 8px;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        .marker {
+        .marker,
+        .hospital-marker {
           transition: transform 0.2s;
         }
-        .marker:hover {
+        .marker:hover,
+        .hospital-marker:hover {
           transform: scale(1.1);
         }
         .user-marker {
@@ -215,7 +298,7 @@ const Map: React.FC<MapProps> = ({
           border-radius: 50%;
         }
       `}</style>
-    </>
+    </div>
   );
 };
 

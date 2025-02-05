@@ -43,7 +43,11 @@ const AmbulanceClient = ({
 
   return (
     <div>
-      <div className="relative grid md:grid-cols-3 gap-4 h-[440px]">
+      <div
+        className={`relative grid transition-all duration-300 ease-in-out gap-4 h-[440px] ${
+          myRequestExists ? "md:grid-cols-2" : "md:grid-cols-3"
+        }`}
+      >
         <div className="relative rounded-lg overflow-hidden shadow-inner border-2 border-red-700">
           {ambulanceData ? (
             <MapWrapper
@@ -59,16 +63,18 @@ const AmbulanceClient = ({
             <div>No ambulance data found</div>
           )}
         </div>
-        <div className="space-y-4 h-full overflow-y-auto border-2 border-red-400 rounded-lg shadow-inner">
-          <HospitalList
-            hospitals={hospitalData?.data || []}
-            onSelectHospital={setSelectedHospital}
-            onNavigateToHospital={handleNavigateToHospital}
-            selectedHospital={selectedHospital}
-            userLocation={[85.333606, 27.705665]}
-            maxDistance={8}
-          />
-        </div>
+        {!myRequestExists && (
+          <div className="space-y-4 h-full overflow-y-auto border-2 border-red-400 rounded-lg shadow-inner">
+            <HospitalList
+              hospitals={hospitalData?.data || []}
+              onSelectHospital={setSelectedHospital}
+              onNavigateToHospital={handleNavigateToHospital}
+              selectedHospital={selectedHospital}
+              userLocation={[85.333606, 27.705665]}
+              maxDistance={8}
+            />
+          </div>
+        )}
         <div className="bg-white rounded-lg shadow-inner overflow-hidden  border-2 border-black/30">
           {myRequestExists ? (
             <>

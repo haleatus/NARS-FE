@@ -2,7 +2,7 @@
 
 import { Ambulance } from "@/core/interface/ambulance.interface";
 import { MapPin, Phone, Edit, Trash } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -19,12 +19,44 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { UpdateAmbulanceForm } from "./update-ambulance-admin-form";
+import { useRouter } from "next/navigation";
 
 const GetAllAmbulanceAdminClient = ({
+  adminAccessToken,
   ambulanceData,
 }: {
+  adminAccessToken: string;
   ambulanceData: Ambulance[];
 }) => {
+  const [selectedAmbulance, setSelectedAmbulance] = useState<Ambulance | null>(
+    null
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const router = useRouter();
+
+  const openModal = (ambulance: Ambulance) => {
+    setSelectedAmbulance(ambulance);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedAmbulance(null);
+    setIsModalOpen(false);
+  };
+
+  const onSuccess = () => {
+    closeModal();
+    router.refresh();
+  };
+
   return (
     <div className="container mx-auto font-work-sans">
       <Table>
@@ -95,7 +127,11 @@ const GetAllAmbulanceAdminClient = ({
               <TableCell className="text-center">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="smallicon">
+                    <Button
+                      variant="ghost"
+                      size="smallicon"
+                      onClick={() => openModal(ambulance)}
+                    >
                       <Edit className="w-4 h-4 text-blue-500" />
                     </Button>
                   </TooltipTrigger>
@@ -118,6 +154,23 @@ const GetAllAmbulanceAdminClient = ({
           ))}
         </TableBody>
       </Table>
+
+      {/* Modal for Update Form */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-lg p-0 h-[calc(100vh-100px)] overflow-y-auto">
+          <DialogHeader className="hidden">
+            <DialogTitle>Update Ambulance</DialogTitle>
+          </DialogHeader>
+          {selectedAmbulance && (
+            <UpdateAmbulanceForm
+              adminAccessToken={adminAccessToken}
+              ambulanceData={selectedAmbulance}
+              onSuccess={onSuccess}
+              onCancel={closeModal}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

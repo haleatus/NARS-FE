@@ -155,7 +155,7 @@ const HospitalList: React.FC<HospitalListProps> = ({
           Showing hospitals within {maxDistance}km
         </div>
       </CardHeader>
-      <ScrollArea className="h-[calc(100%-8rem)] px-2">
+      <ScrollArea className="h-[calc(100%-10rem)] px-2">
         <CardContent>
           {nearbyHospitals.length > 0 ? (
             nearbyHospitals.map((hospital, index) => (

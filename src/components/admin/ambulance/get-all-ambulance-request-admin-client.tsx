@@ -85,16 +85,17 @@ const GetAllAmbulanceRequestClient: React.FC<AmbulanceRequestTableProps> = ({
                     <TooltipTrigger asChild>
                       <div className="flex items-center justify-center">
                         <Ambulance className="w-4 h-4 mr-2" />
-                        {request.ambulance.ambulance_number}
+                        {request.ambulance}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Driver: {request.ambulance.driver_name}</p>
+                      <p>TODO: req ambulance data</p>
+                      {/* <p>Driver: {request.ambulance.driver_name}</p>
                       <p>Contact: {request.ambulance.contact}</p>
                       <p>
                         Location: {request.ambulance.location.latitude},{" "}
                         {request.ambulance.location.longitude}
-                      </p>
+                      </p> */}
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

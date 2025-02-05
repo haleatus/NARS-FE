@@ -69,6 +69,8 @@ const AmbulanceClient = ({
             onSelectHospital={setSelectedHospital}
             onNavigateToHospital={handleNavigateToHospital}
             selectedHospital={selectedHospital}
+            userLocation={[85.333606, 27.705665]}
+            maxDistance={8}
           />
         </div>
         <div className="bg-white rounded-lg shadow-inner overflow-hidden  border-2 border-black/30">

@@ -24,12 +24,14 @@ interface RequestItemProps {
   data: AmbulanceRequest;
   accessToken: string;
   onUpdate?: () => void;
+  onNavigate?: (request: AmbulanceRequest) => void;
 }
 
 export const RequestItem: React.FC<RequestItemProps> = ({
   data,
   accessToken,
   onUpdate,
+  onNavigate,
 }) => {
   const [selectedStatus, setSelectedStatus] = useState(data.status);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -137,6 +139,14 @@ export const RequestItem: React.FC<RequestItemProps> = ({
                   )
                 )}
               </select>
+
+              <Button
+                onClick={() => onNavigate?.(data)}
+                className="w-full bg-blue-500 text-white hover:bg-blue-600"
+              >
+                <MapPin className="w-4 h-4 mr-2" />
+                Navigate
+              </Button>
               <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <AlertDialogTrigger asChild>
                   <Button

@@ -5,17 +5,22 @@ import { useState } from "react";
 import { RequestItem } from "./request-item";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import type { AmbulanceRequestResponse } from "@/core/types/ambulance/request";
+import type {
+  AmbulanceRequest,
+  AmbulanceRequestResponse,
+} from "@/core/types/ambulance/request";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Props {
   requests: AmbulanceRequestResponse;
   accessToken: string;
+  onNavigate?: (request: AmbulanceRequest) => void;
 }
 
 const GetMyAmbulanceRequestClient: React.FC<Props> = ({
   requests,
   accessToken,
+  onNavigate,
 }) => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("PENDING");
@@ -65,6 +70,7 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
                   data={request}
                   accessToken={accessToken}
                   onUpdate={handleUpdateAndDelete}
+                  onNavigate={onNavigate}
                 />
               ))}
             </div>

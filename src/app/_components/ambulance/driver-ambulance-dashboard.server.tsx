@@ -6,24 +6,19 @@ import {
   AmbulanceRequestResult,
   isSuccessResponse,
 } from "@/core/types/ambulance/request";
+import { redirect } from "next/navigation";
 import React from "react";
 
 const DriverAmbulanceDashboardServer = async () => {
   const accessToken = await getCurrentAmbulanceAccessToken();
 
   if (!accessToken) {
-    return (
-      <Alert variant="destructive">Please log in to view your requests.</Alert>
-    );
+    redirect("/ambulance-signin?message=unauthorized");
   }
 
   const result = await getMyAmbulanceRequests({
     accessToken: accessToken,
   });
-
-  if (!result?.data) {
-    return <Alert>No ambulance requests found.</Alert>;
-  }
 
   const response = result.data as AmbulanceRequestResult;
 
@@ -42,9 +37,14 @@ const DriverAmbulanceDashboardServer = async () => {
     return <Alert>You have 0 ambulance requests yet.</Alert>;
   }
 
+  console.log("response", response); // This will provide ambulance requests
+
   return (
     <div>
-      <DriverAmbulanceDashboardClient accessToken="" requests={response} />
+      <DriverAmbulanceDashboardClient
+        accessToken={accessToken}
+        requests={response}
+      />
     </div>
   );
 };

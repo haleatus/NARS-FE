@@ -9,6 +9,17 @@ import { IHospital } from "@/core/types/hospital.interface";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 
+// Nepal bounds coordinates
+// const NEPAL_BOUNDS: [[number, number], [number, number]] = [
+//   [80.0884, 26.3478], // Southwest coordinates
+//   [88.2039, 30.4227], // Northeast coordinates
+// ];
+
+const BAGMATI_BOUNDS: [[number, number], [number, number]] = [
+  [83.7439, 27.2324], // Southwest coordinates (approx.)
+  [86.2362, 28.218], // Northeast coordinates (approx.)
+];
+
 interface MapProps {
   ambulanceData: Ambulance[];
   center: [number, number];
@@ -43,7 +54,9 @@ const Map: React.FC<MapProps> = ({
       container: mapContainer.current,
       style: "mapbox://styles/mapbox/light-v11",
       center: center,
+      maxBounds: BAGMATI_BOUNDS, // Restrict map panning to Bagmati Province
       zoom: initialZoom,
+      minZoom: 6, // Set minimum zoom level
     });
 
     const nav = new mapboxgl.NavigationControl();
@@ -100,7 +113,7 @@ const Map: React.FC<MapProps> = ({
           "line-cap": "round",
         },
         paint: {
-          "line-color": "#3b82f6",
+          "line-color": "#ef4444",
           "line-width": 4,
           "line-opacity": 0.75,
         },
@@ -119,6 +132,7 @@ const Map: React.FC<MapProps> = ({
 
       map.current.fitBounds(bounds, {
         padding: 50,
+        maxZoom: 15, // Limit maximum zoom when fitting bounds
       });
     } catch (error) {
       console.error("Error fetching route:", error);

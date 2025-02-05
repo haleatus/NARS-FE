@@ -28,6 +28,7 @@ export interface UserAmbulanceRequestError {
   statusCode: number;
   timestamp: string;
   message: string;
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   data: null | {};
 }
 

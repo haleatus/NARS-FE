@@ -46,7 +46,7 @@ const DriverAmbulanceDashboardClient = ({
   return (
     <div>
       <div
-        className={`relative grid transition-all duration-300 ease-in-out gap-4 h-[440px] md:grid-cols-2`}
+        className={`relative grid transition-all duration-300 ease-in-out gap-4 h-[calc(100vh-90px)] md:grid-cols-2`}
       >
         <div className="relative rounded-lg overflow-hidden shadow-inner border-2 border-red-700">
           <AmbulanceMap

@@ -5,7 +5,7 @@ import GetMyAmbulanceRequestClient from "./requests/get-my-ambulance-request-cli
 import {
   AmbulanceRequest,
   AmbulanceRequestResponse,
-} from "@/core/types/ambulance/request";
+} from "@/core/interface/ambulance/request";
 import AmbulanceMap from "../map/ambulance/ambulance-map";
 
 const DriverAmbulanceDashboardClient = ({

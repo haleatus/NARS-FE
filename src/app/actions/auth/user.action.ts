@@ -10,7 +10,7 @@ import { cookies } from "next/headers";
 import {
   AuthErrorResponse,
   AuthSuccessResponse,
-} from "@/core/types/auth.interface";
+} from "@/core/interface/auth.interface";
 
 export async function userSignUp(
   formData: z.infer<typeof createUserSchema>

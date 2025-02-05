@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { IHospital } from "@/core/types/hospital.interface";
+import { IHospital } from "@/core/interface/hospital.interface";
 import { Navigation, Search, MapPin } from "lucide-react";
 
 interface HospitalListProps {

@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import SignoutButton from "../auth/user/signout-button";
 import AmbulanceSignoutButton from "../auth/ambulance/ambulance-signout-button";
 import AdminSignoutButton from "../auth/admin/admin-signout-button";
-import { AuthState } from "@/core/types/auth-state.inteface";
+import { AuthState } from "@/core/interface/auth-state.inteface";
 import { getNavLinks } from "@/core/utils/nav-links";
 
 interface NavigationBarClientProps {

@@ -5,7 +5,7 @@ import { createAmbulanceRequestsService } from "@/app/services/user/ambulance-re
 import {
   isSuccessResponse,
   UserAmbulanceRequestResult,
-} from "@/core/types/user/ambulance-request";
+} from "@/core/interface/user/ambulance-request";
 import { z } from "zod";
 
 type RequestResponse = {

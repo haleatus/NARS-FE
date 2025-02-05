@@ -9,7 +9,7 @@ import React, {
   useCallback,
 } from "react";
 import { useRouter } from "next/navigation";
-import { Admin } from "@/core/types/admin.interface";
+import { Admin } from "@/core/interface/admin.interface";
 import getCurrentAdmin from "@/app/actions/admin/auth/get-current-admin.action";
 
 interface AdminContextValue {

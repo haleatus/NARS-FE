@@ -5,7 +5,7 @@ import { Alert } from "@/components/ui/alert";
 import {
   AmbulanceRequestResult,
   isSuccessResponse,
-} from "@/core/types/ambulance/request";
+} from "@/core/interface/ambulance/request";
 import { redirect } from "next/navigation";
 import React from "react";
 

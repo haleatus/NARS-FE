@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Mail, UserIcon, Info } from "lucide-react";
 import Link from "next/link";
-import { Admin } from "@/core/types/admin.interface";
+import { Admin } from "@/core/interface/admin.interface";
 
 const GetAllAdminClient = ({ adminsData }: { adminsData: Admin[] }) => {
   return (

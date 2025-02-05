@@ -1,6 +1,6 @@
 "use client";
 
-import { Ambulance } from "@/core/types/ambulance.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 import { MapPin, Phone, Navigation, Plus } from "lucide-react";
 import React, { useMemo, useState } from "react"; // Added useState import
 import { Card, CardContent } from "../ui/card";
@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { IHospital } from "@/core/types/hospital.interface";
+import { IHospital } from "@/core/interface/hospital.interface";
 
 interface GetAllAmbulanceClientProps {
   ambulanceData: Ambulance[];

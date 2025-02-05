@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { User } from "@/core/types/user/user.interface";
+import type { User } from "@/core/interface/user/user.interface";
 import {
   Table,
   TableBody,

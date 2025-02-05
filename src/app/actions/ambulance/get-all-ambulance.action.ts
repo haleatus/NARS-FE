@@ -1,7 +1,7 @@
 "use server";
 
 import getAllAmbulanceService from "@/app/services/ambulance/get-all-ambulance.service";
-import { Ambulance } from "@/core/types/ambulance.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 
 export async function getAllAmbulance(): Promise<Ambulance[] | null> {
   try {

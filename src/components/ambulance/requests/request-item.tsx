@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { MapPin, Calendar, User, Ambulance, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
-import type { AmbulanceRequest } from "@/core/types/ambulance/request";
+import type { AmbulanceRequest } from "@/core/interface/ambulance/request";
 import updateMyAmbulanceRequestStatus from "@/app/actions/ambulance/requests/update-my-ambulance-request-status.action";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -33,6 +33,8 @@ export const RequestItem: React.FC<RequestItemProps> = ({
   onUpdate,
   onNavigate,
 }) => {
+  console.log("data", data);
+
   const [selectedStatus, setSelectedStatus] = useState(data.status);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -102,8 +104,8 @@ export const RequestItem: React.FC<RequestItemProps> = ({
               />
               <InfoItem
                 icon={<Ambulance className="w-4 h-4" />}
-                label="Ambulance ID"
-                value={data.ambulance._id}
+                label="Ambulance Driver Name"
+                value={data.ambulance.driver_name}
               />
               <InfoItem
                 icon={<MapPin className="w-4 h-4" />}

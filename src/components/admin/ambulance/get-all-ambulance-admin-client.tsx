@@ -1,6 +1,6 @@
 "use client";
 
-import { Ambulance } from "@/core/types/ambulance.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 import { MapPin, Phone, Info } from "lucide-react";
 import React from "react";
 import {

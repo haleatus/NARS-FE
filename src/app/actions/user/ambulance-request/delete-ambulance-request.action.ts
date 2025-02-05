@@ -4,7 +4,7 @@ import { deleteUserAmbulanceRequestService } from "@/app/services/user/ambulance
 import {
   isSuccessResponse,
   UserAmbulanceRequestResult,
-} from "@/core/types/user/ambulance-request";
+} from "@/core/interface/user/ambulance-request";
 
 const deleteUserAmbulanceRequests = async ({
   accessToken,

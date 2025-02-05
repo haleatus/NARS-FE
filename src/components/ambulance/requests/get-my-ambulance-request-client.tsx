@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import type {
   AmbulanceRequest,
   AmbulanceRequestResponse,
-} from "@/core/types/ambulance/request";
+} from "@/core/interface/ambulance/request";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Props {

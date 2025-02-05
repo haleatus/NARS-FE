@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, MapPin } from "lucide-react";
 import createAmbulanceRequest from "@/app/actions/user/ambulance-request/create-ambulance-request.action";
 import { toast } from "sonner";
-import { IHospital } from "@/core/types/hospital.interface";
+import { IHospital } from "@/core/interface/hospital.interface";
 
 interface CreateAmbulanceRequestFormProps {
   ambulanceId: string;

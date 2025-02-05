@@ -8,7 +8,7 @@ import React, {
   ReactNode,
   useCallback,
 } from "react";
-import { User } from "../core/types/user/user.interface";
+import { User } from "../core/interface/user/user.interface";
 import { useRouter } from "next/navigation";
 import getCurrentUser from "@/app/actions/user/auth/get-current-user.action";
 

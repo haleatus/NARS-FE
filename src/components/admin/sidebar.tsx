@@ -30,6 +30,11 @@ const navItems = [
     href: "/dashboard/ambulance/create",
     icon: UserPlus2,
   },
+  {
+    name: "Create Admin",
+    href: "/dashboard/create-admin",
+    icon: UserPlus2,
+  },
 ];
 
 export function Sidebar() {

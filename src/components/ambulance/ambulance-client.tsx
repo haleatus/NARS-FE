@@ -39,6 +39,7 @@ const AmbulanceClient = ({
     setShowRouteToHospital(true);
   };
 
+  console.log("selectedHospital", selectedHospital);
   return (
     <div>
       <div className="relative grid md:grid-cols-3 gap-4 h-[440px]">
@@ -101,6 +102,7 @@ const AmbulanceClient = ({
                     accessToken={accessToken}
                     userLocation={[85.333606, 27.705665]}
                     maxDistance={8}
+                    selectedHospital={selectedHospital}
                   />
                 ) : (
                   <div>No ambulance data found</div>

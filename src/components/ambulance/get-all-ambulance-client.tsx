@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { IHospital } from "@/core/types/hospital.interface";
 
 interface GetAllAmbulanceClientProps {
   ambulanceData: Ambulance[];
@@ -22,6 +23,7 @@ interface GetAllAmbulanceClientProps {
   accessToken: string;
   userLocation: [number, number];
   maxDistance?: number;
+  selectedHospital: IHospital | null;
 }
 
 interface AmbulanceWithDistance extends Ambulance {
@@ -34,6 +36,7 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
   accessToken,
   userLocation,
   maxDistance = 8,
+  selectedHospital,
 }) => {
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = useState(false); // Added dialog state
@@ -153,6 +156,7 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                       <CreateAmbulanceRequestForm
                         ambulanceId={ambulance._id}
                         accessToken={accessToken}
+                        selectedHospital={selectedHospital}
                         onSuccess={() => {
                           setIsDialogOpen(false); // Close dialog on success
                           router.refresh();

@@ -37,8 +37,6 @@ const DriverAmbulanceDashboardServer = async () => {
     return <Alert>You have 0 ambulance requests yet.</Alert>;
   }
 
-  console.log("response", response); // This will provide ambulance requests
-
   return (
     <div>
       <DriverAmbulanceDashboardClient

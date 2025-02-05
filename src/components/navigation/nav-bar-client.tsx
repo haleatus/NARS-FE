@@ -37,11 +37,9 @@ export function NavigationBarClient({ authState }: NavigationBarClientProps) {
   const renderAuthButtons = () => {
     if (authState.isAdmin) {
       return <AdminSignoutButton />;
-    }
-    if (authState.isAmbulance) {
+    } else if (authState.isAmbulance) {
       return <AmbulanceSignoutButton />;
-    }
-    if (authState.isUser) {
+    } else if (authState.isUser) {
       return <SignoutButton />;
     }
 

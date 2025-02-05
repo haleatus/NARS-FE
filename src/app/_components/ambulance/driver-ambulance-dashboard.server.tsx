@@ -5,25 +5,20 @@ import { Alert } from "@/components/ui/alert";
 import {
   AmbulanceRequestResult,
   isSuccessResponse,
-} from "@/core/types/ambulance/request";
+} from "@/core/interface/ambulance/request";
+import { redirect } from "next/navigation";
 import React from "react";
 
 const DriverAmbulanceDashboardServer = async () => {
   const accessToken = await getCurrentAmbulanceAccessToken();
 
   if (!accessToken) {
-    return (
-      <Alert variant="destructive">Please log in to view your requests.</Alert>
-    );
+    redirect("/ambulance-signin?message=unauthorized");
   }
 
   const result = await getMyAmbulanceRequests({
     accessToken: accessToken,
   });
-
-  if (!result?.data) {
-    return <Alert>No ambulance requests found.</Alert>;
-  }
 
   const response = result.data as AmbulanceRequestResult;
 
@@ -44,7 +39,10 @@ const DriverAmbulanceDashboardServer = async () => {
 
   return (
     <div>
-      <DriverAmbulanceDashboardClient accessToken="" requests={response} />
+      <DriverAmbulanceDashboardClient
+        accessToken={accessToken}
+        requests={response}
+      />
     </div>
   );
 };

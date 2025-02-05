@@ -1,6 +1,6 @@
 "use client";
 
-import { Ambulance } from "@/core/types/ambulance.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 import { MapPin, Phone, Navigation, Plus } from "lucide-react";
 import React, { useMemo, useState } from "react"; // Added useState import
 import { Card, CardContent } from "../ui/card";
@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { IHospital } from "@/core/types/hospital.interface";
+import { IHospital } from "@/core/interface/hospital.interface";
 
 interface GetAllAmbulanceClientProps {
   ambulanceData: Ambulance[];
@@ -41,7 +41,10 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
   selectedHospital,
 }) => {
   const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(false); // Added dialog state
+  const [selectedAmbulance, setSelectedAmbulance] = useState<Ambulance | null>(
+    null
+  );
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Calculate distance between two points
   const calculateDistance = (
@@ -140,6 +143,7 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                     size="sm"
                     onClick={() => onNavigateToAmbulance?.(ambulance._id)}
                     className="flex items-center gap-2"
+                    disabled={ambulance.status === "OCCUPIED" ? true : false}
                   >
                     <Navigation className="w-4 h-4" />
                     Navigate
@@ -150,9 +154,13 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                         variant="outline"
                         size="sm"
                         onClick={() => {
+                          setSelectedAmbulance(ambulance);
                           setIsDialogOpen(true);
                         }}
                         className="flex items-center gap-2"
+                        disabled={
+                          ambulance.status === "OCCUPIED" ? true : false
+                        }
                       >
                         <Plus className="w-4 h-4" />
                         Request
@@ -162,18 +170,23 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
                       <DialogHeader className="hidden">
                         <DialogTitle>Request Ambulance</DialogTitle>
                       </DialogHeader>
-                      <CreateAmbulanceRequestForm
-                        ambulanceId={ambulance._id}
-                        accessToken={accessToken}
-                        selectedHospital={selectedHospital}
-                        onSuccess={() => {
-                          setIsDialogOpen(false); // Close dialog on success
-                          router.refresh();
-                        }}
-                        onCancel={() => {
-                          setIsDialogOpen(false); // Close dialog on cancel
-                        }}
-                      />
+
+                      {selectedAmbulance && (
+                        <CreateAmbulanceRequestForm
+                          ambulanceId={selectedAmbulance._id}
+                          ambulanceNumber={selectedAmbulance.ambulance_number}
+                          ambulanceDriver={selectedAmbulance.driver_name}
+                          accessToken={accessToken}
+                          selectedHospital={selectedHospital}
+                          onSuccess={() => {
+                            setIsDialogOpen(false); // Close dialog on success
+                            router.refresh();
+                          }}
+                          onCancel={() => {
+                            setIsDialogOpen(false); // Close dialog on cancel
+                          }}
+                        />
+                      )}
                     </DialogContent>
                   </Dialog>
                 </div>

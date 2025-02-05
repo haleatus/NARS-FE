@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import MapWrapper from "../map/MapWrapper";
 import GetAllAmbulanceClient from "./get-all-ambulance-client";
-import { Ambulance } from "@/core/types/ambulance.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 import {
   IHospital,
   IHospitalSuccessResponse,
-} from "@/core/types/hospital.interface";
-import { UserAmbulanceRequestResponse } from "@/core/types/user/ambulance-request";
+} from "@/core/interface/hospital.interface";
+import { UserAmbulanceRequestResponse } from "@/core/interface/user/ambulance-request";
 import GetUserAmbulanceRequestClient from "../user/ambulance-request/get-user-ambulance-request-client";
 import HospitalList from "../map/HospitalLists";
 

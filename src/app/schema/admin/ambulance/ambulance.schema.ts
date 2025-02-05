@@ -18,10 +18,6 @@ export const updateAmbulanceSchema = z.object({
     .string()
     .min(10, "Contact number must be at least 10 characters.")
     .optional(),
-  password: z
-    .string()
-    .min(6, "Password must be at least 6 characters.")
-    .optional(),
   location: z
     .object({
       latitude: z.string().min(1, "Latitude must be at least 1 character."),

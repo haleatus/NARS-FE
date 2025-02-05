@@ -17,7 +17,7 @@ import {
 import { Ambulance, UserPlus, Mail, Lock, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { AuthErrorResponse } from "@/core/types/auth.interface";
+import { AuthErrorResponse } from "@/core/interface/auth.interface";
 import { adminSignUp } from "@/app/actions/auth/admin.action";
 
 export default function AdminSignUpClient() {

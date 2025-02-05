@@ -11,7 +11,7 @@ import AmbulanceClient from "@/components/ambulance/ambulance-client";
 import { getAllHospitalService } from "@/app/services/hospital/hospital.service";
 import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-user-access-token";
 import getUserAmbulanceRequests from "@/app/actions/user/ambulance-request/get-user-ambulance-requests.action";
-import { UserAmbulanceRequestResponse } from "@/core/types/user/ambulance-request";
+import { UserAmbulanceRequestResponse } from "@/core/interface/user/ambulance-request";
 import { redirect } from "next/navigation";
 
 export default async function AmbulanceDashboard() {

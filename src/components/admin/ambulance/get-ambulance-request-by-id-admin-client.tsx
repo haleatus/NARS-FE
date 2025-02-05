@@ -4,7 +4,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, User, Ambulance, Calendar, Mail } from "lucide-react";
-import { UserAmbulanceRequest } from "@/core/types/user/ambulance-request";
+import { UserAmbulanceRequest } from "@/core/interface/user/ambulance-request";
 
 interface AmbulanceRequestTableProps {
   ambulanceRequestsData: UserAmbulanceRequest;
@@ -66,10 +66,9 @@ const GetAmbulanceRequestByIdClient: React.FC<AmbulanceRequestTableProps> = ({
           <CardContent>
             <div className="mb-2">
               <span className="font-semibold">Driver:</span>{" "}
-              {ambulanceRequestsData.ambulance}
-              {/* {ambulanceRequestsData.ambulance.driver_name} */}
+              {ambulanceRequestsData.ambulance.driver_name}
             </div>
-            {/* <div className="mb-2">
+            <div className="mb-2">
               <span className="font-semibold">Ambulance Number:</span>{" "}
               {ambulanceRequestsData.ambulance.ambulance_number}
             </div>
@@ -83,7 +82,7 @@ const GetAmbulanceRequestByIdClient: React.FC<AmbulanceRequestTableProps> = ({
               <span className="font-semibold">Location:</span>{" "}
               {ambulanceRequestsData.ambulance.location.latitude},{" "}
               {ambulanceRequestsData.ambulance.location.longitude}
-            </div> */}
+            </div>
           </CardContent>
         </Card>
 

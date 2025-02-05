@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, MapPin } from "lucide-react";
 import createAmbulanceRequest from "@/app/actions/user/ambulance-request/create-ambulance-request.action";
 import { toast } from "sonner";
-import { IHospital } from "@/core/types/hospital.interface";
+import { IHospital } from "@/core/interface/hospital.interface";
 
 interface CreateAmbulanceRequestFormProps {
   ambulanceId: string;
@@ -14,6 +14,8 @@ interface CreateAmbulanceRequestFormProps {
   onSuccess?: () => void;
   onCancel?: () => void;
   selectedHospital: IHospital | null;
+  ambulanceNumber: string;
+  ambulanceDriver: string;
 }
 
 export function CreateAmbulanceRequestForm({
@@ -21,6 +23,8 @@ export function CreateAmbulanceRequestForm({
   accessToken,
   onSuccess,
   onCancel,
+  ambulanceNumber,
+  ambulanceDriver,
   selectedHospital,
 }: CreateAmbulanceRequestFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -116,7 +120,8 @@ export function CreateAmbulanceRequestForm({
           {/* Display selected ambulance ID */}
           <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">Selected Ambulance</p>
-            <p className="font-medium">{ambulanceId}</p>
+            <p className="font-medium">{ambulanceDriver}</p>
+            <p className="font-medium">{ambulanceNumber}</p>
           </div>
 
           {/* Display Selected Hospital */}

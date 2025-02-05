@@ -1,7 +1,7 @@
 "use server";
 
 import getAmbulanceByIdService from "@/app/services/ambulance/get-ambulance-by-id.service";
-import { Ambulance } from "@/core/types/ambulance.interface";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 
 export async function getAmbulanceById(
   accessToken: string,

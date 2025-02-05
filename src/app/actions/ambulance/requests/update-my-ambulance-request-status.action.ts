@@ -4,7 +4,7 @@ import { updateMyAmbulanceRequestsStatusService } from "@/app/services/ambulance
 import {
   AmbulanceRequestResult,
   isSuccessResponse,
-} from "@/core/types/ambulance/request";
+} from "@/core/interface/ambulance/request";
 import { z } from "zod";
 
 const updateMyAmbulanceRequestStatus = async ({

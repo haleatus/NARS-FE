@@ -1,4 +1,4 @@
-// import { Ambulance } from "../ambulance.interface";
+import { Ambulance } from "../ambulance.interface";
 import { User } from "./user.interface";
 
 export interface HospitalLocation {
@@ -10,8 +10,7 @@ export interface UserAmbulanceRequest {
   createdAt: string;
   updatedAt: string;
   _id: string;
-  // ambulance: Ambulance;
-  ambulance: string;
+  ambulance: Ambulance;
   requester: User;
   hospital_location: HospitalLocation;
   status: "PENDING" | "ACCEPTED" | "REJECTED";

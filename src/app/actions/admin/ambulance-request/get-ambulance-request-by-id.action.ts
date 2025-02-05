@@ -1,7 +1,7 @@
 "use server";
 
 import getAmbulanceRequestByIdService from "@/app/services/admin/ambulance-request/ambulance-request-by-id.service";
-import { UserAmbulanceRequest } from "@/core/types/user/ambulance-request";
+import { UserAmbulanceRequest } from "@/core/interface/user/ambulance-request";
 
 export async function getAmbulanceRequestById(
   adminAccessToken: string,

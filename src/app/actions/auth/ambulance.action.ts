@@ -5,7 +5,7 @@ import { cookies } from "next/headers";
 import {
   AuthErrorResponse,
   AuthSuccessResponse,
-} from "@/core/types/auth.interface";
+} from "@/core/interface/auth.interface";
 import { signInAmbulanceService } from "@/app/services/auth/ambulance-auth.service";
 import { signInAmbulanceSchema } from "@/app/schema/ambulance/ambulance";
 

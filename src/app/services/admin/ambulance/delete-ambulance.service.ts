@@ -7,7 +7,7 @@ const deleteAmbulanceService = async (
   ambulanceId: string
 ) => {
   const res = await fetch(
-    endpoints.admin.ambulance.updateAmbulance.replace(":id", ambulanceId),
+    endpoints.admin.ambulance.deleteAmbulance.replace(":id", ambulanceId),
     {
       method: "DELETE",
       headers: {

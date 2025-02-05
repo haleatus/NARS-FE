@@ -138,7 +138,7 @@ const HospitalList: React.FC<HospitalListProps> = ({
   };
 
   return (
-    <Card className="w-full h-full font-sans">
+    <Card className="relative w-full h-full font-sans">
       <CardHeader>
         <CardTitle>
           Nearby Hospitals{" "}
@@ -146,6 +146,7 @@ const HospitalList: React.FC<HospitalListProps> = ({
             (Click on hospital name to select)
           </span>
         </CardTitle>
+
         <div className="relative">
           <Input
             placeholder="Search nearby hospitals..."
@@ -155,9 +156,21 @@ const HospitalList: React.FC<HospitalListProps> = ({
           />
           <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
         </div>
-        <div className="text-sm text-gray-500 flex items-center gap-1">
-          <MapPin className="w-4 h-4" />
-          Showing hospitals within {maxDistance}km
+        <div className="text-sm text-gray-500 flex gap-1 justify-between items-center">
+          <div className="flex items-center gap-1">
+            <MapPin className="w-4 h-4" />
+            Showing hospitals within {maxDistance}km
+          </div>
+          {selectedHospital && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onSelectHospital(null)}
+              className="text-black hover:text-red-700 bg-red-500/40 h-5 hover:bg-red-100"
+            >
+              Clear Selection
+            </Button>
+          )}
         </div>
       </CardHeader>
       <ScrollArea className="h-[calc(100%-10rem)] ">

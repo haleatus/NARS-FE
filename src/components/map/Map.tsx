@@ -42,8 +42,8 @@ const Map: React.FC<MapProps> = ({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<mapboxgl.Marker[]>([]);
-  const routeLayer = useRef<string | null>(null);
-  const routeSource = useRef<string | null>(null);
+  const routeLayers = useRef<string[]>([]);
+  const routeSources = useRef<string[]>([]);
 
   const hospitalMarker = useRef<mapboxgl.Marker | null>(null);
 
@@ -67,19 +67,35 @@ const Map: React.FC<MapProps> = ({
     };
   }, []);
 
+  // Function to clear all existing routes
+  const clearExistingRoutes = () => {
+    if (!map.current) return;
+
+    // Remove all existing route layers
+    routeLayers.current.forEach((layerId) => {
+      if (map.current?.getLayer(layerId)) {
+        map.current.removeLayer(layerId);
+      }
+    });
+
+    // Remove all existing route sources
+    routeSources.current.forEach((sourceId) => {
+      if (map.current?.getSource(sourceId)) {
+        map.current.removeSource(sourceId);
+      }
+    });
+
+    // Clear the arrays
+    routeLayers.current = [];
+    routeSources.current = [];
+  };
+
   // Function to draw route
   const drawRoute = async (start: [number, number], end: [number, number]) => {
     if (!map.current) return;
 
-    // Remove existing route if any
-    if (routeLayer.current && routeSource.current) {
-      if (map.current.getLayer(routeLayer.current)) {
-        map.current.removeLayer(routeLayer.current);
-      }
-      if (map.current.getSource(routeSource.current)) {
-        map.current.removeSource(routeSource.current);
-      }
-    }
+    // Clear all existing routes before drawing a new one
+    clearExistingRoutes();
 
     try {
       const query = await fetch(
@@ -119,8 +135,9 @@ const Map: React.FC<MapProps> = ({
         },
       });
 
-      routeSource.current = sourceId;
-      routeLayer.current = layerId;
+      // Store the new route's layer and source IDs
+      routeSources.current.push(sourceId);
+      routeLayers.current.push(layerId);
 
       const coordinates = route;
       const bounds = coordinates.reduce(
@@ -132,7 +149,7 @@ const Map: React.FC<MapProps> = ({
 
       map.current.fitBounds(bounds, {
         padding: 50,
-        maxZoom: 15, // Limit maximum zoom when fitting bounds
+        maxZoom: 15,
       });
     } catch (error) {
       console.error("Error fetching route:", error);
@@ -141,6 +158,9 @@ const Map: React.FC<MapProps> = ({
 
   useEffect(() => {
     if (!map.current || !selectedHospital) return;
+
+    // Clear any existing routes when hospital changes
+    clearExistingRoutes();
 
     // Clear existing hospital marker
     if (hospitalMarker.current) {
@@ -182,6 +202,9 @@ const Map: React.FC<MapProps> = ({
 
   useEffect(() => {
     if (!map.current) return;
+
+    // Clear existing routes when ambulance selection changes
+    clearExistingRoutes();
 
     markers.current.forEach((marker) => marker.remove());
     markers.current = [];

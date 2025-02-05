@@ -29,9 +29,12 @@ const AmbulanceClient = ({
     null
   );
   const [showRouteToHospital, setShowRouteToHospital] = useState(false);
+
   const [selectedAmbulanceForRoute, setSelectedAmbulanceForRoute] = useState<
     string | undefined
   >();
+
+  // console.log("selectedAmbulanceForRoute", selectedAmbulanceForRoute); // This will provide ambulance ID
 
   const handleNavigateToHospital = (hospital: IHospital) => {
     setSelectedHospital(hospital);
@@ -92,6 +95,7 @@ const AmbulanceClient = ({
                 {ambulanceData ? (
                   <GetAllAmbulanceClient
                     ambulanceData={ambulanceData}
+                    selectedAmbulanceId={selectedAmbulanceForRoute}
                     onNavigateToAmbulance={setSelectedAmbulanceForRoute}
                     accessToken={accessToken}
                     userLocation={[85.333606, 27.705665]}

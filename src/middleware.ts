@@ -6,7 +6,7 @@ export function middleware(req: NextRequest) {
   const adminAuthToken = req.cookies.get("adminAccessToken");
   const ambulanceAuthToken = req.cookies.get("ambulanceAccessToken");
 
-  const protectedUserRoutes = ["/profile", "/my-requests"];
+  const protectedUserRoutes = ["/profile", "/ambulance"];
   const protectedAmbulanceRoutes = ["/driver", "/ambulance-profile"];
   const protectedAdminRoutes = ["/dashboard"];
   const currentPath = req.nextUrl.pathname;

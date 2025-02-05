@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { UserAmbulanceRequest } from "@/core/types/user/ambulance-request";
-import UpdateRequestDialog from "./update-requests-dialog";
+// import UpdateRequestDialog from "./update-requests-dialog";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -19,15 +19,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Pencil,
-  Trash2,
-  MapPin,
-  Calendar,
-  User,
-  Ambulance,
-  X,
-} from "lucide-react";
+import { MapPin, Calendar, User, Ambulance, X } from "lucide-react";
 import { format } from "date-fns";
 import deleteUserAmbulanceRequests from "@/app/actions/user/ambulance-request/delete-ambulance-request.action";
 
@@ -112,9 +104,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
             <Ambulance className="w-4 h-4 text-blue-500" />
             <div>
               <p className="text-sm font-medium">Ambulance ID</p>
-              <p className="text-sm text-muted-foreground">
-                {data.ambulance._id}
-              </p>
+              <p className="text-sm text-muted-foreground">{data.ambulance}</p>
             </div>
           </div>
 
@@ -150,10 +140,10 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 font-sans">
-          <UpdateRequestDialog
+          {/* <UpdateRequestDialog
             requestId={data._id}
             accessToken={accessToken}
-            ambulanceId={data.ambulance._id}
+            ambulanceId={data.ambulance}
             initialData={{
               hospital_location: data.hospital_location,
             }}
@@ -169,7 +159,7 @@ export const AmbulanceRequestItem: React.FC<AmbulanceRequestItemProps> = ({
               <Pencil className="w-4 h-4" />
               Edit
             </Button>
-          </UpdateRequestDialog>
+          </UpdateRequestDialog> */}
 
           <AlertDialog>
             <AlertDialogTrigger asChild>

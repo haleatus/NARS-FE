@@ -21,6 +21,7 @@ interface GetAllAmbulanceClientProps {
   ambulanceData: Ambulance[];
   onNavigateToAmbulance?: (ambulanceId: string) => void;
   accessToken: string;
+  selectedAmbulanceId?: string;
   userLocation: [number, number];
   maxDistance?: number;
   selectedHospital: IHospital | null;
@@ -33,6 +34,7 @@ interface AmbulanceWithDistance extends Ambulance {
 const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
   ambulanceData,
   onNavigateToAmbulance,
+  selectedAmbulanceId,
   accessToken,
   userLocation,
   maxDistance = 8,
@@ -97,7 +99,14 @@ const GetAllAmbulanceClient: React.FC<GetAllAmbulanceClientProps> = ({
       <div className="grid grid-cols-1 gap-4">
         {nearbyAmbulances.length > 0 ? (
           nearbyAmbulances.map((ambulance) => (
-            <Card key={ambulance._id} className="relative overflow-hidden">
+            <Card
+              key={ambulance._id}
+              className={`relative overflow-hidden ${
+                selectedAmbulanceId === ambulance._id
+                  ? "border-2 border-blue-500 bg-blue-50"
+                  : ""
+              }`}
+            >
               <CardContent className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="text-lg font-semibold">

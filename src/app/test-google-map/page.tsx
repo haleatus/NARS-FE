@@ -6,8 +6,6 @@ export default function TestGoogleMap({
   apiKey: any;
 }) {
   return (
-    <div className="w-full h-full">
-      <GoogleMap apiKey={apiKey} />
-    </div>
+    <div className="w-full h-full">{/* <GoogleMap apiKey={apiKey} /> */}</div>
   );
 }

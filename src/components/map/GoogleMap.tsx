@@ -9,12 +9,6 @@ interface MapComponentProps {
   ambulances?: Ambulance[];
 }
 
-interface Location {
-  lat: number;
-  lng: number;
-  title: string;
-}
-
 declare global {
   interface Window {
     google: typeof google;
@@ -27,69 +21,121 @@ const GoogleMap: React.FC<MapComponentProps> = ({
   ambulances = [],
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
-  const [searchBox, setSearchBox] =
-    useState<google.maps.places.SearchBox | null>(null);
   const [userLocation, setUserLocation] = useState<google.maps.LatLng | null>(
     null
   );
+  const [destination, setDestination] =
+    useState<google.maps.LatLngLiteral | null>(null);
+  const [directionsService, setDirectionsService] =
+    useState<google.maps.DirectionsService | null>(null);
+  const [directionsRenderer, setDirectionsRenderer] =
+    useState<google.maps.DirectionsRenderer | null>(null);
   const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
+  const [destinationMarker, setDestinationMarker] =
+    useState<google.maps.Marker | null>(null);
   const [ambulanceMarkers, setAmbulanceMarkers] = useState<
     google.maps.Marker[]
   >([]);
+  const [watchId, setWatchId] = useState<number | null>(null);
 
-  // Initialize map
-  const initializeMap = (): void => {
-    if (!mapRef.current || map) return;
-
-    const mapInstance = new window.google.maps.Map(mapRef.current, {
-      center: { lat: 40.7128, lng: -74.006 },
-      zoom: 12,
-      mapTypeControl: true,
-      streetViewControl: true,
-      fullscreenControl: true,
-    });
-
-    setMap(mapInstance);
-
-    // Initialize search box
-    const input = document.createElement("input");
-    input.placeholder = "Search for places...";
-    input.className =
-      "map-search-input bg-white px-4 py-2 rounded-lg shadow-md w-72";
-    input.style.margin = "10px";
-    input.style.position = "absolute";
-    input.style.top = "0";
-    input.style.left = "0";
-    input.style.zIndex = "1";
-
-    mapInstance.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-    const searchBoxInstance = new google.maps.places.SearchBox(input);
-    setSearchBox(searchBoxInstance);
-
-    // Listen for search box changes
-    searchBoxInstance.addListener("places_changed", () => {
-      const places = searchBoxInstance.getPlaces();
-      if (!places || places.length === 0) return;
-
-      const bounds = new google.maps.LatLngBounds();
-      places.forEach((place) => {
-        if (!place.geometry || !place.geometry.location) return;
-
-        if (place.geometry.viewport) {
-          bounds.union(place.geometry.viewport);
-        } else {
-          bounds.extend(place.geometry.location);
-        }
-      });
-
-      mapInstance.fitBounds(bounds);
-    });
+  const locationOptions: PositionOptions = {
+    enableHighAccuracy: true,
+    timeout: 5000,
+    maximumAge: 0,
   };
 
-  // Load Google Maps script
+  const handleLocationError = (error: GeolocationPositionError) => {
+    console.error("Error getting location:", error);
+    const fallbackPos = new google.maps.LatLng(27.7172, 85.324);
+    setUserLocation(fallbackPos);
+    return fallbackPos;
+  };
+
+  const clearCurrentRoute = () => {
+    if (directionsRenderer) {
+      directionsRenderer.setMap(null);
+      directionsRenderer.setMap(map);
+    }
+  };
+
+  const startLocationTracking = () => {
+    if (watchId) {
+      navigator.geolocation.clearWatch(watchId);
+    }
+
+    const id = navigator.geolocation.watchPosition(
+      (position) => {
+        const newUserPos = new google.maps.LatLng(
+          position.coords.latitude,
+          position.coords.longitude
+        );
+
+        setUserLocation(newUserPos);
+
+        if (userMarker) {
+          userMarker.setPosition(newUserPos);
+        }
+
+        if (map) {
+          map.panTo(newUserPos);
+        }
+      },
+      handleLocationError,
+      locationOptions
+    );
+
+    setWatchId(id);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, [watchId]);
+
+  const showDirections = () => {
+    if (
+      !userLocation ||
+      !destination ||
+      !directionsService ||
+      !directionsRenderer
+    )
+      return;
+
+    directionsService.route(
+      {
+        origin: userLocation,
+        destination,
+        travelMode: google.maps.TravelMode.DRIVING,
+        drivingOptions: {
+          departureTime: new Date(),
+          trafficModel: google.maps.TrafficModel.BEST_GUESS,
+        },
+        provideRouteAlternatives: true,
+      },
+      (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK && result) {
+          let bestRoute = result.routes.reduce((best, route) =>
+            route.legs[0].duration &&
+            best.legs[0].duration &&
+            route.legs[0].duration.value < best.legs[0].duration.value
+              ? route
+              : best
+          );
+
+          directionsRenderer.setMap(map);
+          directionsRenderer.setDirections(result);
+        } else {
+          console.error("Directions request failed due to", status);
+        }
+      }
+    );
+  };
+
   useEffect(() => {
     const loadGoogleMaps = () => {
       if (window.google?.maps) {
@@ -97,144 +143,236 @@ const GoogleMap: React.FC<MapComponentProps> = ({
         return;
       }
 
-      window.initMap = initializeMap;
+      window.initMap = () => {
+        initializeMap();
+      };
 
       const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,routes&callback=initMap`;
       script.async = true;
       script.defer = true;
       document.head.appendChild(script);
     };
 
     loadGoogleMaps();
-
-    return () => {
-      markers.forEach((marker) => marker.setMap(null));
-      ambulanceMarkers.forEach((marker) => marker.setMap(null));
-      if (userMarker) userMarker.setMap(null);
-    };
   }, [apiKey]);
 
-  // Get user's location
-  const getUserLocation = () => {
-    if (!map || !navigator.geolocation) return;
+  const initializeMap = async () => {
+    if (!mapRef.current || map) return;
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const userPos = new google.maps.LatLng(
-          position.coords.latitude,
-          position.coords.longitude
-        );
-        setUserLocation(userPos);
+    try {
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(
+            resolve,
+            reject,
+            locationOptions
+          );
+        }
+      );
 
-        // Remove existing user marker
-        if (userMarker) userMarker.setMap(null);
+      const userPos = new google.maps.LatLng(
+        position.coords.latitude,
+        position.coords.longitude
+      );
 
-        // Create new user marker
-        const marker = new google.maps.Marker({
-          position: userPos,
-          map: map,
-          title: "Your Location",
-          icon: {
-            url: "/user-location.svg",
-            scaledSize: new google.maps.Size(32, 32),
+      setUserLocation(userPos);
+
+      const mapInstance = new window.google.maps.Map(mapRef.current, {
+        center: userPos,
+        zoom: 16,
+        styles: [
+          {
+            featureType: "poi",
+            elementType: "labels",
+            stylers: [{ visibility: "off" }],
           },
-        });
+        ],
+        mapTypeControl: false,
+        streetViewControl: false,
+      });
+      setMap(mapInstance);
 
-        setUserMarker(marker);
-        map.setCenter(userPos);
-      },
-      (error) => {
-        console.error("Error getting user location:", error);
+      const marker = new google.maps.Marker({
+        position: userPos,
+        map: mapInstance,
+        title: "Your Location",
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 12,
+          fillColor: "#2563eb",
+          fillOpacity: 1,
+          strokeWeight: 3,
+          strokeColor: "#ffffff",
+        },
+        zIndex: 999,
+      });
+      setUserMarker(marker);
+
+      setDirectionsService(new google.maps.DirectionsService());
+      const renderer = new google.maps.DirectionsRenderer({
+        map: mapInstance,
+        suppressMarkers: true,
+        polylineOptions: {
+          strokeColor: "#2563eb",
+          strokeWeight: 5,
+        },
+      });
+      setDirectionsRenderer(renderer);
+
+      mapInstance.addListener("click", (event: google.maps.MapMouseEvent) => {
+        if (event.latLng) {
+          if (destinationMarker) {
+            destinationMarker.setMap(null);
+          }
+
+          clearCurrentRoute();
+
+          setDestination({
+            lat: event.latLng.lat(),
+            lng: event.latLng.lng(),
+          });
+
+          const newMarker = new google.maps.Marker({
+            position: event.latLng,
+            map: mapInstance,
+            title: "Selected Destination",
+            icon: {
+              url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+              scaledSize: new google.maps.Size(40, 40),
+            },
+            animation: google.maps.Animation.DROP,
+          });
+
+          setDestinationMarker(newMarker);
+        }
+      });
+
+      if (searchInputRef.current) {
+        const autocomplete = new google.maps.places.Autocomplete(
+          searchInputRef.current
+        );
+        autocomplete.bindTo("bounds", mapInstance);
+
+        autocomplete.addListener("place_changed", () => {
+          const place = autocomplete.getPlace();
+          if (!place.geometry || !place.geometry.location) return;
+
+          if (destinationMarker) {
+            destinationMarker.setMap(null);
+          }
+
+          clearCurrentRoute();
+
+          mapInstance.setCenter(place.geometry.location);
+          mapInstance.setZoom(17);
+
+          setDestination({
+            lat: place.geometry.location.lat(),
+            lng: place.geometry.location.lng(),
+          });
+
+          const newMarker = new google.maps.Marker({
+            position: place.geometry.location,
+            map: mapInstance,
+            title: "Selected Destination",
+            icon: {
+              url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+              scaledSize: new google.maps.Size(40, 40),
+            },
+            animation: google.maps.Animation.DROP,
+          });
+
+          setDestinationMarker(newMarker);
+        });
       }
-    );
+
+      startLocationTracking();
+      updateAmbulanceMarkers(mapInstance);
+    } catch (error) {
+      console.error("Error initializing map:", error);
+    }
   };
 
-  // Update ambulance markers
-  useEffect(() => {
-    if (!map) return;
-
-    // Clear existing ambulance markers
+  const updateAmbulanceMarkers = (mapInstance: google.maps.Map) => {
     ambulanceMarkers.forEach((marker) => marker.setMap(null));
-    const newMarkers: google.maps.Marker[] = [];
 
-    ambulances.forEach((ambulance) => {
-      const marker = new google.maps.Marker({
+    const newMarkers: google.maps.Marker[] = ambulances.map((ambulance) => {
+      const ambulanceMarker = new google.maps.Marker({
         position: {
           lat: parseFloat(ambulance.location.latitude),
           lng: parseFloat(ambulance.location.longitude),
         },
-        map: map,
+        map: mapInstance,
+        title: `Ambulance - ${ambulance._id}`,
         icon: {
           url: "/ambulance-icon.svg",
           scaledSize: new google.maps.Size(32, 32),
         },
+        animation: google.maps.Animation.DROP,
       });
 
-      const infoWindow = new google.maps.InfoWindow({
-        content: `
-          <div class="p-3 max-w-xs">
-            <h3 class="font-semibold text-lg mb-2">${ambulance.driver_name}</h3>
-            <p class="text-sm mb-1">
-              <span class="font-medium">Status:</span> 
-              <span class="px-2 py-1 rounded ${
-                ambulance.status === "AVAILABLE"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }">
-                ${ambulance.status}
-              </span>
-            </p>
-            <p class="text-sm mb-1">
-              <span class="font-medium">Number:</span> 
-              ${ambulance.ambulance_number}
-            </p>
-            <p class="text-sm">
-              <span class="font-medium">Contact:</span> 
-              ${ambulance.contact}
-            </p>
-          </div>
-        `,
-      });
+      ambulanceMarker.addListener("click", () => {
+        if (destinationMarker) {
+          destinationMarker.setMap(null);
+        }
 
-      marker.addListener("click", () => {
-        infoWindow.open({
-          anchor: marker,
-          map: map,
+        clearCurrentRoute();
+
+        setDestination({
+          lat: parseFloat(ambulance.location.latitude),
+          lng: parseFloat(ambulance.location.longitude),
         });
+
+        const newMarker = new google.maps.Marker({
+          position: {
+            lat: parseFloat(ambulance.location.latitude),
+            lng: parseFloat(ambulance.location.longitude),
+          },
+          map: mapInstance,
+          title: "Selected Destination",
+          icon: {
+            url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+            scaledSize: new google.maps.Size(40, 40),
+          },
+          animation: google.maps.Animation.DROP,
+        });
+
+        setDestinationMarker(newMarker);
       });
 
-      newMarkers.push(marker);
+      return ambulanceMarker;
     });
 
     setAmbulanceMarkers(newMarkers);
+  };
+
+  useEffect(() => {
+    if (map) updateAmbulanceMarkers(map);
   }, [ambulances, map]);
 
   return (
-    <Card className="p-4 w-full max-w-4xl mx-auto relative">
+    <Card className="p-6 w-full max-w-4xl mx-auto relative shadow-lg">
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">Google Maps</h2>
+        <input
+          ref={searchInputRef}
+          type="text"
+          placeholder="Search for a location..."
+          className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+        />
+        {destination && (
           <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={getUserLocation}
+            className="w-full md:w-auto px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 flex items-center justify-center space-x-2 shadow-md"
+            onClick={showDirections}
           >
-            Get My Location
+            <span>Show Best Route</span>
           </button>
-        </div>
-
-        <div ref={mapRef} className="w-full h-96 rounded-lg overflow-hidden" />
+        )}
+        <div
+          ref={mapRef}
+          className="w-full h-[500px] rounded-lg overflow-hidden shadow-md border border-gray-200"
+        />
       </div>
-
-      <style jsx global>{`
-        .map-search-input {
-          font-family: system-ui, sans-serif;
-          font-size: 14px;
-        }
-        .map-search-input:focus {
-          outline: 2px solid #3b82f6;
-        }
-      `}</style>
     </Card>
   );
 };

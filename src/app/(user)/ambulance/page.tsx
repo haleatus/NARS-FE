@@ -13,6 +13,7 @@ import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-u
 import getUserAmbulanceRequests from "@/app/actions/user/ambulance-request/get-user-ambulance-requests.action";
 import { UserAmbulanceRequestResponse } from "@/core/interface/user/ambulance-request";
 import { redirect } from "next/navigation";
+import AmbulanceClientV2 from "@/components/ambulance/v2/ambulance-client-v2";
 
 export default async function AmbulanceDashboard() {
   const accessToken = await getCurrentUserAccessToken();
@@ -48,13 +49,20 @@ export default async function AmbulanceDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AmbulanceClient
+            <AmbulanceClientV2
               ambulanceData={ambulanceData}
               hospitalData={hospitalData}
               accessToken={accessToken}
               myRequestExists={myRequestExists}
               requests={myAmbulanceRequest.data as UserAmbulanceRequestResponse}
             />
+            {/* <AmbulanceClient
+              ambulanceData={ambulanceData}
+              hospitalData={hospitalData}
+              accessToken={accessToken}
+              myRequestExists={myRequestExists}
+              requests={myAmbulanceRequest.data as UserAmbulanceRequestResponse}
+            /> */}
           </CardContent>
         </Card>
       </div>

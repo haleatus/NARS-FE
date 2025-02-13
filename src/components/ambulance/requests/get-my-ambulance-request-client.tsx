@@ -37,7 +37,7 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
     );
   }
 
-  const statusTabs = ["PENDING", "ENROUTE", "COMPLETED"] as const;
+  const statusTabs = ["PENDING", "ENROUTE"] as const;
 
   const filteredRequests = requests.data.filter(
     (request) => request.status === activeTab
@@ -71,6 +71,7 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
                   accessToken={accessToken}
                   onUpdate={handleUpdateAndDelete}
                   onNavigate={onNavigate}
+                  activeTab={activeTab}
                 />
               ))}
             </div>

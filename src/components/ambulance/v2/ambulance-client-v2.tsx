@@ -1,30 +1,26 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useState } from "react";
-import GetAllAmbulanceClientV2 from "./get-all-ambulance-client-v2";
 import { Ambulance } from "@/core/interface/ambulance.interface";
 import {
   IHospital,
   IHospitalSuccessResponse,
 } from "@/core/interface/hospital.interface";
 import { UserAmbulanceRequestResponse } from "@/core/interface/user/ambulance-request";
-import GetUserAmbulanceRequestClientV2 from "../../user/ambulance-request/v2/get-user-ambulance-request-v2";
 import GoogleMap from "../../map/GoogleMap";
 import GetAllAmbulanceClient from "../get-all-ambulance-client";
-import HospitalList from "../../map/HospitalLists";
 import GetUserAmbulanceRequestClient from "@/components/user/ambulance-request/get-user-ambulance-request-client";
 
 const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
 const AmbulanceClientV2 = ({
   ambulanceData,
-  hospitalData,
   accessToken,
   requests,
   myRequestExists,
 }: {
   ambulanceData: Ambulance[] | null;
-  hospitalData: IHospitalSuccessResponse | null;
   accessToken: string;
   myRequestExists: boolean;
   requests: UserAmbulanceRequestResponse;

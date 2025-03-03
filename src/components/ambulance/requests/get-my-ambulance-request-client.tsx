@@ -71,7 +71,6 @@ const GetMyAmbulanceRequestClient: React.FC<Props> = ({
                   accessToken={accessToken}
                   onUpdate={handleUpdateAndDelete}
                   onNavigate={onNavigate}
-                  activeTab={activeTab}
                 />
               ))}
             </div>

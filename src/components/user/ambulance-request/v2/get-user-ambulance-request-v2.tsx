@@ -8,7 +8,6 @@ import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "lucide-react";
-import { IHospital } from "@/core/interface/hospital.interface";
 
 interface Props {
   requests: UserAmbulanceRequestResponse;

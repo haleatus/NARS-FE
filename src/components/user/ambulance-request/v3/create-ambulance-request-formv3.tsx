@@ -1,13 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-declare global {
-  interface Window {
-    googleMapsLoading?: boolean;
-    googleMapsLoaded?: boolean;
-  }
-}
-
 import { useState, useRef, useEffect } from "react";
 import { createAmbulanceRequestSchema } from "@/app/schema/user/ambulance-request";
 import { Button } from "@/components/ui/button";
@@ -16,6 +9,13 @@ import { Loader2, MapPin, Search } from "lucide-react";
 import createAmbulanceRequest from "@/app/actions/user/ambulance-request/create-ambulance-request.action";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+
+declare global {
+  interface Window {
+    googleMapsLoading?: boolean;
+    googleMapsLoaded?: boolean;
+  }
+}
 
 const mapContainerStyle = {
   width: "100%",
@@ -32,6 +32,18 @@ const bagmatiBounds = {
   south: 26.55,
   west: 84.0,
   east: 86.7,
+};
+
+const markerIcon = {
+  url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+  scaledSize: new google.maps.Size(24, 24),
+  anchor: new google.maps.Point(12, 12),
+};
+
+const searchResultIcon = {
+  url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+  scaledSize: new google.maps.Size(20, 20),
+  anchor: new google.maps.Point(10, 10),
 };
 
 interface CreateAmbulanceRequestFormProps {
@@ -70,7 +82,6 @@ export function CreateAmbulanceRequestFormV3({
     },
   });
 
-  // Initialize the map
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
@@ -78,11 +89,9 @@ export function CreateAmbulanceRequestFormV3({
       mapRef.current &&
       !isMapLoaded
     ) {
-      // Check if Google Maps API is already loaded
       if (window.google && window.google.maps) {
         initMap();
       } else {
-        // Prevent multiple script loads
         if (!window.googleMapsLoading && !window.googleMapsLoaded) {
           window.googleMapsLoading = true;
 
@@ -101,7 +110,6 @@ export function CreateAmbulanceRequestFormV3({
           };
           document.head.appendChild(script);
         } else if (window.googleMapsLoading) {
-          // Handle concurrent requests while script is loading
           const checkInterval = setInterval(() => {
             if (window.googleMapsLoaded) {
               clearInterval(checkInterval);
@@ -124,6 +132,17 @@ export function CreateAmbulanceRequestFormV3({
         latLngBounds: bagmatiBounds,
         strictBounds: true,
       },
+      streetViewControl: false,
+      mapTypeControl: false,
+      fullscreenControl: false,
+      clickableIcons: false,
+      styles: [
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }],
+        },
+      ],
     });
 
     newMap.addListener("click", (event: google.maps.MapMouseEvent) => {
@@ -140,13 +159,12 @@ export function CreateAmbulanceRequestFormV3({
       const latitude = event.latLng.lat();
       const longitude = event.latLng.lng();
 
-      // Clear previous marker if exists
       clearMarkers();
 
-      // Create a new marker
       const marker = new google.maps.Marker({
         position: { lat: latitude, lng: longitude },
         map: map,
+        icon: markerIcon,
       });
 
       setSelectedHospital({
@@ -167,11 +185,10 @@ export function CreateAmbulanceRequestFormV3({
   };
 
   const clearMarkers = () => {
-    if (selectedHospital && selectedHospital.marker) {
+    if (selectedHospital?.marker) {
       selectedHospital.marker.setMap(null);
     }
 
-    // Clear search result markers
     searchResults.forEach((result) => {
       if (result.marker) {
         result.marker.setMap(null);
@@ -180,10 +197,7 @@ export function CreateAmbulanceRequestFormV3({
   };
 
   const handleSearch = (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
-
+    e?.preventDefault();
     if (!placesService || !map || !searchQuery.trim()) return;
 
     const request = {
@@ -191,97 +205,86 @@ export function CreateAmbulanceRequestFormV3({
       bounds: map.getBounds() || undefined,
       location: map.getCenter() || undefined,
       radius: 5000,
-      type: ["hospital", "health"],
     };
 
-    placesService.textSearch(
-      { ...request, type: "hospital" },
-      (results, status) => {
-        if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-          // Clear previous markers
-          clearMarkers();
+    placesService.textSearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        clearMarkers();
 
-          // Create markers for search results
-          const mappedResults = results.map((place) => {
-            const marker = new google.maps.Marker({
-              position: place.geometry?.location,
-              map: map,
-              title: place.name,
-              icon: {
-                url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-              },
-            });
-
-            // Add click listener to each marker
-            marker.addListener("click", () => {
-              if (place.geometry?.location) {
-                const latitude = place.geometry.location.lat();
-                const longitude = place.geometry.location.lng();
-
-                clearMarkers();
-
-                const selectedMarker = new google.maps.Marker({
-                  position: { lat: latitude, lng: longitude },
-                  map: map,
-                });
-
-                setSelectedHospital({
-                  latitude,
-                  longitude,
-                  name: place.name,
-                  marker: selectedMarker,
-                });
-
-                setFormData({
-                  ...formData,
-                  hospital_location: {
-                    latitude: latitude.toString(),
-                    longitude: longitude.toString(),
-                  },
-                });
-              }
-            });
-
-            return {
-              ...place,
-              latitude: place.geometry?.location?.lat(),
-              longitude: place.geometry?.location?.lng(),
-              marker,
-            };
+        const mappedResults = results.map((place) => {
+          const marker = new google.maps.Marker({
+            position: place.geometry?.location,
+            map: map,
+            title: place.name,
+            icon: searchResultIcon,
           });
 
-          setSearchResults(mappedResults);
+          marker.addListener("click", () => {
+            if (place.geometry?.location) {
+              const latitude = place.geometry.location.lat();
+              const longitude = place.geometry.location.lng();
 
-          // Center map and adjust zoom to show all results
-          if (mappedResults.length > 0 && map) {
-            const bounds = new google.maps.LatLngBounds();
-            mappedResults.forEach((result) => {
-              if (result.geometry?.location) {
-                bounds.extend(result.geometry.location);
-              }
-            });
-            map.fitBounds(bounds);
-          }
-        } else {
-          toast.error("No hospitals found");
+              clearMarkers();
+
+              const selectedMarker = new google.maps.Marker({
+                position: { lat: latitude, lng: longitude },
+                map: map,
+                icon: markerIcon,
+              });
+
+              setSelectedHospital({
+                latitude,
+                longitude,
+                name: place.name,
+                marker: selectedMarker,
+              });
+
+              setFormData({
+                ...formData,
+                hospital_location: {
+                  latitude: latitude.toString(),
+                  longitude: longitude.toString(),
+                },
+              });
+            }
+          });
+
+          return {
+            ...place,
+            latitude: place.geometry?.location?.lat(),
+            longitude: place.geometry?.location?.lng(),
+            marker,
+          };
+        });
+
+        setSearchResults(mappedResults);
+
+        if (mappedResults.length > 0) {
+          const bounds = new google.maps.LatLngBounds();
+          mappedResults.forEach((result) => {
+            if (result.geometry?.location) {
+              bounds.extend(result.geometry.location);
+            }
+          });
+          map.fitBounds(bounds);
         }
+      } else {
+        toast.error("No hospitals found");
       }
-    );
+    });
   };
 
   const selectSearchResult = (result: any) => {
     if (result.geometry?.location) {
-      // Center the map on the selected location
       map?.panTo({ lat: result.latitude, lng: result.longitude });
       map?.setZoom(16);
 
-      // Clear previous markers
       clearMarkers();
 
-      // Create a new marker
       const marker = new google.maps.Marker({
         position: { lat: result.latitude, lng: result.longitude },
         map: map,
+        icon: markerIcon,
       });
 
       setSelectedHospital({
@@ -299,7 +302,6 @@ export function CreateAmbulanceRequestFormV3({
         },
       });
 
-      // Clear search results after selection
       setSearchResults([]);
     }
   };
@@ -349,14 +351,12 @@ export function CreateAmbulanceRequestFormV3({
         <form onSubmit={handleSubmit} className="space-y-6">
           <input type="hidden" name="ambulance" value={ambulanceId} />
 
-          {/* Display selected ambulance */}
           <div className="p-4 bg-muted rounded-lg">
             <p className="text-sm text-muted-foreground">Selected Ambulance</p>
             <p className="font-medium">{ambulanceDriver}</p>
             <p className="font-medium">{ambulanceNumber}</p>
           </div>
 
-          {/* Hospital Search - Now a div instead of a form */}
           <div className="space-y-2">
             <h3 className="font-medium">Search for Hospital</h3>
             <div className="flex gap-2">
@@ -379,7 +379,6 @@ export function CreateAmbulanceRequestFormV3({
               </Button>
             </div>
 
-            {/* Search Results */}
             {searchResults.length > 0 && (
               <div className="mt-2 max-h-40 overflow-y-auto border rounded-md p-2">
                 <p className="text-sm font-medium mb-1">Search Results:</p>
@@ -403,12 +402,10 @@ export function CreateAmbulanceRequestFormV3({
             )}
           </div>
 
-          {/* Google Map for Hospital Selection */}
           <div className="space-y-4">
             <h3 className="font-medium">Select Hospital Location</h3>
             <p className="text-sm text-muted-foreground">
               Click on the map to select a location or search for a hospital
-              above
             </p>
             <div
               ref={mapRef}
@@ -432,7 +429,7 @@ export function CreateAmbulanceRequestFormV3({
             ) : (
               <div className="p-4 bg-muted rounded-lg text-center">
                 <p className="text-sm text-muted-foreground">
-                  Please select a hospital by searching or clicking on the map
+                  Please select a hospital location
                 </p>
               </div>
             )}
@@ -443,7 +440,6 @@ export function CreateAmbulanceRequestFormV3({
             )}
           </div>
 
-          {/* Action Buttons */}
           <div className="flex space-x-2 justify-end">
             <Button
               type="button"

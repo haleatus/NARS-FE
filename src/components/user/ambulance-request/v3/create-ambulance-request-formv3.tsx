@@ -1,6 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+declare global {
+  interface Window {
+    googleMapsLoading?: boolean;
+    googleMapsLoaded?: boolean;
+  }
+}
+
 import { useState, useRef, useEffect } from "react";
 import { createAmbulanceRequestSchema } from "@/app/schema/user/ambulance-request";
 import { Button } from "@/components/ui/button";
@@ -71,19 +78,40 @@ export function CreateAmbulanceRequestFormV3({
       mapRef.current &&
       !isMapLoaded
     ) {
-      // Check if Google Maps API is loaded
+      // Check if Google Maps API is already loaded
       if (window.google && window.google.maps) {
         initMap();
       } else {
-        // Load Google Maps API if not already loaded
-        const script = document.createElement("script");
-        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
-        script.async = true;
-        script.defer = true;
-        script.onload = initMap;
-        document.head.appendChild(script);
+        // Prevent multiple script loads
+        if (!window.googleMapsLoading && !window.googleMapsLoaded) {
+          window.googleMapsLoading = true;
+
+          const script = document.createElement("script");
+          script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
+          script.async = true;
+          script.defer = true;
+          script.onload = () => {
+            window.googleMapsLoaded = true;
+            window.googleMapsLoading = false;
+            initMap();
+          };
+          script.onerror = () => {
+            window.googleMapsLoading = false;
+            console.error("Failed to load Google Maps script");
+          };
+          document.head.appendChild(script);
+        } else if (window.googleMapsLoading) {
+          // Handle concurrent requests while script is loading
+          const checkInterval = setInterval(() => {
+            if (window.googleMapsLoaded) {
+              clearInterval(checkInterval);
+              initMap();
+            }
+          }, 100);
+        }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map, isMapLoaded]);
 
   const initMap = () => {

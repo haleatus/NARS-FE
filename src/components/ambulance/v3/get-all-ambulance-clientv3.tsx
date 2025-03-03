@@ -144,7 +144,7 @@ const GetAllAmbulanceClientV3: React.FC<GetAllAmbulanceClientProps> = ({
                         Request
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px] p-0">
+                    <DialogContent className="sm:max-w-[485px] p-0 rounded-sm">
                       <DialogHeader className="hidden">
                         <DialogTitle>Request Ambulance</DialogTitle>
                       </DialogHeader>

@@ -1,5 +1,5 @@
 export const baseURL: string =
-  process.env.BACKEND_BASE_URL || "http://localhost:5000";
+  process.env.BACKEND_BASE_URL || "http://localhost:5000" || "http://localhost:3000";
 
 export const endpoints = {
   auth: {

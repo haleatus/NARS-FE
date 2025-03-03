@@ -5,6 +5,9 @@ import { Ambulance } from "@/core/interface/ambulance.interface";
 import { UserAmbulanceRequestResponse } from "@/core/interface/user/ambulance-request";
 import GetUserAmbulanceRequestClientV3 from "@/components/user/ambulance-request/v3/get-user-ambulance-request-clientv3";
 import GetAllAmbulanceClientV3 from "./get-all-ambulance-clientv3";
+import GoogleMapComponent from "@/components/map/GoogleMapComponent";
+
+const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
 const AmbulanceClientV3 = ({
   ambulanceData,
@@ -25,7 +28,14 @@ const AmbulanceClientV3 = ({
         <div
           className={`relative rounded-lg overflow-hidden shadow-inner border-2 border-red-700`}
         >
-          {ambulanceData ? <div>Map</div> : <div>No ambulance data found</div>}
+          {ambulanceData ? (
+            <GoogleMapComponent
+              apiKey={googleApiKey}
+              ambulances={ambulanceData}
+            />
+          ) : (
+            <div>No ambulance data found</div>
+          )}
         </div>
 
         <div

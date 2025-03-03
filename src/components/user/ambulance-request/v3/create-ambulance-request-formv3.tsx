@@ -34,18 +34,6 @@ const bagmatiBounds = {
   east: 86.7,
 };
 
-const markerIcon = {
-  url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-  scaledSize: new google.maps.Size(24, 24),
-  anchor: new google.maps.Point(12, 12),
-};
-
-const searchResultIcon = {
-  url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
-  scaledSize: new google.maps.Size(20, 20),
-  anchor: new google.maps.Point(10, 10),
-};
-
 interface CreateAmbulanceRequestFormProps {
   ambulanceId: string;
   accessToken: string;
@@ -73,6 +61,9 @@ export function CreateAmbulanceRequestFormV3({
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const mapRef = useRef<HTMLDivElement>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const [markerIcon, setMarkerIcon] = useState<google.maps.Icon | null>(null);
+  const [searchResultIcon, setSearchResultIcon] =
+    useState<google.maps.Icon | null>(null);
 
   const [formData, setFormData] = useState({
     ambulance: ambulanceId,
@@ -81,6 +72,22 @@ export function CreateAmbulanceRequestFormV3({
       longitude: "",
     },
   });
+
+  useEffect(() => {
+    if (typeof google !== "undefined") {
+      setMarkerIcon({
+        url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+        scaledSize: new google.maps.Size(24, 24),
+        anchor: new google.maps.Point(12, 12),
+      });
+
+      setSearchResultIcon({
+        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+        scaledSize: new google.maps.Size(20, 20),
+        anchor: new google.maps.Point(10, 10),
+      });
+    }
+  }, [isMapLoaded]); // Run when map loads
 
   useEffect(() => {
     if (
@@ -164,7 +171,7 @@ export function CreateAmbulanceRequestFormV3({
       const marker = new google.maps.Marker({
         position: { lat: latitude, lng: longitude },
         map: map,
-        icon: markerIcon,
+        icon: markerIcon, // Now uses state-based icon
       });
 
       setSelectedHospital({

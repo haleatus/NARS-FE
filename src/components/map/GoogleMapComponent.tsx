@@ -1,14 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import type React from "react";
-import { useEffect, useRef, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import React, { useEffect, useRef, useState } from "react";
+import { useGoogleMaps } from "@/hooks/use-google-maps";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MapPin, Navigation, Search } from "lucide-react";
-import type { Ambulance } from "@/core/interface/ambulance.interface";
-import { useGoogleMaps } from "@/hooks/use-google-maps";
+import { FaSearch as Search } from "react-icons/fa";
+import { Ambulance } from "@/core/interface/ambulance.interface";
 
 interface MapComponentProps {
   apiKey: string;
@@ -25,441 +23,342 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   apiKey,
   ambulances = [],
 }) => {
+  const { isLoaded } = useGoogleMaps(apiKey);
   const mapRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [userLocation, setUserLocation] = useState<google.maps.LatLng | null>(
     null
   );
-  const [destination, setDestination] =
-    useState<google.maps.LatLngLiteral | null>(null);
   const [directionsService, setDirectionsService] =
     useState<google.maps.DirectionsService | null>(null);
   const [directionsRenderer, setDirectionsRenderer] =
     useState<google.maps.DirectionsRenderer | null>(null);
-  const [userMarker, setUserMarker] = useState<google.maps.Marker | null>(null);
-  const [destinationMarker, setDestinationMarker] =
-    useState<google.maps.Marker | null>(null);
-  const [ambulanceMarkers, setAmbulanceMarkers] = useState<
-    google.maps.Marker[]
+  const [searchInput, setSearchInput] = useState("");
+  const [searchResults, setSearchResults] = useState<
+    google.maps.GeocoderResult[]
   >([]);
-  const [watchId, setWatchId] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [selectedAmbulance, setSelectedAmbulance] = useState<Ambulance | null>(
+  const [selectedLocation, setSelectedLocation] =
+    useState<google.maps.LatLng | null>(null);
+
+  // Refs to store markers (better than state for immediate access)
+  const userMarkerRef = useRef<google.maps.Marker | null>(null);
+  const clickMarkerRef = useRef<google.maps.Marker | null>(null);
+  const searchMarkerRef = useRef<google.maps.Marker | null>(null);
+  const ambulanceMarkersRef = useRef<google.maps.Marker[]>([]);
+  const userCircleRef = useRef<google.maps.Circle | null>(null);
+
+  const autocompleteRef = useRef<google.maps.places.AutocompleteService | null>(
     null
   );
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Use the hook to load Google Maps API
-  const { isLoaded, error } = useGoogleMaps(apiKey);
-
-  // Initialize map when Google Maps is loaded
+  // Initialize map and services
   useEffect(() => {
-    if (isLoaded && mapRef.current && !map) {
-      initializeMap();
-    }
-  }, [isLoaded, map]);
+    if (!isLoaded || !mapRef.current) return;
 
-  // Update ambulance markers when ambulances prop changes
-  useEffect(() => {
-    if (map) updateAmbulanceMarkers(map);
-  }, [ambulances, map]);
+    const mapInstance = new window.google.maps.Map(mapRef.current, {
+      center: { lat: 27.7172, lng: 85.324 },
+      zoom: 14,
+    });
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-      }
+    setMap(mapInstance);
+    setDirectionsService(new window.google.maps.DirectionsService());
+    const rendererInstance = new window.google.maps.DirectionsRenderer({
+      map: mapInstance,
+      suppressMarkers: true, // Don't show default markers
+    });
+    setDirectionsRenderer(rendererInstance);
+    autocompleteRef.current =
+      new window.google.maps.places.AutocompleteService();
 
-      // Clean up markers
-      if (userMarker) userMarker.setMap(null);
-      if (destinationMarker) destinationMarker.setMap(null);
-      ambulanceMarkers.forEach((marker) => marker.setMap(null));
-    };
-  }, [watchId, userMarker, destinationMarker, ambulanceMarkers]);
-
-  const initializeMap = async () => {
-    if (!mapRef.current || map) return;
-    setIsLoading(true);
-
-    try {
-      // Get user's current position
-      const position = await new Promise<GeolocationPosition>(
-        (resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject, {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0,
-          });
-        }
-      );
-
-      const userPos = new google.maps.LatLng(
+    // Get user location and create blue circle
+    navigator.geolocation.getCurrentPosition((position) => {
+      const userLatLng = new google.maps.LatLng(
         position.coords.latitude,
         position.coords.longitude
       );
+      setUserLocation(userLatLng);
 
-      setUserLocation(userPos);
-
-      // Create map instance
-      const mapInstance = new window.google.maps.Map(mapRef.current, {
-        center: userPos,
-        zoom: 15,
-        styles: [
-          {
-            featureType: "poi",
-            elementType: "labels",
-            stylers: [{ visibility: "off" }],
-          },
-        ],
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
-        zoomControl: true,
-        zoomControlOptions: {
-          position: google.maps.ControlPosition.RIGHT_BOTTOM,
-        },
-      });
-
-      setMap(mapInstance);
-
-      // Create user marker
-      const marker = new google.maps.Marker({
-        position: userPos,
+      // Add blue marker for user location
+      userMarkerRef.current = new google.maps.Marker({
+        position: userLatLng,
         map: mapInstance,
         title: "Your Location",
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: "#3b82f6",
-          fillOpacity: 1,
-          strokeWeight: 2,
-          strokeColor: "#ffffff",
-        },
-        zIndex: 999,
+        icon: { url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png" },
+        zIndex: 1000, // Keep on top
       });
-      setUserMarker(marker);
 
-      // Set up directions service
-      setDirectionsService(new google.maps.DirectionsService());
-      const renderer = new google.maps.DirectionsRenderer({
+      // Add blue circle
+      userCircleRef.current = new google.maps.Circle({
+        strokeColor: "#4285F4",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#4285F4",
+        fillOpacity: 0.35,
         map: mapInstance,
-        suppressMarkers: true,
-        polylineOptions: {
-          strokeColor: "#3b82f6",
-          strokeWeight: 5,
-          strokeOpacity: 0.7,
-        },
-        panel: null, // Make sure no directions panel is set
-      });
-      setDirectionsRenderer(renderer);
-
-      // Set up map click handler
-      mapInstance.addListener("click", (event: google.maps.MapMouseEvent) => {
-        if (event.latLng) {
-          handleDestinationChange({
-            lat: event.latLng.lat(),
-            lng: event.latLng.lng(),
-          });
-        }
+        center: userLatLng,
+        radius: 100, // 100 meters radius
       });
 
-      // Set up search autocomplete
-      if (searchInputRef.current) {
-        const autocomplete = new google.maps.places.Autocomplete(
-          searchInputRef.current
-        );
-        autocomplete.bindTo("bounds", mapInstance);
-
-        autocomplete.addListener("place_changed", () => {
-          const place = autocomplete.getPlace();
-          if (!place.geometry || !place.geometry.location) return;
-
-          mapInstance.setCenter(place.geometry.location);
-          mapInstance.setZoom(17);
-
-          handleDestinationChange({
-            lat: place.geometry.location.lat(),
-            lng: place.geometry.location.lng(),
-          });
-        });
-      }
-
-      // Start tracking user location
-      startLocationTracking();
-
-      // Add ambulance markers
-      updateAmbulanceMarkers(mapInstance);
-
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error initializing map:", error);
-      setIsLoading(false);
-
-      // Fallback to a default location if geolocation fails
-      const fallbackPos = new google.maps.LatLng(27.7172, 85.324);
-      setUserLocation(fallbackPos);
-
-      if (mapRef.current) {
-        const mapInstance = new window.google.maps.Map(mapRef.current, {
-          center: fallbackPos,
-          zoom: 15,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: false,
-        });
-        setMap(mapInstance);
-        updateAmbulanceMarkers(mapInstance);
-      }
-    }
-  };
-
-  const startLocationTracking = () => {
-    if (watchId) {
-      navigator.geolocation.clearWatch(watchId);
-    }
-
-    const id = navigator.geolocation.watchPosition(
-      (position) => {
-        const newUserPos = new google.maps.LatLng(
-          position.coords.latitude,
-          position.coords.longitude
-        );
-
-        setUserLocation(newUserPos);
-
-        if (userMarker) {
-          userMarker.setPosition(newUserPos);
-        }
-      },
-      (error) => console.error("Error tracking location:", error),
-      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-    );
-
-    setWatchId(id);
-  };
-
-  const handleDestinationChange = (
-    newDestination: google.maps.LatLngLiteral
-  ) => {
-    // Clear previous destination marker
-    if (destinationMarker) {
-      destinationMarker.setMap(null);
-    }
-
-    // Clear previous route
-    if (directionsRenderer) {
-      directionsRenderer.setDirections(null);
-    }
-
-    setDestination(newDestination);
-    setSelectedAmbulance(null);
-
-    // Create new destination marker
-    if (map) {
-      const newMarker = new google.maps.Marker({
-        position: newDestination,
-        map: map,
-        title: "Selected Destination",
-        icon: {
-          url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-          scaledSize: new google.maps.Size(32, 32),
-        },
-        animation: google.maps.Animation.DROP,
-      });
-
-      setDestinationMarker(newMarker);
-    }
-  };
-
-  const updateAmbulanceMarkers = (mapInstance: google.maps.Map) => {
-    // Clear existing ambulance markers
-    ambulanceMarkers.forEach((marker) => marker.setMap(null));
-
-    // Create new ambulance markers
-    const newMarkers: google.maps.Marker[] = ambulances.map((ambulance) => {
-      const position = {
-        lat: Number.parseFloat(ambulance.location.latitude),
-        lng: Number.parseFloat(ambulance.location.longitude),
-      };
-
-      const ambulanceMarker = new google.maps.Marker({
-        position: position,
-        map: mapInstance,
-        title: `${ambulance.driver_name} - ${ambulance.ambulance_number}`,
-        icon: {
-          url: "/ambulance-icon.svg",
-          scaledSize: new google.maps.Size(28, 28),
-        },
-      });
-
-      // Create info window for ambulance details
-      const infoWindow = new google.maps.InfoWindow({
-        content: `
-          <div style="padding: 8px; max-width: 200px;">
-            <div style="font-weight: bold; margin-bottom: 4px;">${ambulance.ambulance_number}</div>
-            <div>Driver: ${ambulance.driver_name}</div>
-            <div>Contact: ${ambulance.contact}</div>
-            <div>Status: ${ambulance.status}</div>
-          </div>
-        `,
-      });
-
-      // Add click listener to ambulance marker
-      ambulanceMarker.addListener("click", () => {
-        // Close any open info windows
-        newMarkers.forEach((marker) => {
-          const markerInfoWindow = marker.get("infoWindow");
-          if (markerInfoWindow) markerInfoWindow.close();
-        });
-
-        // Open this info window
-        infoWindow.open(mapInstance, ambulanceMarker);
-
-        // Set selected ambulance
-        setSelectedAmbulance(ambulance);
-
-        // Set destination to ambulance location
-        handleDestinationChange(position);
-      });
-
-      // Store info window reference with marker
-      ambulanceMarker.set("infoWindow", infoWindow);
-
-      return ambulanceMarker;
+      // Center map on user location
+      mapInstance.setCenter(userLatLng);
     });
 
-    setAmbulanceMarkers(newMarkers);
+    // Add click listener for map
+    mapInstance.addListener("click", (event: google.maps.MapMouseEvent) => {
+      // Clear existing click marker
+      if (clickMarkerRef.current) {
+        clickMarkerRef.current.setMap(null);
+        clickMarkerRef.current = null;
+      }
+
+      // Clear existing search marker
+      if (searchMarkerRef.current) {
+        searchMarkerRef.current.setMap(null);
+        searchMarkerRef.current = null;
+      }
+
+      // Create new marker
+      if (event.latLng) {
+        clickMarkerRef.current = new google.maps.Marker({
+          position: event.latLng,
+          map: mapInstance,
+          title: "Selected Location",
+          animation: google.maps.Animation.DROP,
+        });
+        setSelectedLocation(event.latLng);
+      }
+    });
+
+    return () => {
+      // Clean up all markers and overlays when component unmounts
+      if (directionsRenderer) directionsRenderer.setMap(null);
+      if (userMarkerRef.current) userMarkerRef.current.setMap(null);
+      if (clickMarkerRef.current) clickMarkerRef.current.setMap(null);
+      if (searchMarkerRef.current) searchMarkerRef.current.setMap(null);
+      if (userCircleRef.current) userCircleRef.current.setMap(null);
+
+      ambulanceMarkersRef.current.forEach((marker) => marker.setMap(null));
+      ambulanceMarkersRef.current = [];
+    };
+  }, [isLoaded]);
+
+  // Handle ambulance markers
+  useEffect(() => {
+    if (!map || !isLoaded) return;
+
+    // Clean up previous ambulance markers
+    ambulanceMarkersRef.current.forEach((marker) => marker.setMap(null));
+    ambulanceMarkersRef.current = [];
+
+    // Create new ambulance markers
+    const newAmbulanceMarkers = ambulances.map((ambulance) => {
+      const marker = new google.maps.Marker({
+        position: new google.maps.LatLng(
+          Number(ambulance.location.latitude),
+          Number(ambulance.location.longitude)
+        ),
+        map,
+        icon: "/ambulance-icon.svg",
+        title: ambulance.ambulance_number,
+      });
+
+      // Add click listener to each ambulance marker
+      marker.addListener("click", () => {
+        // Clear existing click marker
+        if (clickMarkerRef.current) {
+          clickMarkerRef.current.setMap(null);
+          clickMarkerRef.current = null;
+        }
+
+        // Clear existing search marker
+        if (searchMarkerRef.current) {
+          searchMarkerRef.current.setMap(null);
+          searchMarkerRef.current = null;
+        }
+
+        const position = marker.getPosition();
+        setSelectedLocation(position || null);
+        if (userLocation && position) {
+          calculateAndDisplayRoute(userLocation, position);
+        }
+      });
+
+      return marker;
+    });
+
+    ambulanceMarkersRef.current = newAmbulanceMarkers;
+
+    return () => {
+      // Clean up ambulance markers when effect re-runs
+      ambulanceMarkersRef.current.forEach((marker) => marker.setMap(null));
+      ambulanceMarkersRef.current = [];
+    };
+  }, [isLoaded, map, ambulances]);
+
+  // Places autocomplete for search input
+  useEffect(() => {
+    if (!searchInput || !autocompleteRef.current) return;
+
+    // Clear previous results when search input changes
+    setSearchResults([]);
+
+    // Debounce input to avoid too many API calls
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      autocompleteRef.current?.getPlacePredictions(
+        { input: searchInput },
+        (predictions, status) => {
+          if (
+            status === google.maps.places.PlacesServiceStatus.OK &&
+            predictions
+          ) {
+            // Convert predictions to GeocoderResult format
+            const geocoder = new google.maps.Geocoder();
+            const results: google.maps.GeocoderResult[] = [];
+
+            // Use Promise.all to handle multiple async geocode requests
+            Promise.all(
+              predictions.map(
+                (prediction) =>
+                  new Promise<void>((resolve) => {
+                    geocoder.geocode(
+                      { placeId: prediction.place_id },
+                      (geoResults, geoStatus) => {
+                        if (geoStatus === "OK" && geoResults) {
+                          results.push(...geoResults);
+                        }
+                        resolve();
+                      }
+                    );
+                  })
+              )
+            ).then(() => {
+              setSearchResults(results);
+            });
+          }
+        }
+      );
+    }, 300); // 300ms debounce
+
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, [searchInput]);
+
+  const handleSearch = () => {
+    if (!map || !searchInput) return;
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address: searchInput }, (results, status) => {
+      if (status === "OK" && results) {
+        setSearchResults(results);
+      }
+    });
   };
 
-  const showDirections = () => {
-    if (
-      !userLocation ||
-      !destination ||
-      !directionsService ||
-      !directionsRenderer
-    ) {
-      console.error("Missing required elements for directions");
-      return;
+  const handleSelectLocation = (location: google.maps.LatLng) => {
+    if (!map) return;
+
+    setSearchResults([]);
+    map.setCenter(location);
+
+    // Clear existing click marker
+    if (clickMarkerRef.current) {
+      clickMarkerRef.current.setMap(null);
+      clickMarkerRef.current = null;
     }
+
+    // Clear existing search marker
+    if (searchMarkerRef.current) {
+      searchMarkerRef.current.setMap(null);
+      searchMarkerRef.current = null;
+    }
+
+    // Create new search marker
+    searchMarkerRef.current = new google.maps.Marker({
+      position: location,
+      map,
+      title: "Search Location",
+      animation: google.maps.Animation.DROP,
+    });
+
+    setSelectedLocation(location);
+
+    // If user location is available, show route
+    if (userLocation) {
+      calculateAndDisplayRoute(userLocation, location);
+    }
+  };
+
+  const calculateAndDisplayRoute = (
+    origin: google.maps.LatLng,
+    destination: google.maps.LatLng
+  ) => {
+    if (!directionsService || !directionsRenderer) return;
+
+    // Clear previous directions
+    directionsRenderer.setDirections({ routes: [] });
 
     directionsService.route(
       {
-        origin: userLocation.toJSON(),
-        destination: destination,
+        origin,
+        destination,
         travelMode: google.maps.TravelMode.DRIVING,
-        provideRouteAlternatives: true,
       },
-      (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK && result) {
-          console.log("Directions received:", result);
-          directionsRenderer.setDirections(result);
-        } else {
-          console.error("Directions request failed due to", status);
+      (response, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+          directionsRenderer.setDirections(response);
         }
       }
     );
   };
 
-  const centerOnUserLocation = () => {
-    if (map && userLocation) {
-      map.panTo(userLocation);
-      map.setZoom(15);
-    }
+  const handleRoute = () => {
+    if (!userLocation || !selectedLocation) return;
+    calculateAndDisplayRoute(userLocation, selectedLocation);
   };
 
-  // Show loading or error states
-  if (error) {
-    return (
-      <Card className="w-full max-w-4xl mx-auto shadow-sm border border-gray-100">
-        <CardContent className="p-4">
-          <div className="text-center p-6">
-            <p className="text-red-500">
-              Failed to load Google Maps: {error.message}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-sm border border-gray-100">
-      <CardContent className="p-4">
-        <div className="space-y-3">
-          {/* Search bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              ref={searchInputRef}
-              type="text"
-              placeholder="Search for a location..."
-              className="pl-10 pr-4 py-2 h-10 w-full"
-              disabled={!isLoaded}
-            />
-          </div>
-
-          {/* Map container */}
-          <div className="relative">
-            <div
-              ref={mapRef}
-              className="w-full h-[360px] rounded-md overflow-hidden"
-            />
-
-            {(isLoading || !isLoaded) && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white/80">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            )}
-
-            {/* Map controls */}
-            <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-              <Button
-                size="icon"
-                variant="secondary"
-                className="h-10 w-10 rounded-full shadow-md bg-white hover:bg-gray-100"
-                onClick={centerOnUserLocation}
-                disabled={!isLoaded || !userLocation}
-              >
-                <MapPin className="h-5 w-5 text-primary" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Action buttons */}
-          {destination && (
-            <div className="flex items-center justify-between">
-              <div className="text-sm">
-                {selectedAmbulance ? (
-                  <div className="font-medium">
-                    Selected: {selectedAmbulance.ambulance_number} (
-                    {selectedAmbulance.status})
-                  </div>
-                ) : (
-                  <div className="font-medium">Destination selected</div>
-                )}
-              </div>
-              <Button
-                onClick={showDirections}
-                className="flex items-center gap-2"
-                disabled={!isLoaded || !userLocation}
-              >
-                <Navigation className="h-4 w-4" />
-                <span>Show Best Route</span>
-              </Button>
-            </div>
-          )}
-
-          {/* Ambulance count indicator */}
-          {ambulances.length > 0 && (
-            <div className="text-xs text-muted-foreground">
-              {ambulances.length} ambulance{ambulances.length !== 1 ? "s" : ""}{" "}
-              available
-            </div>
-          )}
+    <div className="w-full h-screen relative">
+      <div ref={mapRef} className="w-full h-full" />
+      <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg flex flex-col gap-2">
+        <div className="flex gap-2">
+          <Input
+            type="text"
+            placeholder="Search location"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          <Button onClick={handleSearch}>
+            <Search className="text-lg" />
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+        {searchResults.length > 0 && (
+          <div className="bg-white p-2 rounded-lg shadow-md max-h-48 overflow-auto">
+            {searchResults.map((result, index) => (
+              <div
+                key={index}
+                className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0"
+                onClick={() => handleSelectLocation(result.geometry.location)}
+              >
+                {result.formatted_address}
+              </div>
+            ))}
+          </div>
+        )}
+        <Button
+          onClick={handleRoute}
+          disabled={!selectedLocation || !userLocation}
+        >
+          Show Route
+        </Button>
+      </div>
+    </div>
   );
 };
 

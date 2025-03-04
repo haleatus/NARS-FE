@@ -475,9 +475,9 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   };
 
   return (
-    <div className="w-full h-screen relative">
+    <div className="w-full h-full relative">
       <div ref={mapRef} className="w-full h-full" />
-      <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg flex flex-col gap-2 max-w-xs">
+      <div className="absolute bottom-2 left-2 bg-white p-3 rounded-lg shadow-lg flex flex-col gap-2 max-w-xs">
         <div className="flex gap-2">
           <Input
             type="text"

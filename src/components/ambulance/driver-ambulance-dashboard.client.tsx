@@ -25,8 +25,6 @@ const DriverAmbulanceDashboardClient = ({
     setSelectedRequest(request);
   };
 
-  console.log("requests here ---------------", requests);
-
   let ambulanceLocation: [number, number] | null = null;
   let userLocation: [number, number] | null = null;
   let hospitalLocation: [number, number] | null = null;

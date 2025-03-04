@@ -350,7 +350,7 @@ export function CreateAmbulanceRequestFormV3({
   };
 
   return (
-    <Card className="w-full max-w-lg mx-auto font-sans max-h-[calc(100vh-5rem)] overflow-y-auto">
+    <Card className="w-full max-w-lg mx-auto font-sans max-h-[calc(100vh-6rem)] overflow-y-auto">
       <CardHeader>
         <CardTitle>Create Ambulance Request</CardTitle>
       </CardHeader>

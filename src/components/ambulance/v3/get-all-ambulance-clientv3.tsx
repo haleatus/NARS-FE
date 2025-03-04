@@ -1,11 +1,10 @@
 "use client";
 
-import { Ambulance } from "@/core/interface/ambulance.interface";
+import type { Ambulance } from "@/core/interface/ambulance.interface";
 import { MapPin, Phone, Plus } from "lucide-react";
-import React, { useMemo, useState } from "react";
-
+import type React from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
@@ -41,25 +40,22 @@ const GetAllAmbulanceClientV3: React.FC<GetAllAmbulanceClientProps> = ({
   );
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Calculate distance between two points
-  const calculateDistance = (
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number => {
-    const R = 6371;
-    const dLat = ((lat2 - lat1) * Math.PI) / 180;
-    const dLon = ((lon2 - lon1) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  };
+  const calculateDistance = useCallback(
+    (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+      const R = 6371;
+      const dLat = ((lat2 - lat1) * Math.PI) / 180;
+      const dLon = ((lon2 - lon1) * Math.PI) / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos((lat1 * Math.PI) / 180) *
+          Math.cos((lat2 * Math.PI) / 180) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    },
+    []
+  );
 
   const formatDistance = (distance: number): string => {
     if (distance < 1) {
@@ -68,18 +64,16 @@ const GetAllAmbulanceClientV3: React.FC<GetAllAmbulanceClientProps> = ({
     return `${distance.toFixed(1)}km`;
   };
 
-  // Filter and sort hospitals
   const nearbyAmbulances = useMemo(() => {
     try {
-      // First add distances and filter by max distance
       const ambulanceWithDistance: AmbulanceWithDistance[] = ambulanceData
         .map((ambulance) => ({
           ...ambulance,
           distance: calculateDistance(
             userLocation[1],
             userLocation[0],
-            parseFloat(ambulance.location.latitude),
-            parseFloat(ambulance.location.longitude)
+            Number.parseFloat(ambulance.location.latitude),
+            Number.parseFloat(ambulance.location.longitude)
           ),
         }))
         .filter((ambulance) => ambulance.distance <= maxDistance)
@@ -90,42 +84,59 @@ const GetAllAmbulanceClientV3: React.FC<GetAllAmbulanceClientProps> = ({
       console.error("Filter error:", error);
       return [];
     }
-  }, [ambulanceData, userLocation, maxDistance]);
+  }, [ambulanceData, userLocation, maxDistance, calculateDistance]);
 
   return (
-    <div className="container mx-auto p-4 font-work-sans">
-      <div className="grid grid-cols-1 gap-4">
-        {nearbyAmbulances.length > 0 ? (
-          nearbyAmbulances.map((ambulance) => (
-            <Card key={ambulance._id} className={`relative overflow-hidden `}>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  <h2 className="text-lg font-semibold">
-                    {ambulance.driver_name}
-                  </h2>
+    <div className="w-full space-y-4 p-2">
+      {nearbyAmbulances.length > 0 ? (
+        nearbyAmbulances.map((ambulance) => (
+          <Card
+            key={ambulance._id}
+            className="overflow-hidden border-none shadow-sm hover:shadow-black/60 transition-all duration-300 bg-white shadow-black/30"
+          >
+            <CardContent className="p-4">
+              <div className="flex flex-col space-y-3">
+                {/* Header with driver name and status */}
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                      {ambulance.driver_name.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium">
+                        {ambulance.driver_name}
+                      </h3>
+                      <p className="text-md text-gray-500">
+                        {ambulance.ambulance_number}
+                      </p>
+                    </div>
+                  </div>
                   <Badge
                     variant={
-                      ambulance.status === "AVAILABLE"
-                        ? "default"
-                        : "destructive"
+                      ambulance.status === "AVAILABLE" ? "green" : "destructive"
                     }
+                    className="text-sm font-medium px-2 py-1 font-sans cursor-pointer"
                   >
                     {ambulance.status}
                   </Badge>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">Ambulance Number:</span>{" "}
-                  {ambulance.ambulance_number}
-                </p>
-                <div className="flex items-center text-sm text-gray-600 mb-2">
-                  <Phone className="w-4 h-4 mr-2" />
-                  {ambulance.contact}
+
+                {/* Info grid */}
+                <div className="grid grid-cols-2 gap-3 text-md">
+                  <InfoItem
+                    icon={<Phone className="w-4 h-4 text-blue-500" />}
+                    label="Contact"
+                    value={ambulance.contact}
+                  />
+                  <InfoItem
+                    icon={<MapPin className="w-4 h-4 text-red-500" />}
+                    label="Distance"
+                    value={formatDistance(ambulance.distance)}
+                  />
                 </div>
-                <div className="flex items-center text-sm text-gray-600 mb-4">
-                  <MapPin className="w-4 h-4 mr-2" />
-                  {formatDistance(ambulance.distance)}
-                </div>
-                <div className="flex justify-between items-center font-sans">
+
+                {/* Request button */}
+                <div className="flex justify-end pt-2">
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                       <Button
@@ -135,20 +146,20 @@ const GetAllAmbulanceClientV3: React.FC<GetAllAmbulanceClientProps> = ({
                           setSelectedAmbulance(ambulance);
                           setIsDialogOpen(true);
                         }}
-                        className="flex items-center gap-2"
-                        disabled={
-                          ambulance.status === "OCCUPIED" ? true : false
-                        }
+                        className="border-gray-200 text-blue-500 hover:text-blue-600 hover:bg-blue-50 font-sans text-md"
+                        disabled={ambulance.status !== "AVAILABLE"}
                       >
-                        <Plus className="w-4 h-4" />
-                        Request
+                        <Plus className="w-4 h-4 mr-1.5" />
+                        Request Ambulance
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="sm:max-w-[485px] p-0 rounded-sm">
-                      <DialogHeader className="hidden">
+                    <DialogContent
+                      className="sm:max-w-[500px] p-0"
+                      onPointerDown={(e) => e.stopPropagation()}
+                    >
+                      <DialogHeader className="p-4 bg-gray-50 border-b hidden">
                         <DialogTitle>Request Ambulance</DialogTitle>
                       </DialogHeader>
-
                       {selectedAmbulance && (
                         <CreateAmbulanceRequestFormV3
                           ambulanceId={selectedAmbulance._id}
@@ -156,28 +167,40 @@ const GetAllAmbulanceClientV3: React.FC<GetAllAmbulanceClientProps> = ({
                           ambulanceDriver={selectedAmbulance.driver_name}
                           accessToken={accessToken}
                           onSuccess={() => {
-                            setIsDialogOpen(false); // Close dialog on success
+                            setIsDialogOpen(false);
                             router.refresh();
                           }}
-                          onCancel={() => {
-                            setIsDialogOpen(false); // Close dialog on cancel
-                          }}
+                          onCancel={() => setIsDialogOpen(false)}
                         />
                       )}
                     </DialogContent>
                   </Dialog>
                 </div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <div className="text-center text-gray-500 py-4">
-            No nearby hospitals found
-          </div>
-        )}
-      </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      ) : (
+        <Card className="p-6 text-center text-muted-foreground bg-white border-none shadow-sm">
+          No nearby ambulances found
+        </Card>
+      )}
     </div>
   );
 };
+
+const InfoItem: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}> = ({ icon, label, value }) => (
+  <div className="flex items-center gap-2 font-sans">
+    <div className="bg-gray-100 p-1.5 rounded-md">{icon}</div>
+    <div>
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-md">{value}</p>
+    </div>
+  </div>
+);
 
 export default GetAllAmbulanceClientV3;

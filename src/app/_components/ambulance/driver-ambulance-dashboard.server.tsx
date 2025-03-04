@@ -8,6 +8,7 @@ import {
 } from "@/core/interface/ambulance/request";
 import { redirect } from "next/navigation";
 import React from "react";
+import EmptyState from "./empty-state";
 
 const DriverAmbulanceDashboardServer = async () => {
   const accessToken = await getCurrentAmbulanceAccessToken();
@@ -34,7 +35,7 @@ const DriverAmbulanceDashboardServer = async () => {
     !response.data ||
     (Array.isArray(response.data) && response.data.length === 0)
   ) {
-    return <Alert>You have 0 ambulance requests yet.</Alert>;
+    return EmptyState();
   }
 
   return (

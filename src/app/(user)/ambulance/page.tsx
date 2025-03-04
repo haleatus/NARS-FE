@@ -7,12 +7,11 @@ import {
 } from "@/components/ui/card";
 import { Ambulance } from "lucide-react";
 import { getAllAmbulance } from "@/app/actions/ambulance/get-all-ambulance.action";
-import AmbulanceClient from "@/components/ambulance/ambulance-client";
-import { getAllHospitalService } from "@/app/services/hospital/hospital.service";
 import { getCurrentUserAccessToken } from "@/app/actions/user/auth/get-current-user-access-token";
 import getUserAmbulanceRequests from "@/app/actions/user/ambulance-request/get-user-ambulance-requests.action";
 import { UserAmbulanceRequestResponse } from "@/core/interface/user/ambulance-request";
 import { redirect } from "next/navigation";
+import AmbulanceClientV3 from "@/components/ambulance/v3/ambulance-client-v3";
 
 export default async function AmbulanceDashboard() {
   const accessToken = await getCurrentUserAccessToken();
@@ -22,9 +21,8 @@ export default async function AmbulanceDashboard() {
   }
 
   const ambulanceData = await getAllAmbulance();
-  const hospitalData = await getAllHospitalService();
 
-  if (!ambulanceData || !hospitalData) {
+  if (!ambulanceData) {
     return <div>Loading...</div>;
   }
 
@@ -48,9 +46,8 @@ export default async function AmbulanceDashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <AmbulanceClient
+            <AmbulanceClientV3
               ambulanceData={ambulanceData}
-              hospitalData={hospitalData}
               accessToken={accessToken}
               myRequestExists={myRequestExists}
               requests={myAmbulanceRequest.data as UserAmbulanceRequestResponse}

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import type React from "react";
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { MapPin, Navigation, Search } from "lucide-react";
 import type { Ambulance } from "@/core/interface/ambulance.interface";
+import { useGoogleMaps } from "@/hooks/use-google-maps";
 
 interface MapComponentProps {
   apiKey: string;
@@ -16,7 +18,6 @@ interface MapComponentProps {
 declare global {
   interface Window {
     google: typeof google;
-    initMap: () => void;
   }
 }
 
@@ -48,38 +49,34 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
     null
   );
 
-  // Initialize map when component mounts
+  // Use the hook to load Google Maps API
+  const { isLoaded, error } = useGoogleMaps(apiKey);
+
+  // Initialize map when Google Maps is loaded
   useEffect(() => {
-    const loadGoogleMaps = () => {
-      if (window.google?.maps) {
-        initializeMap();
-        return;
-      }
-
-      window.initMap = () => {
-        initializeMap();
-      };
-
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,routes&callback=initMap`;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    };
-
-    loadGoogleMaps();
-
-    return () => {
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-      }
-    };
-  }, [apiKey, watchId]);
+    if (isLoaded && mapRef.current && !map) {
+      initializeMap();
+    }
+  }, [isLoaded, map]);
 
   // Update ambulance markers when ambulances prop changes
   useEffect(() => {
     if (map) updateAmbulanceMarkers(map);
-  }, [map]);
+  }, [ambulances, map]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+
+      // Clean up markers
+      if (userMarker) userMarker.setMap(null);
+      if (destinationMarker) destinationMarker.setMap(null);
+      ambulanceMarkers.forEach((marker) => marker.setMap(null));
+    };
+  }, [watchId, userMarker, destinationMarker, ambulanceMarkers]);
 
   const initializeMap = async () => {
     if (!mapRef.current || map) return;
@@ -371,6 +368,21 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
     }
   };
 
+  // Show loading or error states
+  if (error) {
+    return (
+      <Card className="w-full max-w-4xl mx-auto shadow-sm border border-gray-100">
+        <CardContent className="p-4">
+          <div className="text-center p-6">
+            <p className="text-red-500">
+              Failed to load Google Maps: {error.message}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-4xl mx-auto shadow-sm border border-gray-100">
       <CardContent className="p-4">
@@ -383,6 +395,7 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
               type="text"
               placeholder="Search for a location..."
               className="pl-10 pr-4 py-2 h-10 w-full"
+              disabled={!isLoaded}
             />
           </div>
 
@@ -393,7 +406,7 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
               className="w-full h-[360px] rounded-md overflow-hidden"
             />
 
-            {isLoading && (
+            {(isLoading || !isLoaded) && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/80">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               </div>
@@ -406,6 +419,7 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
                 variant="secondary"
                 className="h-10 w-10 rounded-full shadow-md bg-white hover:bg-gray-100"
                 onClick={centerOnUserLocation}
+                disabled={!isLoaded || !userLocation}
               >
                 <MapPin className="h-5 w-5 text-primary" />
               </Button>
@@ -428,6 +442,7 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
               <Button
                 onClick={showDirections}
                 className="flex items-center gap-2"
+                disabled={!isLoaded || !userLocation}
               >
                 <Navigation className="h-4 w-4" />
                 <span>Show Best Route</span>

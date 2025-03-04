@@ -75,6 +75,7 @@ export function CreateAmbulanceForm({
     };
 
     loadGoogleMapsScript();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [googleApiKey]);
 
   // Initialize map

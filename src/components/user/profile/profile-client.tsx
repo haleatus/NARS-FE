@@ -36,12 +36,12 @@ const ProfileClient = () => {
           />
           <div>
             <h1 className="text-2xl font-semibold">{userProfile.fullname}</h1>
-            <p className="text-sm ">Member since {userProfile.memberSince}</p>
+            {/* <p className="text-sm ">Member since {userProfile.memberSince}</p> */}
           </div>
         </div>
 
         {/* Bio */}
-        <p className="mt-4 text-sm">{userProfile.bio}</p>
+        {/* <p className="mt-4 text-sm">{userProfile.bio}</p> */}
 
         {/* Details Section */}
         <div className="mt-6 space-y-4">

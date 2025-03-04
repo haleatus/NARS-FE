@@ -28,7 +28,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/app/actions/admin/ambulance-request/get-ambulance-request-by-id.action.ts",
-    "src/app/services/admin/ambulance-request/ambulance-request-by-id/.service.ts"
+    "src/app/services/admin/ambulance-request/ambulance-request-by-id/.service.ts",
+    "src/components/ambulance/v3/get-all-ambulance-client.v3tsx"
   ],
   "exclude": ["node_modules"]
 }

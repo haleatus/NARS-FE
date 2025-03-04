@@ -39,13 +39,19 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   >([]);
   const [selectedLocation, setSelectedLocation] =
     useState<google.maps.LatLng | null>(null);
+  const [selectedAmbulanceId, setSelectedAmbulanceId] = useState<string | null>(
+    null
+  );
 
   // Refs to store markers (better than state for immediate access)
   const userMarkerRef = useRef<google.maps.Marker | null>(null);
   const clickMarkerRef = useRef<google.maps.Marker | null>(null);
   const searchMarkerRef = useRef<google.maps.Marker | null>(null);
-  const ambulanceMarkersRef = useRef<google.maps.Marker[]>([]);
+  const ambulanceMarkersRef = useRef<Map<string, google.maps.Marker>>(
+    new Map()
+  );
   const userCircleRef = useRef<google.maps.Circle | null>(null);
+  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
 
   const autocompleteRef = useRef<google.maps.places.AutocompleteService | null>(
     null
@@ -70,6 +76,9 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
     setDirectionsRenderer(rendererInstance);
     autocompleteRef.current =
       new window.google.maps.places.AutocompleteService();
+
+    // Create info window for markers
+    infoWindowRef.current = new google.maps.InfoWindow();
 
     // Get user location and create blue circle
     navigator.geolocation.getCurrentPosition((position) => {
@@ -118,6 +127,10 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
         searchMarkerRef.current = null;
       }
 
+      // Reset selected ambulance
+      setSelectedAmbulanceId(null);
+      resetAmbulanceMarkers();
+
       // Create new marker
       if (event.latLng) {
         clickMarkerRef.current = new google.maps.Marker({
@@ -137,11 +150,20 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       if (clickMarkerRef.current) clickMarkerRef.current.setMap(null);
       if (searchMarkerRef.current) searchMarkerRef.current.setMap(null);
       if (userCircleRef.current) userCircleRef.current.setMap(null);
+      if (infoWindowRef.current) infoWindowRef.current.close();
 
       ambulanceMarkersRef.current.forEach((marker) => marker.setMap(null));
-      ambulanceMarkersRef.current = [];
+      ambulanceMarkersRef.current.clear();
     };
   }, [isLoaded]);
+
+  // Function to reset ambulance markers to default appearance
+  const resetAmbulanceMarkers = () => {
+    ambulanceMarkersRef.current.forEach((marker) => {
+      marker.setIcon("/ambulance-icon.svg");
+      marker.setZIndex(1);
+    });
+  };
 
   // Handle ambulance markers
   useEffect(() => {
@@ -149,15 +171,17 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
 
     // Clean up previous ambulance markers
     ambulanceMarkersRef.current.forEach((marker) => marker.setMap(null));
-    ambulanceMarkersRef.current = [];
+    ambulanceMarkersRef.current.clear();
 
     // Create new ambulance markers
-    const newAmbulanceMarkers = ambulances.map((ambulance) => {
+    ambulances.forEach((ambulance) => {
+      const position = new google.maps.LatLng(
+        Number(ambulance.location.latitude),
+        Number(ambulance.location.longitude)
+      );
+
       const marker = new google.maps.Marker({
-        position: new google.maps.LatLng(
-          Number(ambulance.location.latitude),
-          Number(ambulance.location.longitude)
-        ),
+        position,
         map,
         icon: "/ambulance-icon.svg",
         title: ambulance.ambulance_number,
@@ -177,24 +201,65 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
           searchMarkerRef.current = null;
         }
 
-        const position = marker.getPosition();
-        setSelectedLocation(position || null);
-        if (userLocation && position) {
+        // Reset all ambulance markers first
+        resetAmbulanceMarkers();
+
+        // Set this ambulance as selected
+        setSelectedAmbulanceId(ambulance._id);
+
+        // Change this ambulance's marker to indicate selection
+        marker.setIcon({
+          url: "/ambulance-icon.svg",
+          scaledSize: new google.maps.Size(40, 40), // Make it larger
+        });
+        marker.setZIndex(1001); // Put it on top
+
+        // Show info window for selected ambulance
+        if (infoWindowRef.current) {
+          infoWindowRef.current.setContent(
+            `<div class="p-2">
+              <p><strong>Ambulance:</strong> ${ambulance.ambulance_number}</p>
+              <p><strong>Status:</strong> ${ambulance.status || "Available"}</p>
+            </div>`
+          );
+          infoWindowRef.current.open(map, marker);
+        }
+
+        setSelectedLocation(position);
+        if (userLocation) {
           calculateAndDisplayRoute(userLocation, position);
         }
       });
 
-      return marker;
+      // Store the marker with ambulance ID
+      ambulanceMarkersRef.current.set(ambulance._id, marker);
     });
-
-    ambulanceMarkersRef.current = newAmbulanceMarkers;
 
     return () => {
       // Clean up ambulance markers when effect re-runs
       ambulanceMarkersRef.current.forEach((marker) => marker.setMap(null));
-      ambulanceMarkersRef.current = [];
+      ambulanceMarkersRef.current.clear();
     };
   }, [isLoaded, map, ambulances]);
+
+  // Update ambulance markers if selection changes
+  useEffect(() => {
+    resetAmbulanceMarkers();
+
+    if (
+      selectedAmbulanceId &&
+      ambulanceMarkersRef.current.has(selectedAmbulanceId)
+    ) {
+      const marker = ambulanceMarkersRef.current.get(selectedAmbulanceId);
+      if (marker) {
+        marker.setIcon({
+          url: "/ambulance-icon.svg",
+          scaledSize: new google.maps.Size(40, 40), // Make it larger
+        });
+        marker.setZIndex(1001); // Put it on top
+      }
+    }
+  }, [selectedAmbulanceId]);
 
   // Places autocomplete for search input
   useEffect(() => {
@@ -264,6 +329,10 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   const handleSelectLocation = (location: google.maps.LatLng) => {
     if (!map) return;
 
+    // Reset selected ambulance
+    setSelectedAmbulanceId(null);
+    resetAmbulanceMarkers();
+
     setSearchResults([]);
     map.setCenter(location);
 
@@ -301,8 +370,13 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   ) => {
     if (!directionsService || !directionsRenderer) return;
 
-    // Clear previous directions
-    directionsRenderer.setDirections({ routes: [] });
+    // Clear previous directions by setting map to null
+    directionsRenderer.setMap(null);
+
+    // Reconnect to map
+    if (map) {
+      directionsRenderer.setMap(map);
+    }
 
     directionsService.route(
       {
@@ -311,7 +385,7 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
         travelMode: google.maps.TravelMode.DRIVING,
       },
       (response, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
+        if (status === google.maps.DirectionsStatus.OK && response) {
           directionsRenderer.setDirections(response);
         }
       }
@@ -349,6 +423,15 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
                 {result.formatted_address}
               </div>
             ))}
+          </div>
+        )}
+        {selectedAmbulanceId && (
+          <div className="bg-blue-50 p-2 rounded border border-blue-200 mb-2">
+            <div className="font-medium">Selected Ambulance</div>
+            <div className="text-sm">
+              {ambulances.find((amb) => amb._id === selectedAmbulanceId)
+                ?.ambulance_number || ""}
+            </div>
           </div>
         )}
         <Button

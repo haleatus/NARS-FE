@@ -6,6 +6,7 @@ import { useGoogleMaps } from "@/hooks/use-google-maps";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FaSearch as Search } from "react-icons/fa";
+import { FaHospital } from "react-icons/fa";
 import { Ambulance } from "@/core/interface/ambulance.interface";
 
 interface MapComponentProps {
@@ -35,13 +36,19 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
     useState<google.maps.DirectionsRenderer | null>(null);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState<
-    google.maps.GeocoderResult[]
+    {
+      name: string;
+      vicinity: string;
+      location: google.maps.LatLng;
+      placeId: string;
+    }[]
   >([]);
   const [selectedLocation, setSelectedLocation] =
     useState<google.maps.LatLng | null>(null);
   const [selectedAmbulanceId, setSelectedAmbulanceId] = useState<string | null>(
     null
   );
+  const [isSearching, setIsSearching] = useState(false);
 
   // Refs to store markers (better than state for immediate access)
   const userMarkerRef = useRef<google.maps.Marker | null>(null);
@@ -50,21 +57,32 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   const ambulanceMarkersRef = useRef<Map<string, google.maps.Marker>>(
     new Map()
   );
+  const hospitalMarkersRef = useRef<google.maps.Marker[]>([]);
   const userCircleRef = useRef<google.maps.Circle | null>(null);
   const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
-
-  const autocompleteRef = useRef<google.maps.places.AutocompleteService | null>(
+  const placesServiceRef = useRef<google.maps.places.PlacesService | null>(
     null
   );
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Nepal boundaries (approximately)
+  const NEPAL_BOUNDS = {
+    north: 30.45,
+    south: 26.35,
+    east: 88.2,
+    west: 80.05,
+  };
 
   // Initialize map and services
   useEffect(() => {
     if (!isLoaded || !mapRef.current) return;
 
     const mapInstance = new window.google.maps.Map(mapRef.current, {
-      center: { lat: 27.7172, lng: 85.324 },
-      zoom: 14,
+      center: { lat: 27.7172, lng: 85.324 }, // Kathmandu
+      zoom: 12,
+      restriction: {
+        latLngBounds: NEPAL_BOUNDS,
+        strictBounds: false,
+      },
     });
 
     setMap(mapInstance);
@@ -74,8 +92,11 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       suppressMarkers: true, // Don't show default markers
     });
     setDirectionsRenderer(rendererInstance);
-    autocompleteRef.current =
-      new window.google.maps.places.AutocompleteService();
+
+    // Initialize Places service for hospital search
+    placesServiceRef.current = new google.maps.places.PlacesService(
+      mapInstance
+    );
 
     // Create info window for markers
     infoWindowRef.current = new google.maps.InfoWindow();
@@ -131,6 +152,11 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       setSelectedAmbulanceId(null);
       resetAmbulanceMarkers();
 
+      // Close info window
+      if (infoWindowRef.current) {
+        infoWindowRef.current.close();
+      }
+
       // Create new marker
       if (event.latLng) {
         clickMarkerRef.current = new google.maps.Marker({
@@ -154,6 +180,9 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
 
       ambulanceMarkersRef.current.forEach((marker) => marker.setMap(null));
       ambulanceMarkersRef.current.clear();
+
+      hospitalMarkersRef.current.forEach((marker) => marker.setMap(null));
+      hospitalMarkersRef.current = [];
     };
   }, [isLoaded]);
 
@@ -163,6 +192,12 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       marker.setIcon("/ambulance-icon.svg");
       marker.setZIndex(1);
     });
+  };
+
+  // Function to clear hospital markers
+  const clearHospitalMarkers = () => {
+    hospitalMarkersRef.current.forEach((marker) => marker.setMap(null));
+    hospitalMarkersRef.current = [];
   };
 
   // Handle ambulance markers
@@ -261,72 +296,99 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
     }
   }, [selectedAmbulanceId]);
 
-  // Places autocomplete for search input
-  useEffect(() => {
-    if (!searchInput || !autocompleteRef.current) return;
+  // Search for hospitals in Nepal based on search input
+  const searchHospitals = () => {
+    if (!map || !placesServiceRef.current) return;
 
-    // Clear previous results when search input changes
-    setSearchResults([]);
+    setIsSearching(true);
+    clearHospitalMarkers();
 
-    // Debounce input to avoid too many API calls
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
+    // Get center for search (prefer user location or map center)
+    const searchCenter = userLocation || map.getCenter();
 
-    debounceTimeoutRef.current = setTimeout(() => {
-      autocompleteRef.current?.getPlacePredictions(
-        { input: searchInput },
-        (predictions, status) => {
-          if (
-            status === google.maps.places.PlacesServiceStatus.OK &&
-            predictions
-          ) {
-            // Convert predictions to GeocoderResult format
-            const geocoder = new google.maps.Geocoder();
-            const results: google.maps.GeocoderResult[] = [];
-
-            // Use Promise.all to handle multiple async geocode requests
-            Promise.all(
-              predictions.map(
-                (prediction) =>
-                  new Promise<void>((resolve) => {
-                    geocoder.geocode(
-                      { placeId: prediction.place_id },
-                      (geoResults, geoStatus) => {
-                        if (geoStatus === "OK" && geoResults) {
-                          results.push(...geoResults);
-                        }
-                        resolve();
-                      }
-                    );
-                  })
-              )
-            ).then(() => {
-              setSearchResults(results);
-            });
-          }
-        }
-      );
-    }, 300); // 300ms debounce
-
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
+    // Prepare the search request
+    const request: google.maps.places.TextSearchRequest = {
+      query: `${searchInput} hospital Nepal`,
+      location: searchCenter,
+      radius: 50000, // 50km radius
+      region: "np", // Nepal country code
+      type: "hospital",
     };
-  }, [searchInput]);
 
-  const handleSearch = () => {
-    if (!map || !searchInput) return;
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address: searchInput }, (results, status) => {
-      if (status === "OK" && results) {
-        setSearchResults(results);
+    placesServiceRef.current.textSearch(request, (results, status) => {
+      setIsSearching(false);
+
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        // Convert results to our format
+        const formattedResults = results.map((place) => ({
+          name: place.name || "",
+          vicinity: place.formatted_address || "",
+          location: place.geometry?.location || new google.maps.LatLng(0, 0),
+          placeId: place.place_id || "",
+        }));
+
+        setSearchResults(formattedResults);
+
+        // Create markers for each hospital
+        formattedResults.forEach((hospital) => {
+          const marker = new google.maps.Marker({
+            position: hospital.location,
+            map,
+            title: hospital.name,
+            icon: {
+              url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+              scaledSize: new google.maps.Size(30, 30),
+            },
+          });
+
+          // Add click listener to hospital marker
+          marker.addListener("click", () => {
+            if (infoWindowRef.current) {
+              infoWindowRef.current.setContent(
+                `<div class="p-2">
+                  <h3 class="font-bold">${hospital.name}</h3>
+                  <p>${hospital.vicinity}</p>
+                </div>`
+              );
+              infoWindowRef.current.open(map, marker);
+            }
+
+            // Set as selected location
+            setSelectedLocation(hospital.location);
+
+            // If user location is available, show route
+            if (userLocation) {
+              calculateAndDisplayRoute(userLocation, hospital.location);
+            }
+          });
+
+          hospitalMarkersRef.current.push(marker);
+        });
+
+        // If we have results, fit the map to show all markers
+        if (formattedResults.length > 0) {
+          const bounds = new google.maps.LatLngBounds();
+          formattedResults.forEach((hospital) => {
+            bounds.extend(hospital.location);
+          });
+          if (userLocation) {
+            bounds.extend(userLocation);
+          }
+          map.fitBounds(bounds);
+        }
+      } else {
+        // No results or error
+        setSearchResults([]);
       }
     });
   };
 
-  const handleSelectLocation = (location: google.maps.LatLng) => {
+  const handleSelectHospital = (hospital: {
+    name: string;
+    vicinity: string;
+    location: google.maps.LatLng;
+    placeId: string;
+  }) => {
     if (!map) return;
 
     // Reset selected ambulance
@@ -334,7 +396,7 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
     resetAmbulanceMarkers();
 
     setSearchResults([]);
-    map.setCenter(location);
+    map.setCenter(hospital.location);
 
     // Clear existing click marker
     if (clickMarkerRef.current) {
@@ -350,17 +412,32 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
 
     // Create new search marker
     searchMarkerRef.current = new google.maps.Marker({
-      position: location,
+      position: hospital.location,
       map,
-      title: "Search Location",
+      title: hospital.name,
       animation: google.maps.Animation.DROP,
+      icon: {
+        url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+        scaledSize: new google.maps.Size(40, 40),
+      },
     });
 
-    setSelectedLocation(location);
+    // Show info window
+    if (infoWindowRef.current) {
+      infoWindowRef.current.setContent(
+        `<div class="p-2">
+          <h3 class="font-bold">${hospital.name}</h3>
+          <p>${hospital.vicinity}</p>
+        </div>`
+      );
+      infoWindowRef.current.open(map, searchMarkerRef.current);
+    }
+
+    setSelectedLocation(hospital.location);
 
     // If user location is available, show route
     if (userLocation) {
-      calculateAndDisplayRoute(userLocation, location);
+      calculateAndDisplayRoute(userLocation, hospital.location);
     }
   };
 
@@ -400,27 +477,40 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   return (
     <div className="w-full h-screen relative">
       <div ref={mapRef} className="w-full h-full" />
-      <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg flex flex-col gap-2">
+      <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-lg flex flex-col gap-2 max-w-xs">
         <div className="flex gap-2">
           <Input
             type="text"
-            placeholder="Search location"
+            placeholder="Search for hospitals in Nepal"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
+            className="flex-1"
           />
-          <Button onClick={handleSearch}>
-            <Search className="text-lg" />
+          <Button
+            onClick={searchHospitals}
+            disabled={isSearching || !searchInput.trim()}
+            className="min-w-fit"
+          >
+            {isSearching ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
+            ) : (
+              <>
+                <FaHospital className="mr-1" />
+                <Search className="text-lg" />
+              </>
+            )}
           </Button>
         </div>
         {searchResults.length > 0 && (
           <div className="bg-white p-2 rounded-lg shadow-md max-h-48 overflow-auto">
-            {searchResults.map((result, index) => (
+            {searchResults.map((hospital, index) => (
               <div
                 key={index}
                 className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200 last:border-b-0"
-                onClick={() => handleSelectLocation(result.geometry.location)}
+                onClick={() => handleSelectHospital(hospital)}
               >
-                {result.formatted_address}
+                <div className="font-medium">{hospital.name}</div>
+                <div className="text-xs text-gray-600">{hospital.vicinity}</div>
               </div>
             ))}
           </div>

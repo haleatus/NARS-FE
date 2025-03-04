@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createAmbulanceSchema } from "@/app/schema/admin/ambulance/ambulance.schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,13 +9,19 @@ import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import createAmbulanceAction from "@/app/actions/admin/ambulance/create-ambulance.action";
 import { toast } from "sonner";
-import Map, { Marker, NavigationControl } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+
+const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
 interface CreateAmbulanceFormProps {
   adminAccessToken: string;
   onSuccess?: () => void;
   onCancel?: () => void;
+}
+
+declare global {
+  interface Window {
+    google: typeof google;
+  }
 }
 
 export function CreateAmbulanceForm({
@@ -37,11 +43,104 @@ export function CreateAmbulanceForm({
     },
   });
 
-  const [viewState, setViewState] = useState({
-    latitude: 27.70885, // Default latitude
-    longitude: 85.321741, // Default longitude
-    zoom: 12,
-  });
+  // Google Maps states
+  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [isLoaded, setIsLoaded] = useState(false); // Track if Google Maps is loaded
+  const markerRef = useRef<google.maps.Marker | null>(null);
+
+  // Load Google Maps API script
+  useEffect(() => {
+    const loadGoogleMapsScript = () => {
+      if (
+        window.google ||
+        document.querySelector('script[src*="maps.googleapis.com"]')
+      ) {
+        // Google Maps already loaded
+        setIsLoaded(true);
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleApiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => {
+        setIsLoaded(true);
+      };
+      script.onerror = () => {
+        console.error("Failed to load Google Maps API");
+      };
+      document.head.appendChild(script);
+    };
+
+    loadGoogleMapsScript();
+  }, [googleApiKey]);
+
+  // Initialize map
+  useEffect(() => {
+    if (!isLoaded || !mapRef.current) return;
+
+    const mapInstance = new window.google.maps.Map(mapRef.current, {
+      center: { lat: 27.70885, lng: 85.321741 }, // Kathmandu
+      zoom: 12,
+    });
+
+    setMap(mapInstance);
+
+    // Add click listener to map
+    mapInstance.addListener("click", (event: google.maps.MapMouseEvent) => {
+      const latLng = event.latLng;
+      if (latLng) {
+        setFormData((prev) => ({
+          ...prev,
+          location: {
+            latitude: latLng.lat().toString(),
+            longitude: latLng.lng().toString(),
+          },
+        }));
+
+        // Update or create marker
+        if (markerRef.current) {
+          markerRef.current.setPosition(latLng);
+        } else {
+          markerRef.current = new google.maps.Marker({
+            position: latLng,
+            map: mapInstance,
+            title: "Ambulance Location",
+          });
+        }
+      }
+    });
+    return () => {
+      // Clean up the map when the component unmounts
+      if (markerRef.current) {
+        markerRef.current.setMap(null); // Remove the marker from the map
+      }
+    };
+  }, [isLoaded]);
+
+  // Update marker position if location in form data changes
+  useEffect(() => {
+    if (!map || !formData.location.latitude || !formData.location.longitude)
+      return;
+
+    const lat = parseFloat(formData.location.latitude);
+    const lng = parseFloat(formData.location.longitude);
+    const latLng = new window.google.maps.LatLng(lat, lng);
+
+    if (markerRef.current) {
+      markerRef.current.setPosition(latLng);
+    } else {
+      markerRef.current = new google.maps.Marker({
+        position: latLng,
+        map: map,
+        title: "Ambulance Location",
+      });
+    }
+
+    map.setCenter(latLng); // Center the map on the marker
+  }, [formData.location, map]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -60,17 +159,6 @@ export function CreateAmbulanceForm({
         [name]: value,
       }));
     }
-  };
-
-  const handleMapClick = (event: any) => {
-    const { lngLat } = event;
-    setFormData((prev) => ({
-      ...prev,
-      location: {
-        latitude: lngLat.lat.toString(),
-        longitude: lngLat.lng.toString(),
-      },
-    }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -213,23 +301,7 @@ export function CreateAmbulanceForm({
           <div className="space-y-4">
             <h3 className="font-medium">Location</h3>
             <div className="h-64 w-full">
-              <Map
-                {...viewState}
-                mapStyle="mapbox://styles/mapbox/streets-v11"
-                mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}
-                onMove={(evt) => setViewState(evt.viewState)}
-                onClick={handleMapClick}
-                minZoom={5}
-                maxZoom={20}
-              >
-                <NavigationControl />
-                {formData.location.latitude && formData.location.longitude && (
-                  <Marker
-                    latitude={parseFloat(formData.location.latitude)}
-                    longitude={parseFloat(formData.location.longitude)}
-                  />
-                )}
-              </Map>
+              <div ref={mapRef} className="w-full h-full" />
             </div>
 
             <div>

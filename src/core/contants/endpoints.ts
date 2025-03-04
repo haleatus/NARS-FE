@@ -1,5 +1,7 @@
 export const baseURL: string =
-  process.env.BACKEND_BASE_URL || "http://localhost:5000" || "http://localhost:3000";
+  process.env.BACKEND_BASE_URL ||
+  "http://localhost:5000" ||
+  "http://localhost:3000";
 
 export const endpoints = {
   auth: {
@@ -24,6 +26,7 @@ export const endpoints = {
       updateAmbulanceRequest: `${baseURL}/api/nars/user/ambulance-request/update/:id`,
       deleteAmbulanceRequest: `${baseURL}/api/nars/user/ambulance-request/delete/:id`,
     },
+    updateUser: `${baseURL}/api/nars/user/update`,
   },
   admin: {
     ambulance: {

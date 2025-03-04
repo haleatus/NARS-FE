@@ -63,6 +63,8 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   const placesServiceRef = useRef<google.maps.places.PlacesService | null>(
     null
   );
+  const [trafficLayer, setTrafficLayer] =
+    useState<google.maps.TrafficLayer | null>(null);
 
   // Nepal boundaries (approximately)
   const NEPAL_BOUNDS = {
@@ -92,6 +94,10 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       suppressMarkers: true, // Don't show default markers
     });
     setDirectionsRenderer(rendererInstance);
+
+    // Initialize traffic layer
+    const trafficLayerInstance = new google.maps.TrafficLayer();
+    setTrafficLayer(trafficLayerInstance);
 
     // Initialize Places service for hospital search
     placesServiceRef.current = new google.maps.places.PlacesService(
@@ -157,6 +163,14 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
         infoWindowRef.current.close();
       }
 
+      // Clear directions and hide traffic layer
+      if (directionsRenderer) {
+        directionsRenderer.setMap(null);
+      }
+      if (trafficLayer) {
+        trafficLayer.setMap(null);
+      }
+
       // Create new marker
       if (event.latLng) {
         clickMarkerRef.current = new google.maps.Marker({
@@ -177,6 +191,7 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       if (searchMarkerRef.current) searchMarkerRef.current.setMap(null);
       if (userCircleRef.current) userCircleRef.current.setMap(null);
       if (infoWindowRef.current) infoWindowRef.current.close();
+      if (trafficLayer) trafficLayer.setMap(null);
 
       ambulanceMarkersRef.current.forEach((marker) => marker.setMap(null));
       ambulanceMarkersRef.current.clear();
@@ -455,6 +470,9 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       directionsRenderer.setMap(map);
     }
 
+    // Show traffic layer
+    trafficLayer?.setMap(map);
+
     directionsService.route(
       {
         origin,
@@ -464,6 +482,8 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       (response, status) => {
         if (status === google.maps.DirectionsStatus.OK && response) {
           directionsRenderer.setDirections(response);
+        } else {
+          trafficLayer?.setMap(null);
         }
       }
     );

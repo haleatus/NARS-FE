@@ -53,6 +53,8 @@ const DriverMap: React.FC<MapComponentProps> = ({
   const userMarkerRef = useRef<google.maps.Marker | null>(null);
   const ambulanceMarkerRef = useRef<google.maps.Marker | null>(null);
   const hospitalMarkerRef = useRef<google.maps.Marker | null>(null);
+  const [trafficLayer, setTrafficLayer] =
+    useState<google.maps.TrafficLayer | null>(null);
 
   useEffect(() => {
     if (!isLoaded || !mapRef.current) return;
@@ -67,6 +69,12 @@ const DriverMap: React.FC<MapComponentProps> = ({
     });
 
     setMap(mapInstance);
+
+    // Initialize traffic layer
+    const trafficLayerInstance = new google.maps.TrafficLayer();
+    trafficLayerInstance.setMap(mapInstance); // Enable traffic layer by default
+    setTrafficLayer(trafficLayerInstance);
+
     setDirectionsService(new window.google.maps.DirectionsService());
 
     const rendererAmbulanceToUserInstance =
@@ -98,6 +106,7 @@ const DriverMap: React.FC<MapComponentProps> = ({
       if (userMarkerRef.current) userMarkerRef.current.setMap(null);
       if (ambulanceMarkerRef.current) ambulanceMarkerRef.current.setMap(null);
       if (hospitalMarkerRef.current) hospitalMarkerRef.current.setMap(null);
+      if (trafficLayer) trafficLayer.setMap(null); // Clean up traffic layer
     };
   }, [isLoaded]);
 

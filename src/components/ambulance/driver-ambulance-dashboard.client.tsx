@@ -25,7 +25,7 @@ const DriverAmbulanceDashboardClient = ({
     setSelectedRequest(request);
   };
 
-  console.log("rrerrr", requests);
+  console.log("requests here ---------------", requests);
 
   let ambulanceLocation: [number, number] | null = null;
   let userLocation: [number, number] | null = null;
@@ -36,7 +36,10 @@ const DriverAmbulanceDashboardClient = ({
       parseFloat(selectedRequest.ambulance.location.longitude),
       parseFloat(selectedRequest.ambulance.location.latitude),
     ];
-    userLocation = [parseFloat("85.363654"), parseFloat("27.719549")];
+    userLocation = [
+      parseFloat(selectedRequest.requester.location?.longitude || "85.363654"),
+      parseFloat(selectedRequest.requester.location?.latitude || "27.719549"),
+    ];
     hospitalLocation = [
       parseFloat(selectedRequest.hospital_location.longitude),
       parseFloat(selectedRequest.hospital_location.latitude),

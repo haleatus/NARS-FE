@@ -6,4 +6,19 @@ export interface User {
   email: string;
   contact: string;
   deletedAt?: string | Date | null;
+  location?: {
+    latitude: string;
+    longitude: string;
+  };
+}
+
+export interface UpdateUser {
+  fullname?: string;
+  email?: string;
+  contact?: string;
+  password?: string;
+  location?: {
+    latitude: string;
+    longitude: string;
+  };
 }

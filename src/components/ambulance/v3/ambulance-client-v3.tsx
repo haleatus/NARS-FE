@@ -21,8 +21,6 @@ const AmbulanceClientV3 = ({
   myRequestExists: boolean;
   requests: UserAmbulanceRequestResponse;
 }) => {
-  console.log("req", requests);
-
   return (
     <div>
       <div

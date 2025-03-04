@@ -33,8 +33,6 @@ export const RequestItem: React.FC<RequestItemProps> = ({
   onUpdate,
   onNavigate,
 }) => {
-  console.log("data", data);
-
   const [selectedStatus, setSelectedStatus] = useState(data.status);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);

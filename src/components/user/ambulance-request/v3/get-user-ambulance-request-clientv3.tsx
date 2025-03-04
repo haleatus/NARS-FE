@@ -5,8 +5,6 @@ import React from "react";
 import { AmbulanceRequestItem } from "../ambulance-request-item";
 import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Navigation } from "lucide-react";
 
 interface Props {
   requests: UserAmbulanceRequestResponse;
@@ -31,10 +29,6 @@ const GetUserAmbulanceRequestClientV3: React.FC<Props> = ({
     );
   }
 
-  const handleNavigate = () => {
-    // Show rthe route
-  };
-
   return (
     <div className="flex flex-col p-2 gap-4">
       <AmbulanceRequestItem
@@ -43,15 +37,6 @@ const GetUserAmbulanceRequestClientV3: React.FC<Props> = ({
         onUpdate={handleUpdateAndDelete}
         onDelete={handleUpdateAndDelete}
       />
-      <Button
-        size="sm"
-        variant="outline"
-        className="flex items-center gap-2"
-        onClick={() => handleNavigate()}
-      >
-        <Navigation size={16} />
-        Navigate
-      </Button>
     </div>
   );
 };

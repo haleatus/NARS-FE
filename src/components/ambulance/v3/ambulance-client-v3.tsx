@@ -6,6 +6,7 @@ import { UserAmbulanceRequestResponse } from "@/core/interface/user/ambulance-re
 import GetUserAmbulanceRequestClientV3 from "@/components/user/ambulance-request/v3/get-user-ambulance-request-clientv3";
 import GetAllAmbulanceClientV3 from "./get-all-ambulance-clientv3";
 import GoogleMapComponent from "@/components/map/GoogleMapComponent";
+import AmbulanceRouteMap from "@/components/map/ambulance/ambulance-route-map";
 
 const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
 
@@ -20,6 +21,8 @@ const AmbulanceClientV3 = ({
   myRequestExists: boolean;
   requests: UserAmbulanceRequestResponse;
 }) => {
+  console.log("req", requests);
+
   return (
     <div>
       <div
@@ -28,13 +31,15 @@ const AmbulanceClientV3 = ({
         <div
           className={`relative rounded-lg overflow-hidden shadow-inner border-2 border-red-700`}
         >
-          {ambulanceData ? (
+          {ambulanceData && !requests && (
             <GoogleMapComponent
               apiKey={googleApiKey}
               ambulances={ambulanceData}
             />
-          ) : (
-            <div>No ambulance data found</div>
+          )}
+
+          {requests && (
+            <AmbulanceRouteMap apiKey={googleApiKey} request={requests} />
           )}
         </div>
 

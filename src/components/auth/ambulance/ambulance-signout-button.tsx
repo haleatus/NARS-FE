@@ -27,8 +27,8 @@ const AmbulanceSignoutButton = () => {
       await refetchUser();
       await refetchAdmin();
       toast.success("Sign out successful! Redirecting...");
-      // Redirect to login page or update UI
-      router.push("/ambulance-signin");
+      router.replace("/"); // Replace history
+      window.location.reload(); // Force reload to reset UI
     } else {
       // Handle error
       toast.error(result.error?.message);

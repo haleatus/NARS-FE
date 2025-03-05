@@ -66,6 +66,11 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
   const [trafficLayer, setTrafficLayer] =
     useState<google.maps.TrafficLayer | null>(null);
 
+  const [routeInfo, setRouteInfo] = useState<{
+    distance: string;
+    duration: string;
+  } | null>(null);
+
   // Nepal boundaries (approximately)
   const NEPAL_BOUNDS = {
     north: 30.45,
@@ -170,6 +175,9 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
       if (trafficLayer) {
         trafficLayer.setMap(null);
       }
+
+      // Clear route information
+      setRouteInfo(null);
 
       // Create new marker
       if (event.latLng) {
@@ -478,12 +486,30 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
         origin,
         destination,
         travelMode: google.maps.TravelMode.DRIVING,
+        drivingOptions: {
+          departureTime: new Date(), // Current time
+          trafficModel: google.maps.TrafficModel.BEST_GUESS, // Optimize for traffic
+        },
       },
       (response, status) => {
         if (status === google.maps.DirectionsStatus.OK && response) {
           directionsRenderer.setDirections(response);
+
+          // Extract distance and duration from the first route's first leg
+          const route = response.routes[0];
+          const leg = route.legs[0];
+
+          if (leg) {
+            setRouteInfo({
+              distance: leg.distance?.text || "N/A",
+              duration: leg.duration?.text || "N/A",
+            });
+          } else {
+            setRouteInfo(null);
+          }
         } else {
           trafficLayer?.setMap(null);
+          setRouteInfo(null);
         }
       }
     );
@@ -541,6 +567,15 @@ const GoogleMapComponent: React.FC<MapComponentProps> = ({
             <div className="text-sm">
               {ambulances.find((amb) => amb._id === selectedAmbulanceId)
                 ?.ambulance_number || ""}
+            </div>
+          </div>
+        )}
+        {routeInfo && (
+          <div className="bg-green-50 p-2 rounded border border-green-200 mb-2">
+            <div className="font-medium">Route Information</div>
+            <div className="text-sm">
+              <p>Distance: {routeInfo.distance}</p>
+              <p>Estimated Time: {routeInfo.duration}</p>
             </div>
           </div>
         )}

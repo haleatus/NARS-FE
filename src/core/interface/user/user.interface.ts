@@ -16,7 +16,6 @@ export interface UpdateUser {
   fullname?: string;
   email?: string;
   contact?: string;
-  password?: string;
   location?: {
     latitude: string;
     longitude: string;

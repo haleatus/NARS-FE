@@ -29,8 +29,6 @@ export const updateMyAmbulanceRequestsStatusService = async ({
       }
     );
 
-    console.log("res", res);
-
     if (!res.ok) {
       if (res.status === 404) {
         return {

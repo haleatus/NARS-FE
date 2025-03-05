@@ -61,6 +61,11 @@ const AmbulanceRouteMap: React.FC<MapComponentProps> = ({
   const [trafficLayer, setTrafficLayer] =
     useState<google.maps.TrafficLayer | null>(null);
 
+  const [routeInfo, setRouteInfo] = useState<{
+    ambulanceToUser: { distance: string; duration: string } | null;
+    userToHospital: { distance: string; duration: string } | null;
+  }>({ ambulanceToUser: null, userToHospital: null });
+
   useEffect(() => {
     if (!isLoaded || !mapRef.current) return;
 
@@ -226,15 +231,34 @@ const AmbulanceRouteMap: React.FC<MapComponentProps> = ({
         origin: ambulanceLocation,
         destination: userLocation,
         travelMode: google.maps.TravelMode.DRIVING,
+        drivingOptions: {
+          departureTime: new Date(), // Current time
+          trafficModel: google.maps.TrafficModel.BEST_GUESS, // Optimize for traffic
+        },
       },
       (response, status) => {
         if (status === google.maps.DirectionsStatus.OK && response) {
           directionsRendererAmbulanceToUser.setDirections(response);
+
+          // Extract distance and duration for ambulance to user route
+          const route = response.routes[0];
+          const leg = route.legs[0];
+
+          if (leg) {
+            setRouteInfo((prev) => ({
+              ...prev,
+              ambulanceToUser: {
+                distance: leg.distance?.text || "N/A",
+                duration: leg.duration?.text || "N/A",
+              },
+            }));
+          }
         } else {
           console.error(
             "Directions request failed (ambulance to user) due to " + status,
             response
           );
+          setRouteInfo((prev) => ({ ...prev, ambulanceToUser: null }));
         }
       }
     );
@@ -245,21 +269,67 @@ const AmbulanceRouteMap: React.FC<MapComponentProps> = ({
         origin: userLocation,
         destination: hospitalLocation,
         travelMode: google.maps.TravelMode.DRIVING,
+        drivingOptions: {
+          departureTime: new Date(), // Current time
+          trafficModel: google.maps.TrafficModel.BEST_GUESS, // Optimize for traffic
+        },
       },
       (response, status) => {
         if (status === google.maps.DirectionsStatus.OK && response) {
           directionsRendererUserToHospital.setDirections(response);
+
+          // Extract distance and duration for user to hospital route
+          const route = response.routes[0];
+          const leg = route.legs[0];
+
+          if (leg) {
+            setRouteInfo((prev) => ({
+              ...prev,
+              userToHospital: {
+                distance: leg.distance?.text || "N/A",
+                duration: leg.duration?.text || "N/A",
+              },
+            }));
+          }
         } else {
           console.error(
             "Directions request failed (user to hospital) due to " + status,
             response
           );
+          setRouteInfo((prev) => ({ ...prev, userToHospital: null }));
         }
       }
     );
   };
 
-  return <div ref={mapRef} className="w-full h-full" />;
+  return (
+    <div className="w-full h-full relative">
+      <div ref={mapRef} className="w-full h-full" />
+
+      {/* Route Information Box */}
+      <div className="absolute bottom-2 left-2 bg-white p-3 rounded-lg shadow-lg flex flex-col gap-2 max-w-xs">
+        {routeInfo.ambulanceToUser && (
+          <div className="bg-blue-50 p-2 rounded border border-blue-200 mb-2">
+            <div className="font-medium">Ambulance to User</div>
+            <div className="text-sm">
+              <p>Distance: {routeInfo.ambulanceToUser.distance}</p>
+              <p>Estimated Time: {routeInfo.ambulanceToUser.duration}</p>
+            </div>
+          </div>
+        )}
+
+        {routeInfo.userToHospital && (
+          <div className="bg-green-50 p-2 rounded border border-green-200 mb-2">
+            <div className="font-medium">User to Hospital</div>
+            <div className="text-sm">
+              <p>Distance: {routeInfo.userToHospital.distance}</p>
+              <p>Estimated Time: {routeInfo.userToHospital.duration}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default AmbulanceRouteMap;

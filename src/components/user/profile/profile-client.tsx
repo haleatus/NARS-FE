@@ -30,7 +30,6 @@ const ProfileClient = ({ accessToken }: { accessToken: string }) => {
     fullname: userProfile.fullname,
     email: userProfile.email,
     contact: userProfile.contact,
-    password: "",
     location: {
       latitude:
         typeof userProfile.location === "object"
@@ -98,6 +97,8 @@ const ProfileClient = ({ accessToken }: { accessToken: string }) => {
   const toggleEdit = () => {
     setIsEditing(!isEditing);
   };
+
+  console.log("This is an unnecessary log that is to be removed");
 
   return (
     <div className="flex items-center justify-center font-mono">
